@@ -1,3 +1,5 @@
+import {Data} from "./Data";
+
 const fs = require('fs');
 const path = require('path');
 const ExcelJS = require('exceljs');
@@ -35,8 +37,8 @@ namespace SetUnitPriceByExcel
                 const sheet = workbook.GetSheetAt(0);
                 let resultPath: string;
                 let path: string;
-                for(let i=0; i<dic.value.Count; i++){
-                    if(dic.value[i].Item==='일반'){
+                for(let i=0; i<dic.values.Count; i++){
+                    if(dic.values[i].Item==='일반'){
                         //엑셀핸들링
                     }
                 }
