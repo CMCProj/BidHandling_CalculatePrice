@@ -3,7 +3,7 @@
 const ExcelHandling = require('./ExcelHandling.ts')
 const Data = require('./Data.ts')
 
-class FillCostAccount {
+export class FillCostAccount {
     //원가계산서 항목별 조사금액 채움(관리자 보정 후)
     public static FillInvestigationCosts() {
         let costStatementPath: string = ''
