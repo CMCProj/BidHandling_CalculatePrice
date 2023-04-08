@@ -1,13 +1,16 @@
 "use strict";
 //"object is possibly 'undefined'"" -> tsconfig.json 으로 이동하여 "strictNullChecks":false를 추가
 //decimal, round사용 부분 수정 필요(라이브러리)
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FillCostAccount = void 0;
 var ExcelHandling_1 = require("./ExcelHandling");
 var Data_1 = require("./Data");
-var fs_1 = require("fs");
-var path_1 = require("path");
-var big_js_1 = require("big.js");
+var fs_1 = __importDefault(require("fs"));
+var path_1 = __importDefault(require("path"));
+var big_js_1 = __importDefault(require("big.js"));
 var FillCostAccount = /** @class */ (function () {
     function FillCostAccount() {
     }

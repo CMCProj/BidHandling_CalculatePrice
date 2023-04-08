@@ -1,7 +1,7 @@
-const Path = require('path')
+import path from 'path'
 
-class Data {
-    public static folder: string = Path.resolve(__dirname, '../AutoBid') //내 문서 폴더의 AutoBID 폴더로 지정 (23.02.02)
+export class Data {
+    public static folder: string = path.resolve(__dirname, '../AutoBid') //내 문서 폴더의 AutoBID 폴더로 지정 (23.02.02)
     // WPF 앱 파일 관리 변수
     public static XlsText: string = ''
     public static XlsFiles: File[]
@@ -18,7 +18,7 @@ class Data {
     //js는 number가 부동소수점
     public static BalanceRateNum?: number // 업체 평균 사정율 변수
     // 프로그램 폴더로 위치 변경
-    public static work_path: string = Path.join(Data.folder, 'WORK DIRECTORY') //작업폴더(WORK DIRECTORY) 경로
+    public static work_path: string = path.join(Data.folder, 'WORK DIRECTORY') //작업폴더(WORK DIRECTORY) 경로
 
     private materialUnit: number = 0 //재료비 단가
     private laborUnit: number = 0 //노무비 단가
@@ -164,4 +164,3 @@ class Data {
     }
     public static ExecuteReset: string = '0' //Reset 함수 사용시 단가 소수처리 옵션과 별개로 소수 첫째자리 아래로 절사
 }
-module.exports = Data

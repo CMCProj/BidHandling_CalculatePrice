@@ -1,5 +1,11 @@
-var Path = require('path');
-var Data = /** @class */ (function () {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Data = void 0;
+var path_1 = __importDefault(require("path"));
+var Data = exports.Data = /** @class */ (function () {
     function Data() {
         this.materialUnit = 0; //재료비 단가
         this.laborUnit = 0; //노무비 단가
@@ -129,7 +135,7 @@ var Data = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    Data.folder = Path.resolve(__dirname, '../AutoBid'); //내 문서 폴더의 AutoBID 폴더로 지정 (23.02.02)
+    Data.folder = path_1.default.resolve(__dirname, '../AutoBid'); //내 문서 폴더의 AutoBID 폴더로 지정 (23.02.02)
     // WPF 앱 파일 관리 변수
     Data.XlsText = '';
     Data.CanCovertFile = false; // 새로운 파일 업로드 시 변환 가능
@@ -139,7 +145,7 @@ var Data = /** @class */ (function () {
     Data.CompanyRegistrationNum = ''; //1.31 사업자등록번호 추가
     Data.CompanyRegistrationName = ''; // 2.02 회사명 추가
     // 프로그램 폴더로 위치 변경
-    Data.work_path = Path.join(Data.folder, 'WORK DIRECTORY'); //작업폴더(WORK DIRECTORY) 경로
+    Data.work_path = path_1.default.join(Data.folder, 'WORK DIRECTORY'); //작업폴더(WORK DIRECTORY) 경로
     Data.Dic = new Map(); //key : 세부공사별 번호 / value : 세부공사별 리스트
     Data.ConstructionNums = new Map(); //세부 공사별 번호 저장
     Data.MatchedConstNum = new Map(); //실내역과 세부공사별 번호의 매칭 결과
@@ -160,4 +166,3 @@ var Data = /** @class */ (function () {
     Data.ExecuteReset = '0'; //Reset 함수 사용시 단가 소수처리 옵션과 별개로 소수 첫째자리 아래로 절사
     return Data;
 }());
-module.exports = Data;

@@ -1,11 +1,13 @@
-//const fs = require('fs')
-//const AdmZip = require('adm-zip')
-const { buffer } = require('stream/consumers')
-const convert = require('xml-js')
-//const Data = require('./Data.js')
+//const { buffer } = require('stream/consumers')
+import convert from 'xml-js'
+import fs from 'fs'
+import AdmZip from 'adm-zip'
+
+import { Data } from './Data'
+//실행 위해 프로그램 내 폴더로 경로 변경
 
 let filename = undefined
-class BidHandling {
+export class BidHandling {
     public static BidToJson() {
         const copiedFolder: string = Data.folder + '\\EmptyBid'
         let bidFile = fs.readdirSync(copiedFolder)
@@ -42,16 +44,13 @@ class BidHandling {
     }
 
     public static JsonToBid() {
-        const resultFilePath = 'C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID\\OutputDataFromBID.json'
+        const resultFilePath = Data.folder + '\\OutputDataFromBID.json'
         const json = fs.readFileSync(resultFilePath, 'utf-8')
-        const xml = convert.json2xml(json, { compact: true, ignoreComment: true, space: 4 })
+        const xml = convert.json2xml(json, { compact: true, ignoreComment: true, spaces: 4 })
 
         fs.writeFileSync(Data.folder + '\\Result_Xml.xml', xml)
 
-        let text = fs.readFileSync(
-            'C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID\\Result_Xml.xml',
-            'utf-8'
-        )
+        let text = fs.readFileSync(Data.folder + '\\Result_Xml.xml', 'utf-8')
         const encodeValue = Buffer.from(text, 'utf-8')
         text = encodeValue.toString('base64')
 
@@ -72,7 +71,6 @@ class BidHandling {
         fs.rmSync(Data.folder + '\\EmptyBid\\XmlToBID.BID')
     }
 }
-module.exports = BidHandling
 
 // BidHandling.BidToJson();
 // BidHandling.JsonToBid();

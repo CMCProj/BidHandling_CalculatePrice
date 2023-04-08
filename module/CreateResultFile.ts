@@ -1,8 +1,7 @@
 import { Data } from './Data'
-
-const fs = require('fs')
-const path = require('path')
-const ExcelJS = require('exceljs')
+import path from 'path'
+import fs from 'fs'
+import exceljs from 'exceljs'
 
 export class CreateResultFile {
     public static Create(): void {

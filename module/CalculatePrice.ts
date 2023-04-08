@@ -1,12 +1,12 @@
-const DATA = require('./Data')
-const FCA = require('./fillCostAccount')
-const CRF = require('./CreateResultFile')
+import { Data } from './Data'
+import { FillCostAccount } from './fillCostAccount'
+import { CreateResultFile } from './CreateResultFile'
 
-const fs = require('fs')
-const AdmZip = require('adm-zip')
-const Big = require('big.js')
-
-class CalculatePrice {
+import fs from 'fs'
+import AdmZip from 'adm-zip'
+import Big from 'big.js'
+//실행 위해 프로그램 내 폴더로 경로 변경
+export class CalculatePrice {
     private static docBID: JSON
     private static eleBID: JSON
     private static maxBID: JSON
@@ -17,18 +17,18 @@ class CalculatePrice {
     private static exCount: number = 0
 
     public static Calculation(): void {
-        const bidString: string = fs.readFileSync(DATA.folder + '\\OutputDATAFromBID.json', 'utf-8')
+        const bidString: string = fs.readFileSync(Data.folder + '\\OutputDataFromBID.json', 'utf-8')
         this.docBID = JSON.parse(bidString)
         this.eleBID = this.docBID['data']
 
         this.Reset()
 
-        if (DATA.StandardMarketDeduction.localeCompare('1')) this.ApplyStandardPriceOption()
+        if (Data.StandardMarketDeduction.localeCompare('1')) this.ApplyStandardPriceOption()
 
         this.GetFixedPriceRate()
         this.FindMyPercent()
         this.GetWeight()
-        this.CalculateRate(DATA.PersonalRate, DATA.BalancedRate)
+        this.CalculateRate(Data.PersonalRate, Data.BalancedRate)
         this.Recalculation()
 
         if (this.exCount !== 0) {
@@ -38,34 +38,34 @@ class CalculatePrice {
 
         this.SetPriceOfSuperConstruction()
 
-        FCA.CalculateBiddingCosts()
+        FillCostAccount.CalculateBiddingCosts()
         this.SetBusinessInfo()
         this.SubstitutePrice()
         this.CreateFile()
     }
 
     public static Reset(): void {
-        DATA.ExecuteReset = '1'
+        Data.ExecuteReset = '1'
 
-        let DM: number = DATA.Investigation['직접재료비']
-        let DL: number = DATA.Investigation['직접노무비']
-        let OE: number = DATA.Investigation['산출경비']
-        let FM: number = DATA.InvestigateFixedPriceDirectMaterial
-        let FL: number = DATA.InvestigateFixedPriceDirectLabor
-        let FOE: number = DATA.InvestigateFixedPriceOutputExpense
-        let SM: number = DATA.InvestigateStandardMaterial
-        let SL: number = DATA.InvestigateStandardLabor
-        let SOE: number = DATA.InvestigateStandardExpense
+        let DM: number = Data.Investigation['직접재료비']
+        let DL: number = Data.Investigation['직접노무비']
+        let OE: number = Data.Investigation['산출경비']
+        let FM: number = Data.InvestigateFixedPriceDirectMaterial
+        let FL: number = Data.InvestigateFixedPriceDirectLabor
+        let FOE: number = Data.InvestigateFixedPriceOutputExpense
+        let SM: number = Data.InvestigateStandardMaterial
+        let SL: number = Data.InvestigateStandardLabor
+        let SOE: number = Data.InvestigateStandardExpense
 
-        DATA.RealDirectMaterial = DM
-        DATA.RealDirectLabor = DL
-        DATA.RealOutputExpense = OE
-        DATA.FixedPriceDirectMaterial = FM
-        DATA.FixedPriceDirectLabor = FL
-        DATA.FixedPriceOutputExpense = FOE
-        DATA.StandardMaterial = SM
-        DATA.StandardLabor = SL
-        DATA.StandardExpense = SOE
+        Data.RealDirectMaterial = DM
+        Data.RealDirectLabor = DL
+        Data.RealOutputExpense = OE
+        Data.FixedPriceDirectMaterial = FM
+        Data.FixedPriceDirectLabor = FL
+        Data.FixedPriceOutputExpense = FOE
+        Data.StandardMaterial = SM
+        Data.StandardLabor = SL
+        Data.StandardExpense = SOE
 
         const bidT3: object = this.eleBID['T3']
         let code: string
@@ -79,7 +79,7 @@ class CalculatePrice {
                 let constNum: string = JSON.stringify(bidT3[key]['C1']['_text']).slice(1, -1)
                 let numVal: string = JSON.stringify(bidT3[key]['C2']['_text']).slice(1, -1)
                 let detailVal: string = JSON.stringify(bidT3[key]['C3']['_text']).slice(1, -1)
-                let curObject = DATA.Dic.get(constNum).find(
+                let curObject = Data.Dic.get(constNum).find(
                     (x) => x.WorkNum === numVal && x.DetailWorkNum === detailVal
                 )
 
@@ -89,7 +89,7 @@ class CalculatePrice {
             }
         }
 
-        DATA.ExecuteReset = '0'
+        Data.ExecuteReset = '0'
     }
 
     public static ApplyStandardPriceOption(): void {
@@ -105,36 +105,36 @@ class CalculatePrice {
                 let constNum: string = JSON.stringify(bidT3[key]['C1']['_text']).slice(1, -1)
                 let numVal: string = JSON.stringify(bidT3[key]['C2']['_text']).slice(1, -1)
                 let detailVal: string = JSON.stringify(bidT3[key]['C3']['_text']).slice(1, -1)
-                let curObject = DATA.Dic.get(constNum).find(
+                let curObject = Data.Dic.get(constNum).find(
                     (x) => x.WorkNum === numVal && x.DetailWorkNum === detailVal
                 )
 
                 if (curObject.Item.localeCompare('표준시장단가')) {
-                    DATA.RealDirectMaterial -= +JSON.stringify(bidT3[key]['C20']['_text']).slice(
+                    Data.RealDirectMaterial -= +JSON.stringify(bidT3[key]['C20']['_text']).slice(
                         1,
                         -1
                     )
-                    DATA.RealDirectLabor -= +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1)
-                    DATA.RealOutputExpense -= +JSON.stringify(bidT3[key]['C22']['_text']).slice(
+                    Data.RealDirectLabor -= +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1)
+                    Data.RealOutputExpense -= +JSON.stringify(bidT3[key]['C22']['_text']).slice(
                         1,
                         -1
                     )
-                    DATA.FixedPriceDirectMaterial -= +JSON.stringify(
+                    Data.FixedPriceDirectMaterial -= +JSON.stringify(
                         bidT3[key]['C20']['_text']
                     ).slice(1, -1)
-                    DATA.FixedPriceDirectLabor -= +JSON.stringify(bidT3[key]['C21']['_text']).slice(
+                    Data.FixedPriceDirectLabor -= +JSON.stringify(bidT3[key]['C21']['_text']).slice(
                         1,
                         -1
                     )
-                    DATA.FixedPriceOutputExpense -= +JSON.stringify(
+                    Data.FixedPriceOutputExpense -= +JSON.stringify(
                         bidT3[key]['C22']['_text']
                     ).slice(1, -1)
-                    DATA.StandardMaterial -= +JSON.stringify(bidT3[key]['C20']['_text']).slice(
+                    Data.StandardMaterial -= +JSON.stringify(bidT3[key]['C20']['_text']).slice(
                         1,
                         -1
                     )
-                    DATA.StandardLabor -= +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1)
-                    DATA.StandardExpense -= +JSON.stringify(bidT3[key]['C22']['_text']).slice(1, -1)
+                    Data.StandardLabor -= +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1)
+                    Data.StandardExpense -= +JSON.stringify(bidT3[key]['C22']['_text']).slice(1, -1)
 
                     if (curObject.MaterialUnit !== 0)
                         curObject.MaterialUnit =
@@ -155,62 +155,62 @@ class CalculatePrice {
                     bidT3[key]['C22']['_text'] = curObject.Expense.toString()
                     bidT3[key]['C23']['_text'] = curObject.PriceSum.toString()
 
-                    DATA.RealDirectMaterial += +JSON.stringify(bidT3[key]['C20']['_text']).slice(
+                    Data.RealDirectMaterial += +JSON.stringify(bidT3[key]['C20']['_text']).slice(
                         1,
                         -1
                     )
-                    DATA.RealDirectLabor += +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1)
-                    DATA.RealOutputExpense += +JSON.stringify(bidT3[key]['C22']['_text']).slice(
+                    Data.RealDirectLabor += +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1)
+                    Data.RealOutputExpense += +JSON.stringify(bidT3[key]['C22']['_text']).slice(
                         1,
                         -1
                     )
-                    DATA.FixedPriceDirectMaterial += +JSON.stringify(
+                    Data.FixedPriceDirectMaterial += +JSON.stringify(
                         bidT3[key]['C20']['_text']
                     ).slice(1, -1)
-                    DATA.FixedPriceDirectLabor += +JSON.stringify(bidT3[key]['C21']['_text']).slice(
+                    Data.FixedPriceDirectLabor += +JSON.stringify(bidT3[key]['C21']['_text']).slice(
                         1,
                         -1
                     )
-                    DATA.FixedPriceOutputExpense += +JSON.stringify(
+                    Data.FixedPriceOutputExpense += +JSON.stringify(
                         bidT3[key]['C22']['_text']
                     ).slice(1, -1)
-                    DATA.StandardMaterial += +JSON.stringify(bidT3[key]['C20']['_text']).slice(
+                    Data.StandardMaterial += +JSON.stringify(bidT3[key]['C20']['_text']).slice(
                         1,
                         -1
                     )
-                    DATA.StandardLabor += +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1)
-                    DATA.StandardExpense += +JSON.stringify(bidT3[key]['C22']['_text']).slice(1, -1)
+                    Data.StandardLabor += +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1)
+                    Data.StandardExpense += +JSON.stringify(bidT3[key]['C22']['_text']).slice(1, -1)
                 }
             }
         }
     }
 
     public static GetFixedPriceRate(): void {
-        const directConstPrice: number = DATA.Investigation['직공비']
+        const directConstPrice: number = Data.Investigation['직공비']
         const fixCostSum: number =
-            DATA.InvestigateFixedPriceDirectMaterial +
-            DATA.InvestigateFixedPriceDirectLabor +
-            DATA.InvestigateFixedPriceOutputExpense
+            Data.InvestigateFixedPriceDirectMaterial +
+            Data.InvestigateFixedPriceDirectLabor +
+            Data.InvestigateFixedPriceOutputExpense
 
-        DATA.FixedPricePercent = Math.trunc((fixCostSum / directConstPrice) * 100 * 10000) / 10000
+        Data.FixedPricePercent = Math.trunc((fixCostSum / directConstPrice) * 100 * 10000) / 10000
     }
 
     public static FindMyPercent(): void {
-        if (DATA.FixedPricePercent < 20.0) this.myPercent = 0.85
-        else if (DATA.FixedPricePercent < 25.0) this.myPercent = 0.84
-        else if (DATA.FixedPricePercent < 30.0) this.myPercent = 0.83
+        if (Data.FixedPricePercent < 20.0) this.myPercent = 0.85
+        else if (Data.FixedPricePercent < 25.0) this.myPercent = 0.84
+        else if (Data.FixedPricePercent < 30.0) this.myPercent = 0.83
         else this.myPercent = 0.82
     }
 
     public static GetWeight(): void {
         let varCostSum =
-            DATA.RealPriceDirectMaterial + DATA.RealPriceDirectLabor + DATA.RealPriceOutputExpense
+            Data.RealPriceDirectMaterial + Data.RealPriceDirectLabor + Data.RealPriceOutputExpense
         let weight: number
         let maxWeight: number = 0
         let weightSum: number = 0
-        let max: typeof DATA = new DATA()
+        let max: Data = new Data()
 
-        DATA.Dic.forEach((value, _) => {
+        Data.Dic.forEach((value, _) => {
             for (let idx in value) {
                 if (value[idx].Item.localeCompare('일반')) {
                     let material = value[idx].Material
@@ -258,16 +258,16 @@ class CalculatePrice {
 
     public static RoundOrTruncate(
         Rate: number,
-        Object: typeof DATA,
+        Object: Data,
         refMyMaterialUnit: { value: number },
         refMyLaborUnit: { value: number },
         refMyExpenseUnit: { value: number }
     ): void {
-        if (DATA.UnitPriceTrimming.localeCompare('1')) {
+        if (Data.UnitPriceTrimming.localeCompare('1')) {
             refMyMaterialUnit.value = Math.trunc(Object.MaterialUnit * Rate * 10) / 10
             refMyLaborUnit.value = Math.trunc(Object.LaborUnit * Rate * 10) / 10
             refMyExpenseUnit.value = Math.trunc(Object.ExpenseUnit * Rate * 10) / 10
-        } else if (DATA.UnitPriceTrimming.localeCompare('2')) {
+        } else if (Data.UnitPriceTrimming.localeCompare('2')) {
             refMyMaterialUnit.value = Math.ceil(Object.MaterialUnit * Rate)
             refMyLaborUnit.value = Math.ceil(Object.LaborUnit * Rate)
             refMyExpenseUnit.value = Math.ceil(Object.ExpenseUnit * Rate)
@@ -275,7 +275,7 @@ class CalculatePrice {
     }
 
     public static CheckLaborLimit80(
-        Object: typeof DATA,
+        Object: Data,
         refMyMaterialUnit: { value: number },
         refMyLaborUnit: { value: number },
         refMyExpenseUnit: { value: number }
@@ -305,17 +305,17 @@ class CalculatePrice {
                 let constNum: string = JSON.stringify(bidT3[key]['C1']['_text']).slice(1, -1)
                 let numVal: string = JSON.stringify(bidT3[key]['C2']['_text']).slice(1, -1)
                 let detailVal: string = JSON.stringify(bidT3[key]['C3']['_text']).slice(1, -1)
-                let curObject = DATA.Dic.get(constNum).find(
+                let curObject = Data.Dic.get(constNum).find(
                     (x) => x.WorkNum === numVal && x.DetailWorkNum === detailVal
                 )
 
                 if (curObject.Item.localeCompare('일반')) {
-                    DATA.RealDirectMaterial -= +JSON.stringify(bidT3[key]['C20']['_text']).slice(
+                    Data.RealDirectMaterial -= +JSON.stringify(bidT3[key]['C20']['_text']).slice(
                         1,
                         -1
                     )
-                    DATA.RealDirectLabor -= +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1)
-                    DATA.RealOutputExpense -= +JSON.stringify(bidT3[key]['C22']['_text']).slice(
+                    Data.RealDirectLabor -= +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1)
+                    Data.RealOutputExpense -= +JSON.stringify(bidT3[key]['C22']['_text']).slice(
                         1,
                         -1
                     )
@@ -329,7 +329,7 @@ class CalculatePrice {
                     let myExpenseUnit = { value: 0 }
                     let myPrice: number
 
-                    if (DATA.ZeroWeightDeduction.localeCompare('1')) {
+                    if (Data.ZeroWeightDeduction.localeCompare('1')) {
                         if (curObject.Weight === 0 && curObject.LaborUnit === 0) {
                             curObject.MaterialUnit = Math.ceil(curObject.MaterialUnit * 0.5)
                             curObject.ExpenseUnit = Math.ceil(curObject.ExpenseUnit * 0.5)
@@ -343,13 +343,13 @@ class CalculatePrice {
                             bidT3[key]['C22']['_text'] = curObject.Expense.toString()
                             bidT3[key]['C23']['_text'] = curObject.PriceSum.toString()
 
-                            DATA.RealDirectMaterial += +JSON.stringify(
+                            Data.RealDirectMaterial += +JSON.stringify(
                                 bidT3[key]['C20']['_text']
                             ).slice(1, -1)
-                            DATA.RealDirectLabor += +JSON.stringify(
+                            Data.RealDirectLabor += +JSON.stringify(
                                 bidT3[key]['C21']['_text']
                             ).slice(1, -1)
-                            DATA.RealOutputExpense += +JSON.stringify(
+                            Data.RealOutputExpense += +JSON.stringify(
                                 bidT3[key]['C22']['_text']
                             ).slice(1, -1)
 
@@ -369,7 +369,7 @@ class CalculatePrice {
                                 myExpenseUnit
                             )
                         }
-                    } else if (DATA.ZeroWeightDeduction.localeCompare('2')) {
+                    } else if (Data.ZeroWeightDeduction.localeCompare('2')) {
                         this.RoundOrTruncate(
                             this.targetRate,
                             curObject,
@@ -387,7 +387,7 @@ class CalculatePrice {
 
                     myPrice = myMaterialUnit.value + myLaborUnit.value + myExpenseUnit.value
 
-                    if (DATA.LaborCostLowBound.localeCompare('1')) {
+                    if (Data.LaborCostLowBound.localeCompare('1')) {
                         let Excess: number = myPrice - targetPrice
                         let laborExcess: number = myLaborUnit.value - curObject.LaborUnit * 0.8
                         laborExcess = Math.trunc(laborExcess * 10) / 10
@@ -429,12 +429,12 @@ class CalculatePrice {
                     bidT3[key]['C22']['_text'] = curObject.Expense.toString()
                     bidT3[key]['C23']['_text'] = curObject.PriceSum.toString()
 
-                    DATA.RealDirectMaterial += +JSON.stringify(bidT3[key]['C20']['_text']).slice(
+                    Data.RealDirectMaterial += +JSON.stringify(bidT3[key]['C20']['_text']).slice(
                         1,
                         -1
                     )
-                    DATA.RealDirectLabor += +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1)
-                    DATA.RealOutputExpense += +JSON.stringify(bidT3[key]['C22']['_text']).slice(
+                    Data.RealDirectLabor += +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1)
+                    Data.RealOutputExpense += +JSON.stringify(bidT3[key]['C22']['_text']).slice(
                         1,
                         -1
                     )
@@ -454,12 +454,12 @@ class CalculatePrice {
     }
 
     public static SetExcludingPrice(): void {
-        let TempInvestDirectSum: number = DATA.Investigation['직공비']
-        let TempRealDirectSum: number = FCA.ToLong(
-            DATA.RealDirectMaterial + DATA.RealDirectLabor + DATA.RealOutputExpense
+        let TempInvestDirectSum: number = Data.Investigation['직공비']
+        let TempRealDirectSum: number = FillCostAccount.ToLong(
+            Data.RealDirectMaterial + Data.RealDirectLabor + Data.RealOutputExpense
         )
         let InvestExSum: number =
-            DATA.ExcludingMaterial + DATA.ExcludingLabor + DATA.ExcludingExpense
+            Data.ExcludingMaterial + Data.ExcludingLabor + Data.ExcludingExpense
         let TempExRate: number = Math.round((InvestExSum / TempInvestDirectSum) * 100000) / 100000
         let TempExPrice: number = Math.ceil(TempRealDirectSum * TempExRate)
         let keyFound: number = 0
@@ -468,7 +468,7 @@ class CalculatePrice {
         let code: string
         let type: string
 
-        if (DATA.CostAccountDeduction.localeCompare('1')) {
+        if (Data.CostAccountDeduction.localeCompare('1')) {
             TempExPrice = Math.ceil(Math.ceil(TempExPrice * 0.997))
         }
 
@@ -480,7 +480,7 @@ class CalculatePrice {
                 let constNum: string = JSON.stringify(bidT3[key]['C1']['_text']).slice(1, -1)
                 let numVal: string = JSON.stringify(bidT3[key]['C2']['_text']).slice(1, -1)
                 let detailVal: string = JSON.stringify(bidT3[key]['C3']['_text']).slice(1, -1)
-                let curObject = DATA.Dic.get(constNum).find(
+                let curObject = Data.Dic.get(constNum).find(
                     (x) => x.WorkNum === numVal && x.DetailWorkNum === detailVal
                 )
 
@@ -545,7 +545,7 @@ class CalculatePrice {
                             1,
                             -1
                         )
-                        let curObject = DATA.Dic.get(constNum).find(
+                        let curObject = Data.Dic.get(constNum).find(
                             (x) => x.WorkNum === numVal && x.DetailWorkNum === detailVal
                         )
 
@@ -690,14 +690,14 @@ class CalculatePrice {
                 let constNum: string = JSON.stringify(bidT3[key]['C1']['_text']).slice(1, -1)
                 let numVal: string = JSON.stringify(bidT3[key]['C2']['_text']).slice(1, -1)
                 let detailVal: string = JSON.stringify(bidT3[key]['C3']['_text']).slice(1, -1)
-                let curObject = DATA.Dic.get(constNum).find(
+                let curObject = Data.Dic.get(constNum).find(
                     (x) => x.WorkNum === numVal && x.DetailWorkNum === detailVal
                 )
 
                 if (curObject.Item.localeCompare('제요율적용제외')) {
-                    DATA.AdjustedExMaterial += Number(bidT3[key]['C20']['_text'].slice(1, -1))
-                    DATA.AdjustedExLabor += Number(bidT3[key]['C21']['_text'].slice(1, -1))
-                    DATA.AdjustedExExpense += Number(bidT3[key]['C22']['_text'].slice(1, -1))
+                    Data.AdjustedExMaterial += Number(bidT3[key]['C20']['_text'].slice(1, -1))
+                    Data.AdjustedExLabor += Number(bidT3[key]['C21']['_text'].slice(1, -1))
+                    Data.AdjustedExExpense += Number(bidT3[key]['C22']['_text'].slice(1, -1))
                 }
             }
         }
@@ -805,8 +805,8 @@ class CalculatePrice {
     public static SetBusinessInfo(): void {
         const bidT1: object = this.eleBID['T1']
 
-        bidT1['C17']['_text'] = DATA.CompanyRegistrationNum
-        bidT1['C18']['_text'] = DATA.CompanyRegistrationName
+        bidT1['C17']['_text'] = Data.CompanyRegistrationNum
+        bidT1['C18']['_text'] = Data.CompanyRegistrationName
     }
 
     public static SubstitutePrice(): void {
@@ -815,43 +815,41 @@ class CalculatePrice {
         for (let key in bidT5) {
             if (
                 bidT5[key]['C4']['_text'].slice(1, -1) !== '이윤' &&
-                DATA.Bidding[bidT5[key]['C4']['_text'].slice(1, -1)]
+                Data.Bidding[bidT5[key]['C4']['_text'].slice(1, -1)]
             ) {
                 bidT5[key]['C8']['_text'] =
-                    DATA.Bidding[bidT5[key]['C4']['_text'].slice(1, -1)].toString()
-            } else if (DATA.Rate1[bidT5[key]['C4']['_text'].slice(1, -1)]) {
+                    Data.Bidding[bidT5[key]['C4']['_text'].slice(1, -1)].toString()
+            } else if (Data.Rate1[bidT5[key]['C4']['_text'].slice(1, -1)]) {
                 bidT5[key]['C8']['_text'] =
-                    DATA.Bidding[bidT5[key]['C4']['_text'].slice(1, -1)].toString()
+                    Data.Bidding[bidT5[key]['C4']['_text'].slice(1, -1)].toString()
             }
         }
 
-        fs.writeFileSync(DATA.folder + '\\OutputDATAFromBID.json', JSON.stringify(this.docBID))
+        fs.writeFileSync(Data.folder + '\\OutputDataFromBID.json', JSON.stringify(this.docBID))
     }
 
     public static CreateZipFile(xlsfiles: Array<string>): void {
-        if (fs.existsSync(DATA.folder + '\\WORK DIRCETORY\\입찰내역.zip')) {
-            fs.rmSync(DATA.folder + '\\WORK DIRCETORY\\입찰내역.zip')
+        if (fs.existsSync(Data.folder + '\\WORK DIRCETORY\\입찰내역.zip')) {
+            fs.rmSync(Data.folder + '\\WORK DIRCETORY\\입찰내역.zip')
         }
 
         const zip = new AdmZip()
 
         for (let idx in xlsfiles) {
-            zip.addLocalFile(DATA.folder + '\\' + xlsfiles[idx])
+            zip.addLocalFile(Data.folder + '\\' + xlsfiles[idx])
         }
 
-        zip.writeZip(DATA.work_path + '\\입찰내역.zip')
+        zip.writeZip(Data.work_path + '\\입찰내역.zip')
     }
 
     public static CreateFile(): void {
-        CRF.Create()
-        const files: Array<string> = fs.readdirSync(DATA.folder)
+        CreateResultFile.Create()
+        const files: Array<string> = fs.readdirSync(Data.folder)
         const xlsFiles: Array<string> = files.filter(
             (file) => file.substring(file.length - 4, file.length).toLowerCase() === '.xls'
         )
         this.CreateZipFile(xlsFiles)
     }
 }
-
-module.exports = CalculatePrice
 
 // CalculatePrice.Calculation();
