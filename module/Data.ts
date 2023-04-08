@@ -56,7 +56,7 @@ export class Data {
             return Math.floor(this.laborUnit * 10) / 10
         return this.laborUnit
     }
-    public set LavorUnit(value: number) {
+    public set LaborUnit(value: number) {
         this.laborUnit = value
     }
 
