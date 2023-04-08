@@ -2,9 +2,27 @@ namespace SetUnitPriceByExcel
 {
     class ExcelHandling
     {
-        GetRow(sheet, rownum: number)
+        public static GetRow(sheet, rownum: number)
         {
-            const worksheet = sheet.
+
+        }
+
+        public static GetCell(row, cellnum: number)
+        {
+
+        }
+
+        public static GetCell(sheet, rownum: number, cellnum: number)
+        {
+
+        }
+        public static GetWorkbook(filename: String, version: String)
+        {
+
+        }
+
+        public static WriteExcel(workbook, filepath: String)
+        {
 
         }
     }
