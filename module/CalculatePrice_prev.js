@@ -1,141 +1,122 @@
-const DATA = require('./Data')
-const FCA = require('./fillCostAccount')
-const CRF = require('./CreateResultFile')
-
-const fs = require('fs')
-const AdmZip = require('adm-zip')
-const Big = require('big.js')
-
-class CalculatePrice {
-    private static docBID: JSON
-    private static eleBID: JSON
-    private static maxBID: JSON
-    public static myPercent: number
-    public static balancedUnitPriceRate: number
-    public static targetRate: number
-    private static exSum: number = 0
-    private static exCount: number = 0
-
-    public static Calculation(): void {
-        const bidString: string = fs.readFileSync(DATA.folder + '\\OutputDATAFromBID.json', 'utf-8')
+'use strict'
+Object.defineProperty(exports, '__esModule', { value: true })
+exports.CalculatePrice = void 0
+var Data_1 = require('./Data')
+var fillCostAccount_1 = require('./fillCostAccount')
+//var CreateResultFile_1 = require('./CreateResultFile')
+var fs = require('fs')
+var AdmZip = require('adm-zip')
+var Big = require('big.js')
+var CalculatePrice = (exports.CalculatePrice = /** @class */ (function () {
+    function CalculatePrice() {}
+    CalculatePrice.Calculation = function () {
+        console.log(Data_1)
+        var bidString = fs.readFileSync(Data_1.Data.folder + '\\test\\Setting_test.json', 'utf-8')
         this.docBID = JSON.parse(bidString)
         this.eleBID = this.docBID['data']
-
         this.Reset()
-
-        if (DATA.StandardMarketDeduction.localeCompare('1')) this.ApplyStandardPriceOption()
-
+        if (Data_1.Data.StandardMarketDeduction.localeCompare('1')) this.ApplyStandardPriceOption()
         this.GetFixedPriceRate()
         this.FindMyPercent()
         this.GetWeight()
-        this.CalculateRate(DATA.PersonalRate, DATA.BalancedRate)
+        this.CalculateRate(Data_1.Data.PersonalRate, Data_1.Data.BalancedRate)
         this.Recalculation()
-
         if (this.exCount !== 0) {
             this.SetExcludingPrice()
             this.GetAdjustedExcludePrice()
         }
-
         this.SetPriceOfSuperConstruction()
-
-        FCA.CalculateBiddingCosts()
+        fillCostAccount_1.FillCostAccount.CalculateBiddingCosts()
         this.SetBusinessInfo()
         this.SubstitutePrice()
-        this.CreateFile()
+        //this.CreateFile() //현재 사용X
     }
-
-    public static Reset(): void {
-        DATA.ExecuteReset = '1'
-
-        let DM: number = DATA.Investigation['직접재료비']
-        let DL: number = DATA.Investigation['직접노무비']
-        let OE: number = DATA.Investigation['산출경비']
-        let FM: number = DATA.InvestigateFixedPriceDirectMaterial
-        let FL: number = DATA.InvestigateFixedPriceDirectLabor
-        let FOE: number = DATA.InvestigateFixedPriceOutputExpense
-        let SM: number = DATA.InvestigateStandardMaterial
-        let SL: number = DATA.InvestigateStandardLabor
-        let SOE: number = DATA.InvestigateStandardExpense
-
-        DATA.RealDirectMaterial = DM
-        DATA.RealDirectLabor = DL
-        DATA.RealOutputExpense = OE
-        DATA.FixedPriceDirectMaterial = FM
-        DATA.FixedPriceDirectLabor = FL
-        DATA.FixedPriceOutputExpense = FOE
-        DATA.StandardMaterial = SM
-        DATA.StandardLabor = SL
-        DATA.StandardExpense = SOE
-
-        const bidT3: object = this.eleBID['T3']
-        let code: string
-        let type: string
-
-        for (let key in bidT3) {
+    CalculatePrice.Reset = function () {
+        Data_1.Data.ExecuteReset = '1'
+        var DM = Data_1.Data.Investigation['직접재료비']
+        var DL = Data_1.Data.Investigation['직접노무비']
+        var OE = Data_1.Data.Investigation['산출경비']
+        var FM = Data_1.Data.InvestigateFixedPriceDirectMaterial
+        var FL = Data_1.Data.InvestigateFixedPriceDirectLabor
+        var FOE = Data_1.Data.InvestigateFixedPriceOutputExpense
+        var SM = Data_1.Data.InvestigateStandardMaterial
+        var SL = Data_1.Data.InvestigateStandardLabor
+        var SOE = Data_1.Data.InvestigateStandardExpense
+        Data_1.Data.RealDirectMaterial = DM
+        Data_1.Data.RealDirectLabor = DL
+        Data_1.Data.RealOutputExpense = OE
+        Data_1.Data.FixedPriceDirectMaterial = FM
+        Data_1.Data.FixedPriceDirectLabor = FL
+        Data_1.Data.FixedPriceOutputExpense = FOE
+        Data_1.Data.StandardMaterial = SM
+        Data_1.Data.StandardLabor = SL
+        Data_1.Data.StandardExpense = SOE
+        var bidT3 = this.eleBID['T3']
+        var code
+        var type
+        var _loop_1 = function (key) {
             code = JSON.stringify(bidT3[key]['C9']['_text'])
             type = JSON.stringify(bidT3[key]['C5']['_text'])[1]
-
             if (code !== undefined && type === 'S') {
-                let constNum: string = JSON.stringify(bidT3[key]['C1']['_text']).slice(1, -1)
-                let numVal: string = JSON.stringify(bidT3[key]['C2']['_text']).slice(1, -1)
-                let detailVal: string = JSON.stringify(bidT3[key]['C3']['_text']).slice(1, -1)
-                let curObject = DATA.Dic.get(constNum).find(
-                    (x) => x.WorkNum === numVal && x.DetailWorkNum === detailVal
-                )
-
+                var constNum = JSON.stringify(bidT3[key]['C1']['_text']).slice(1, -1)
+                var numVal_1 = JSON.stringify(bidT3[key]['C2']['_text']).slice(1, -1)
+                var detailVal_1 = JSON.stringify(bidT3[key]['C3']['_text']).slice(1, -1)
+                var curObject = Data_1.Data.Dic.get(constNum).find(function (x) {
+                    return x.WorkNum === numVal_1 && x.DetailWorkNum === detailVal_1
+                })
                 curObject.MaterialUnit = Number(bidT3[key]['C16']['_text'].slice(1, -1))
                 curObject.LaborUnit = Number(bidT3[key]['C17']['_text'].slice(1, -1))
                 curObject.ExpenseUnit = Number(bidT3[key]['C18']['_text'].slice(1, -1))
             }
         }
-
-        DATA.ExecuteReset = '0'
+        for (var key in bidT3) {
+            _loop_1(key)
+        }
+        Data_1.Data.ExecuteReset = '0'
     }
-
-    public static ApplyStandardPriceOption(): void {
-        const bidT3: object = this.eleBID['T3']
-        let code: string
-        let type: string
-
-        for (let key in bidT3) {
+    CalculatePrice.ApplyStandardPriceOption = function () {
+        var bidT3 = this.eleBID['T3']
+        var code
+        var type
+        var _loop_2 = function (key) {
             code = JSON.stringify(bidT3[key]['C9']['_text'])
             type = JSON.stringify(bidT3[key]['C5']['_text'])[1]
-
             if (code !== undefined && type === 'S') {
-                let constNum: string = JSON.stringify(bidT3[key]['C1']['_text']).slice(1, -1)
-                let numVal: string = JSON.stringify(bidT3[key]['C2']['_text']).slice(1, -1)
-                let detailVal: string = JSON.stringify(bidT3[key]['C3']['_text']).slice(1, -1)
-                let curObject = DATA.Dic.get(constNum).find(
-                    (x) => x.WorkNum === numVal && x.DetailWorkNum === detailVal
-                )
-
+                var constNum = JSON.stringify(bidT3[key]['C1']['_text']).slice(1, -1)
+                var numVal_2 = JSON.stringify(bidT3[key]['C2']['_text']).slice(1, -1)
+                var detailVal_2 = JSON.stringify(bidT3[key]['C3']['_text']).slice(1, -1)
+                var curObject = Data_1.Data.Dic.get(constNum).find(function (x) {
+                    return x.WorkNum === numVal_2 && x.DetailWorkNum === detailVal_2
+                })
                 if (curObject.Item.localeCompare('표준시장단가')) {
-                    DATA.RealDirectMaterial -= +JSON.stringify(bidT3[key]['C20']['_text']).slice(
-                        1,
-                        -1
-                    )
-                    DATA.RealDirectLabor -= +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1)
-                    DATA.RealOutputExpense -= +JSON.stringify(bidT3[key]['C22']['_text']).slice(
-                        1,
-                        -1
-                    )
-                    DATA.FixedPriceDirectMaterial -= +JSON.stringify(
+                    Data_1.Data.RealDirectMaterial -= +JSON.stringify(
                         bidT3[key]['C20']['_text']
                     ).slice(1, -1)
-                    DATA.FixedPriceDirectLabor -= +JSON.stringify(bidT3[key]['C21']['_text']).slice(
-                        1,
-                        -1
-                    )
-                    DATA.FixedPriceOutputExpense -= +JSON.stringify(
+                    Data_1.Data.RealDirectLabor -= +JSON.stringify(
+                        bidT3[key]['C21']['_text']
+                    ).slice(1, -1)
+                    Data_1.Data.RealOutputExpense -= +JSON.stringify(
                         bidT3[key]['C22']['_text']
                     ).slice(1, -1)
-                    DATA.StandardMaterial -= +JSON.stringify(bidT3[key]['C20']['_text']).slice(
+                    Data_1.Data.FixedPriceDirectMaterial -= +JSON.stringify(
+                        bidT3[key]['C20']['_text']
+                    ).slice(1, -1)
+                    Data_1.Data.FixedPriceDirectLabor -= +JSON.stringify(
+                        bidT3[key]['C21']['_text']
+                    ).slice(1, -1)
+                    Data_1.Data.FixedPriceOutputExpense -= +JSON.stringify(
+                        bidT3[key]['C22']['_text']
+                    ).slice(1, -1)
+                    Data_1.Data.StandardMaterial -= +JSON.stringify(
+                        bidT3[key]['C20']['_text']
+                    ).slice(1, -1)
+                    Data_1.Data.StandardLabor -= +JSON.stringify(bidT3[key]['C21']['_text']).slice(
                         1,
                         -1
                     )
-                    DATA.StandardLabor -= +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1)
-                    DATA.StandardExpense -= +JSON.stringify(bidT3[key]['C22']['_text']).slice(1, -1)
-
+                    Data_1.Data.StandardExpense -= +JSON.stringify(
+                        bidT3[key]['C22']['_text']
+                    ).slice(1, -1)
                     if (curObject.MaterialUnit !== 0)
                         curObject.MaterialUnit =
                             Math.trunc(curObject.MaterialUnit * 0.997 * 10) / 10 + 1.0
@@ -145,7 +126,6 @@ class CalculatePrice {
                     if (curObject.ExpenseUnit !== 0)
                         curObject.ExpenseUnit =
                             Math.trunc(curObject.ExpenseUnit * 0.997 * 10) / 10 + 0.1
-
                     bidT3[key]['C16']['_text'] = curObject.MaterialUnit.toString()
                     bidT3[key]['C17']['_text'] = curObject.LaborUnit.toString()
                     bidT3[key]['C18']['_text'] = curObject.ExpenseUnit.toString()
@@ -154,94 +134,91 @@ class CalculatePrice {
                     bidT3[key]['C21']['_text'] = curObject.Labor.toString()
                     bidT3[key]['C22']['_text'] = curObject.Expense.toString()
                     bidT3[key]['C23']['_text'] = curObject.PriceSum.toString()
-
-                    DATA.RealDirectMaterial += +JSON.stringify(bidT3[key]['C20']['_text']).slice(
-                        1,
-                        -1
-                    )
-                    DATA.RealDirectLabor += +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1)
-                    DATA.RealOutputExpense += +JSON.stringify(bidT3[key]['C22']['_text']).slice(
-                        1,
-                        -1
-                    )
-                    DATA.FixedPriceDirectMaterial += +JSON.stringify(
+                    Data_1.Data.RealDirectMaterial += +JSON.stringify(
                         bidT3[key]['C20']['_text']
                     ).slice(1, -1)
-                    DATA.FixedPriceDirectLabor += +JSON.stringify(bidT3[key]['C21']['_text']).slice(
-                        1,
-                        -1
-                    )
-                    DATA.FixedPriceOutputExpense += +JSON.stringify(
+                    Data_1.Data.RealDirectLabor += +JSON.stringify(
+                        bidT3[key]['C21']['_text']
+                    ).slice(1, -1)
+                    Data_1.Data.RealOutputExpense += +JSON.stringify(
                         bidT3[key]['C22']['_text']
                     ).slice(1, -1)
-                    DATA.StandardMaterial += +JSON.stringify(bidT3[key]['C20']['_text']).slice(
+                    Data_1.Data.FixedPriceDirectMaterial += +JSON.stringify(
+                        bidT3[key]['C20']['_text']
+                    ).slice(1, -1)
+                    Data_1.Data.FixedPriceDirectLabor += +JSON.stringify(
+                        bidT3[key]['C21']['_text']
+                    ).slice(1, -1)
+                    Data_1.Data.FixedPriceOutputExpense += +JSON.stringify(
+                        bidT3[key]['C22']['_text']
+                    ).slice(1, -1)
+                    Data_1.Data.StandardMaterial += +JSON.stringify(
+                        bidT3[key]['C20']['_text']
+                    ).slice(1, -1)
+                    Data_1.Data.StandardLabor += +JSON.stringify(bidT3[key]['C21']['_text']).slice(
                         1,
                         -1
                     )
-                    DATA.StandardLabor += +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1)
-                    DATA.StandardExpense += +JSON.stringify(bidT3[key]['C22']['_text']).slice(1, -1)
+                    Data_1.Data.StandardExpense += +JSON.stringify(
+                        bidT3[key]['C22']['_text']
+                    ).slice(1, -1)
                 }
             }
         }
+        for (var key in bidT3) {
+            _loop_2(key)
+        }
     }
-
-    public static GetFixedPriceRate(): void {
-        const directConstPrice: number = DATA.Investigation['직공비']
-        const fixCostSum: number =
-            DATA.InvestigateFixedPriceDirectMaterial +
-            DATA.InvestigateFixedPriceDirectLabor +
-            DATA.InvestigateFixedPriceOutputExpense
-
-        DATA.FixedPricePercent = Math.trunc((fixCostSum / directConstPrice) * 100 * 10000) / 10000
+    CalculatePrice.GetFixedPriceRate = function () {
+        var directConstPrice = Data_1.Data.Investigation['직공비']
+        var fixCostSum =
+            Data_1.Data.InvestigateFixedPriceDirectMaterial +
+            Data_1.Data.InvestigateFixedPriceDirectLabor +
+            Data_1.Data.InvestigateFixedPriceOutputExpense
+        Data_1.Data.FixedPricePercent =
+            Math.trunc((fixCostSum / directConstPrice) * 100 * 10000) / 10000
     }
-
-    public static FindMyPercent(): void {
-        if (DATA.FixedPricePercent < 20.0) this.myPercent = 0.85
-        else if (DATA.FixedPricePercent < 25.0) this.myPercent = 0.84
-        else if (DATA.FixedPricePercent < 30.0) this.myPercent = 0.83
+    CalculatePrice.FindMyPercent = function () {
+        if (Data_1.Data.FixedPricePercent < 20.0) this.myPercent = 0.85
+        else if (Data_1.Data.FixedPricePercent < 25.0) this.myPercent = 0.84
+        else if (Data_1.Data.FixedPricePercent < 30.0) this.myPercent = 0.83
         else this.myPercent = 0.82
     }
-
-    public static GetWeight(): void {
-        let varCostSum =
-            DATA.RealPriceDirectMaterial + DATA.RealPriceDirectLabor + DATA.RealPriceOutputExpense
-        let weight: number
-        let maxWeight: number = 0
-        let weightSum: number = 0
-        let max: typeof DATA = new DATA()
-
-        DATA.Dic.forEach((value, _) => {
-            for (let idx in value) {
+    CalculatePrice.GetWeight = function () {
+        var varCostSum =
+            Data_1.Data.RealPriceDirectMaterial +
+            Data_1.Data.RealPriceDirectLabor +
+            Data_1.Data.RealPriceOutputExpense
+        var weight
+        var maxWeight = 0
+        var weightSum = 0
+        var max = new Data_1.Data()
+        Data_1.Data.Dic.forEach(function (value, _) {
+            for (var idx in value) {
                 if (value[idx].Item.localeCompare('일반')) {
-                    let material = value[idx].Material
-                    let labor = value[idx].Labor
-                    let expense = value[idx].Expense
-
+                    var material = value[idx].Material
+                    var labor = value[idx].Labor
+                    var expense = value[idx].Expense
                     weight =
                         Math.round(((material + labor + expense) / varCostSum) * 1000000) / 1000000
                     weightSum += weight
-
                     if (maxWeight < weight) {
                         maxWeight = weight
                         max = value[idx]
                     }
-
                     value[idx].Weight = weight
                 }
             }
         })
-
         if (weightSum !== 1.0) {
-            let lack: number = 1.0 - weightSum
+            var lack = 1.0 - weightSum
             max.Weight += lack
         }
     }
-
-    public static CalculateRate(presonalRate: any, balancedRate: any): void {
-        const unitPrice = Big(100)
+    CalculatePrice.CalculateRate = function (presonalRate, balancedRate) {
+        var unitPrice = Big(100)
         presonalRate = Big(presonalRate)
         balancedRate = Big(balancedRate)
-
         this.balancedUnitPriceRate =
             (0.9 * unitPrice * (1.0 + balancedRate / 100) * this.myPercent) /
             (1.0 - 0.1 * this.myPercent) /
@@ -252,88 +229,75 @@ class CalculatePrice {
                 this.myPercent) /
             100
         this.targetRate = Math.trunc(this.targetRate * 1000000) / 1000000
-
         console.log(this.targetRate)
     }
-
-    public static RoundOrTruncate(
-        Rate: number,
-        Object: typeof DATA,
-        refMyMaterialUnit: { value: number },
-        refMyLaborUnit: { value: number },
-        refMyExpenseUnit: { value: number }
-    ): void {
-        if (DATA.UnitPriceTrimming.localeCompare('1')) {
+    CalculatePrice.RoundOrTruncate = function (
+        Rate,
+        Object,
+        refMyMaterialUnit,
+        refMyLaborUnit,
+        refMyExpenseUnit
+    ) {
+        if (Data_1.Data.UnitPriceTrimming.localeCompare('1')) {
             refMyMaterialUnit.value = Math.trunc(Object.MaterialUnit * Rate * 10) / 10
             refMyLaborUnit.value = Math.trunc(Object.LaborUnit * Rate * 10) / 10
             refMyExpenseUnit.value = Math.trunc(Object.ExpenseUnit * Rate * 10) / 10
-        } else if (DATA.UnitPriceTrimming.localeCompare('2')) {
+        } else if (Data_1.Data.UnitPriceTrimming.localeCompare('2')) {
             refMyMaterialUnit.value = Math.ceil(Object.MaterialUnit * Rate)
             refMyLaborUnit.value = Math.ceil(Object.LaborUnit * Rate)
             refMyExpenseUnit.value = Math.ceil(Object.ExpenseUnit * Rate)
         }
     }
-
-    public static CheckLaborLimit80(
-        Object: typeof DATA,
-        refMyMaterialUnit: { value: number },
-        refMyLaborUnit: { value: number },
-        refMyExpenseUnit: { value: number }
-    ): void {
+    CalculatePrice.CheckLaborLimit80 = function (
+        Object,
+        refMyMaterialUnit,
+        refMyLaborUnit,
+        refMyExpenseUnit
+    ) {
         if (Object.LaborUnit * 0.8 > refMyLaborUnit.value) {
-            const deficiency: number = Object.LaborUnit * 0.8 - refMyLaborUnit.value
-
+            var deficiency = Object.LaborUnit * 0.8 - refMyLaborUnit.value
             if (refMyLaborUnit.value !== 0) refMyMaterialUnit.value -= deficiency
             else if (refMyExpenseUnit.value !== 0) refMyExpenseUnit.value -= deficiency
-
             refMyLaborUnit.value = Object.LaborUnit * 0.8
         }
     }
-
-    public static Recalculation(): void {
-        const bidT3: object = this.eleBID['T3']
-        let code: string
-        let type: string
+    CalculatePrice.Recalculation = function () {
+        var bidT3 = this.eleBID['T3']
+        var code
+        var type
         this.exCount = 0
         this.exSum = 0
-
-        for (let key in bidT3) {
+        var _loop_3 = function (key) {
             code = JSON.stringify(bidT3[key]['C9']['_text'])
             type = JSON.stringify(bidT3[key]['C5']['_text'])[1]
-
             if (code !== undefined && type === 'S') {
-                let constNum: string = JSON.stringify(bidT3[key]['C1']['_text']).slice(1, -1)
-                let numVal: string = JSON.stringify(bidT3[key]['C2']['_text']).slice(1, -1)
-                let detailVal: string = JSON.stringify(bidT3[key]['C3']['_text']).slice(1, -1)
-                let curObject = DATA.Dic.get(constNum).find(
-                    (x) => x.WorkNum === numVal && x.DetailWorkNum === detailVal
-                )
-
+                var constNum = JSON.stringify(bidT3[key]['C1']['_text']).slice(1, -1)
+                var numVal_3 = JSON.stringify(bidT3[key]['C2']['_text']).slice(1, -1)
+                var detailVal_3 = JSON.stringify(bidT3[key]['C3']['_text']).slice(1, -1)
+                var curObject = Data_1.Data.Dic.get(constNum).find(function (x) {
+                    return x.WorkNum === numVal_3 && x.DetailWorkNum === detailVal_3
+                })
                 if (curObject.Item.localeCompare('일반')) {
-                    DATA.RealDirectMaterial -= +JSON.stringify(bidT3[key]['C20']['_text']).slice(
-                        1,
-                        -1
-                    )
-                    DATA.RealDirectLabor -= +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1)
-                    DATA.RealOutputExpense -= +JSON.stringify(bidT3[key]['C22']['_text']).slice(
-                        1,
-                        -1
-                    )
-
-                    let targetPrice: number =
+                    Data_1.Data.RealDirectMaterial -= +JSON.stringify(
+                        bidT3[key]['C20']['_text']
+                    ).slice(1, -1)
+                    Data_1.Data.RealDirectLabor -= +JSON.stringify(
+                        bidT3[key]['C21']['_text']
+                    ).slice(1, -1)
+                    Data_1.Data.RealOutputExpense -= +JSON.stringify(
+                        bidT3[key]['C22']['_text']
+                    ).slice(1, -1)
+                    var targetPrice =
                         (curObject.MaterialUnit + curObject.LaborUnit + curObject.ExpenseUnit) *
-                        this.targetRate
-
-                    let myMaterialUnit = { value: 0 }
-                    let myLaborUnit = { value: 0 }
-                    let myExpenseUnit = { value: 0 }
-                    let myPrice: number
-
-                    if (DATA.ZeroWeightDeduction.localeCompare('1')) {
+                        this_1.targetRate
+                    var myMaterialUnit = { value: 0 }
+                    var myLaborUnit = { value: 0 }
+                    var myExpenseUnit = { value: 0 }
+                    var myPrice = void 0
+                    if (Data_1.Data.ZeroWeightDeduction.localeCompare('1')) {
                         if (curObject.Weight === 0 && curObject.LaborUnit === 0) {
                             curObject.MaterialUnit = Math.ceil(curObject.MaterialUnit * 0.5)
                             curObject.ExpenseUnit = Math.ceil(curObject.ExpenseUnit * 0.5)
-
                             bidT3[key]['C16']['_text'] = curObject.MaterialUnit.toString()
                             bidT3[key]['C17']['_text'] = curObject.LaborUnit.toString()
                             bidT3[key]['C18']['_text'] = curObject.ExpenseUnit.toString()
@@ -342,56 +306,51 @@ class CalculatePrice {
                             bidT3[key]['C21']['_text'] = curObject.Labor.toString()
                             bidT3[key]['C22']['_text'] = curObject.Expense.toString()
                             bidT3[key]['C23']['_text'] = curObject.PriceSum.toString()
-
-                            DATA.RealDirectMaterial += +JSON.stringify(
+                            Data_1.Data.RealDirectMaterial += +JSON.stringify(
                                 bidT3[key]['C20']['_text']
                             ).slice(1, -1)
-                            DATA.RealDirectLabor += +JSON.stringify(
+                            Data_1.Data.RealDirectLabor += +JSON.stringify(
                                 bidT3[key]['C21']['_text']
                             ).slice(1, -1)
-                            DATA.RealOutputExpense += +JSON.stringify(
+                            Data_1.Data.RealOutputExpense += +JSON.stringify(
                                 bidT3[key]['C22']['_text']
                             ).slice(1, -1)
-
-                            continue
+                            return 'continue'
                         } else {
-                            this.RoundOrTruncate(
-                                this.targetRate,
+                            this_1.RoundOrTruncate(
+                                this_1.targetRate,
                                 curObject,
                                 myMaterialUnit,
                                 myLaborUnit,
                                 myExpenseUnit
                             )
-                            this.CheckLaborLimit80(
+                            this_1.CheckLaborLimit80(
                                 curObject,
                                 myMaterialUnit,
                                 myLaborUnit,
                                 myExpenseUnit
                             )
                         }
-                    } else if (DATA.ZeroWeightDeduction.localeCompare('2')) {
-                        this.RoundOrTruncate(
-                            this.targetRate,
+                    } else if (Data_1.Data.ZeroWeightDeduction.localeCompare('2')) {
+                        this_1.RoundOrTruncate(
+                            this_1.targetRate,
                             curObject,
                             myMaterialUnit,
                             myLaborUnit,
                             myExpenseUnit
                         )
-                        this.CheckLaborLimit80(
+                        this_1.CheckLaborLimit80(
                             curObject,
                             myMaterialUnit,
                             myLaborUnit,
                             myExpenseUnit
                         )
                     }
-
                     myPrice = myMaterialUnit.value + myLaborUnit.value + myExpenseUnit.value
-
-                    if (DATA.LaborCostLowBound.localeCompare('1')) {
-                        let Excess: number = myPrice - targetPrice
-                        let laborExcess: number = myLaborUnit.value - curObject.LaborUnit * 0.8
+                    if (Data_1.Data.LaborCostLowBound.localeCompare('1')) {
+                        var Excess = myPrice - targetPrice
+                        var laborExcess = myLaborUnit.value - curObject.LaborUnit * 0.8
                         laborExcess = Math.trunc(laborExcess * 10) / 10
-
                         if (laborExcess > 0) {
                             if (myExpenseUnit.value !== 0) {
                                 myLaborUnit.value -= laborExcess
@@ -407,7 +366,6 @@ class CalculatePrice {
                             }
                         } else if (laborExcess < 0) {
                             myLaborUnit.value = curObject.LaborUnit * 0.8
-
                             if (myMaterialUnit.value !== 0) {
                                 myMaterialUnit.value += laborExcess + Excess
                             } else {
@@ -415,11 +373,9 @@ class CalculatePrice {
                             }
                         }
                     }
-
                     curObject.MaterialUnit = myMaterialUnit.value
                     curObject.LaborUnit = myLaborUnit.value
                     curObject.ExpenseUnit = myExpenseUnit.value
-
                     bidT3[key]['C16']['_text'] = curObject.MaterialUnit.toString()
                     bidT3[key]['C17']['_text'] = curObject.LaborUnit.toString()
                     bidT3[key]['C18']['_text'] = curObject.ExpenseUnit.toString()
@@ -428,85 +384,83 @@ class CalculatePrice {
                     bidT3[key]['C21']['_text'] = curObject.Labor.toString()
                     bidT3[key]['C22']['_text'] = curObject.Expense.toString()
                     bidT3[key]['C23']['_text'] = curObject.PriceSum.toString()
-
-                    DATA.RealDirectMaterial += +JSON.stringify(bidT3[key]['C20']['_text']).slice(
-                        1,
-                        -1
-                    )
-                    DATA.RealDirectLabor += +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1)
-                    DATA.RealOutputExpense += +JSON.stringify(bidT3[key]['C22']['_text']).slice(
-                        1,
-                        -1
-                    )
+                    Data_1.Data.RealDirectMaterial += +JSON.stringify(
+                        bidT3[key]['C20']['_text']
+                    ).slice(1, -1)
+                    Data_1.Data.RealDirectLabor += +JSON.stringify(
+                        bidT3[key]['C21']['_text']
+                    ).slice(1, -1)
+                    Data_1.Data.RealOutputExpense += +JSON.stringify(
+                        bidT3[key]['C22']['_text']
+                    ).slice(1, -1)
                 } else if (curObject.Item === '제요율적용제외') {
                     curObject.MaterialUnit =
-                        Math.trunc(curObject.MaterialUnit * this.targetRate * 10) / 10
+                        Math.trunc(curObject.MaterialUnit * this_1.targetRate * 10) / 10
                     curObject.LaborUnit =
-                        Math.trunc(curObject.LaborUnit * this.targetRate * 10) / 10
+                        Math.trunc(curObject.LaborUnit * this_1.targetRate * 10) / 10
                     curObject.ExpenseUnit =
-                        Math.trunc(curObject.ExpenseUnit * this.targetRate * 10) / 10
-
-                    this.exSum += curObject.PriceSum
-                    this.exCount++
+                        Math.trunc(curObject.ExpenseUnit * this_1.targetRate * 10) / 10
+                    this_1.exSum += curObject.PriceSum
+                    this_1.exCount++
                 }
             }
         }
+        var this_1 = this
+        for (var key in bidT3) {
+            _loop_3(key)
+        }
     }
-
-    public static SetExcludingPrice(): void {
-        let TempInvestDirectSum: number = DATA.Investigation['직공비']
-        let TempRealDirectSum: number = FCA.ToLong(
-            DATA.RealDirectMaterial + DATA.RealDirectLabor + DATA.RealOutputExpense
+    CalculatePrice.SetExcludingPrice = function () {
+        var TempInvestDirectSum = Data_1.Data.Investigation['직공비']
+        var TempRealDirectSum = fillCostAccount_1.FillCostAccount.ToLong(
+            Data_1.Data.RealDirectMaterial +
+                Data_1.Data.RealDirectLabor +
+                Data_1.Data.RealOutputExpense
         )
-        let InvestExSum: number =
-            DATA.ExcludingMaterial + DATA.ExcludingLabor + DATA.ExcludingExpense
-        let TempExRate: number = Math.round((InvestExSum / TempInvestDirectSum) * 100000) / 100000
-        let TempExPrice: number = Math.ceil(TempRealDirectSum * TempExRate)
-        let keyFound: number = 0
-
-        const bidT3: object = this.eleBID['T3']
-        let code: string
-        let type: string
-
-        if (DATA.CostAccountDeduction.localeCompare('1')) {
+        var InvestExSum =
+            Data_1.Data.ExcludingMaterial +
+            Data_1.Data.ExcludingLabor +
+            Data_1.Data.ExcludingExpense
+        var TempExRate = Math.round((InvestExSum / TempInvestDirectSum) * 100000) / 100000
+        var TempExPrice = Math.ceil(TempRealDirectSum * TempExRate)
+        var keyFound = 0
+        var bidT3 = this.eleBID['T3']
+        var code
+        var type
+        if (Data_1.Data.CostAccountDeduction.localeCompare('1')) {
             TempExPrice = Math.ceil(Math.ceil(TempExPrice * 0.997))
         }
-
-        for (let key in bidT3) {
+        var _loop_4 = function (key) {
             code = JSON.stringify(bidT3[key]['C9']['_text'])
             type = JSON.stringify(bidT3[key]['C5']['_text'])[1]
-
             if (code !== undefined && type === 'S') {
-                let constNum: string = JSON.stringify(bidT3[key]['C1']['_text']).slice(1, -1)
-                let numVal: string = JSON.stringify(bidT3[key]['C2']['_text']).slice(1, -1)
-                let detailVal: string = JSON.stringify(bidT3[key]['C3']['_text']).slice(1, -1)
-                let curObject = DATA.Dic.get(constNum).find(
-                    (x) => x.WorkNum === numVal && x.DetailWorkNum === detailVal
-                )
-
+                var constNum = JSON.stringify(bidT3[key]['C1']['_text']).slice(1, -1)
+                var numVal_4 = JSON.stringify(bidT3[key]['C2']['_text']).slice(1, -1)
+                var detailVal_4 = JSON.stringify(bidT3[key]['C3']['_text']).slice(1, -1)
+                var curObject = Data_1.Data.Dic.get(constNum).find(function (x) {
+                    return x.WorkNum === numVal_4 && x.DetailWorkNum === detailVal_4
+                })
                 if (curObject.Item.localeCompare('제요율적용제외')) {
-                    if (this.maxBID === undefined) {
-                        this.maxBID = bidT3[key]
+                    if (this_2.maxBID === undefined) {
+                        this_2.maxBID = bidT3[key]
                     }
-
                     if (
                         bidT3[key]['C15']['_text'].slice(1, -1) === '1' &&
                         bidT3[key]['C15']['_text'].slice(1, -1) !== '0'
                     ) {
                         if (
                             Number(bidT3[key]['C19']['_text'].slice(1, -1)) >
-                            Number(this.maxBID['C19']['_text'].slice(1, -1))
+                            Number(this_2.maxBID['C19']['_text'].slice(1, -1))
                         ) {
                             if (
                                 Number(bidT3[key]['C19']['_text'].slice(1, -1)) * 1.5 >
-                                curObject.PriceSum + (TempExPrice - this.exSum)
+                                curObject.PriceSum + (TempExPrice - this_2.exSum)
                             ) {
                                 keyFound = 1
-                                this.maxBID = bidT3[key]
+                                this_2.maxBID = bidT3[key]
                             }
                         }
                     }
-
                     bidT3[key]['C16']['_text'] = curObject.MaterialUnit.toString()
                     bidT3[key]['C17']['_text'] = curObject.LaborUnit.toString()
                     bidT3[key]['C18']['_text'] = curObject.ExpenseUnit.toString()
@@ -518,141 +472,130 @@ class CalculatePrice {
                 }
             }
         }
-
+        var this_2 = this
+        for (var key in bidT3) {
+            _loop_4(key)
+        }
         if (keyFound === 0) {
-            let divisionPrice: number = Math.trunc((TempExPrice - this.exSum) / this.exCount)
-            let deficiency: number = Math.ceil(
-                TempExPrice - this.exSum - divisionPrice * this.exCount
-            )
-            let count: number = 0
-
+            var divisionPrice = Math.trunc((TempExPrice - this.exSum) / this.exCount)
+            var deficiency = Math.ceil(TempExPrice - this.exSum - divisionPrice * this.exCount)
+            var count = 0
             while (count !== this.exCount) {
-                const bidT3: object = this.eleBID['T3']
-                let code: string
-                let type: string
-
-                for (let key in bidT3) {
-                    code = JSON.stringify(bidT3[key]['C9']['_text'])
-                    type = JSON.stringify(bidT3[key]['C5']['_text'])[1]
-
-                    if (code !== undefined && type === 'S') {
-                        let constNum: string = JSON.stringify(bidT3[key]['C1']['_text']).slice(
-                            1,
-                            -1
-                        )
-                        let numVal: string = JSON.stringify(bidT3[key]['C2']['_text']).slice(1, -1)
-                        let detailVal: string = JSON.stringify(bidT3[key]['C3']['_text']).slice(
-                            1,
-                            -1
-                        )
-                        let curObject = DATA.Dic.get(constNum).find(
-                            (x) => x.WorkNum === numVal && x.DetailWorkNum === detailVal
-                        )
-
+                var bidT3_1 = this.eleBID['T3']
+                var code_1 = void 0
+                var type_1 = void 0
+                var _loop_5 = function (key) {
+                    code_1 = JSON.stringify(bidT3_1[key]['C9']['_text'])
+                    type_1 = JSON.stringify(bidT3_1[key]['C5']['_text'])[1]
+                    if (code_1 !== undefined && type_1 === 'S') {
+                        var constNum = JSON.stringify(bidT3_1[key]['C1']['_text']).slice(1, -1)
+                        var numVal_5 = JSON.stringify(bidT3_1[key]['C2']['_text']).slice(1, -1)
+                        var detailVal_5 = JSON.stringify(bidT3_1[key]['C3']['_text']).slice(1, -1)
+                        var curObject = Data_1.Data.Dic.get(constNum).find(function (x) {
+                            return x.WorkNum === numVal_5 && x.DetailWorkNum === detailVal_5
+                        })
                         if (
                             curObject.Item.localeCompare('제요율적용제외') &&
                             curObject.Quantity === 1
                         ) {
                             if (curObject.LaborUnit !== 0) {
                                 if (
-                                    Number(bidT3[key]['C19']['_text'].slice(1, -1)) * 1.5 >
+                                    Number(bidT3_1[key]['C19']['_text'].slice(1, -1)) * 1.5 >
                                     curObject.LaborUnit + divisionPrice
                                 ) {
                                     curObject.LaborUnit += divisionPrice
-
-                                    bidT3[key]['C17']['_text'] = curObject.LaborUnit.toString()
-                                    bidT3[key]['C19']['_text'] = curObject.UnitPriceSum.toString()
-                                    bidT3[key]['C21']['_text'] = curObject.Labor.toString()
-                                    bidT3[key]['C23']['_text'] = curObject.PriceSum.toString()
+                                    bidT3_1[key]['C17']['_text'] = curObject.LaborUnit.toString()
+                                    bidT3_1[key]['C19']['_text'] = curObject.UnitPriceSum.toString()
+                                    bidT3_1[key]['C21']['_text'] = curObject.Labor.toString()
+                                    bidT3_1[key]['C23']['_text'] = curObject.PriceSum.toString()
                                     count++
                                 }
-
-                                if (count === this.exCount) {
-                                    bidT3[key]['C17']['_text'] = (
+                                if (count === this_3.exCount) {
+                                    bidT3_1[key]['C17']['_text'] = (
                                         deficiency + curObject.LaborUnit
                                     ).toString()
-                                    bidT3[key]['C19']['_text'] = (
+                                    bidT3_1[key]['C19']['_text'] = (
                                         deficiency + curObject.UnitPriceSum
                                     ).toString()
-                                    bidT3[key]['C21']['_text'] = (
+                                    bidT3_1[key]['C21']['_text'] = (
                                         deficiency + curObject.Labor
                                     ).toString()
-                                    bidT3[key]['C23']['_text'] = (
+                                    bidT3_1[key]['C23']['_text'] = (
                                         deficiency + curObject.PriceSum
                                     ).toString()
-                                    break
+                                    return 'break'
                                 }
                             } else {
                                 if (curObject.ExpenseUnit !== 0) {
                                     if (
-                                        Number(bidT3[key]['C19']['_text'].slice(1, -1)) * 1.5 >
+                                        Number(bidT3_1[key]['C19']['_text'].slice(1, -1)) * 1.5 >
                                         curObject.ExpenseUnit + divisionPrice
                                     ) {
                                         curObject.ExpenseUnit += divisionPrice
-
-                                        bidT3[key]['C18']['_text'] =
+                                        bidT3_1[key]['C18']['_text'] =
                                             curObject.ExpenseUnit.toString()
-                                        bidT3[key]['C19']['_text'] =
+                                        bidT3_1[key]['C19']['_text'] =
                                             curObject.UnitPriceSum.toString()
-                                        bidT3[key]['C22']['_text'] = curObject.Expense.toString()
-                                        bidT3[key]['C23']['_text'] = curObject.PriceSum.toString()
+                                        bidT3_1[key]['C22']['_text'] = curObject.Expense.toString()
+                                        bidT3_1[key]['C23']['_text'] = curObject.PriceSum.toString()
                                         count++
                                     }
-
-                                    if (count === this.exCount) {
-                                        bidT3[key]['C18']['_text'] = (
+                                    if (count === this_3.exCount) {
+                                        bidT3_1[key]['C18']['_text'] = (
                                             deficiency + curObject.ExpenseUnit
                                         ).toString()
-                                        bidT3[key]['C19']['_text'] = (
+                                        bidT3_1[key]['C19']['_text'] = (
                                             deficiency + curObject.UnitPriceSum
                                         ).toString()
-                                        bidT3[key]['C22']['_text'] = (
+                                        bidT3_1[key]['C22']['_text'] = (
                                             deficiency + curObject.Expense
                                         ).toString()
-                                        bidT3[key]['C23']['_text'] = (
+                                        bidT3_1[key]['C23']['_text'] = (
                                             deficiency + curObject.PriceSum
                                         ).toString()
-                                        break
+                                        return 'break'
                                     }
                                 } else {
                                     if (
-                                        Number(bidT3[key]['C19']['_text'].slice(1, -1)) * 1.5 >
+                                        Number(bidT3_1[key]['C19']['_text'].slice(1, -1)) * 1.5 >
                                         curObject.MaterialUnit + divisionPrice
                                     ) {
                                         curObject.MaterialUnit += divisionPrice
-
-                                        bidT3[key]['C16']['_text'] =
+                                        bidT3_1[key]['C16']['_text'] =
                                             curObject.MaterialUnit.toString()
-                                        bidT3[key]['C19']['_text'] =
+                                        bidT3_1[key]['C19']['_text'] =
                                             curObject.UnitPriceSum.toString()
-                                        bidT3[key]['C20']['_text'] = curObject.Material.toString()
-                                        bidT3[key]['C23']['_text'] = curObject.PriceSum.toString()
+                                        bidT3_1[key]['C20']['_text'] = curObject.Material.toString()
+                                        bidT3_1[key]['C23']['_text'] = curObject.PriceSum.toString()
                                         count++
                                     }
-
-                                    if (count === this.exCount) {
-                                        bidT3[key]['C18']['_text'] = (
+                                    if (count === this_3.exCount) {
+                                        bidT3_1[key]['C18']['_text'] = (
                                             deficiency + curObject.MaterialUnit
                                         ).toString()
-                                        bidT3[key]['C19']['_text'] = (
+                                        bidT3_1[key]['C19']['_text'] = (
                                             deficiency + curObject.UnitPriceSum
                                         ).toString()
-                                        bidT3[key]['C22']['_text'] = (
+                                        bidT3_1[key]['C22']['_text'] = (
                                             deficiency + curObject.Material
                                         ).toString()
-                                        bidT3[key]['C23']['_text'] = (
+                                        bidT3_1[key]['C23']['_text'] = (
                                             deficiency + curObject.PriceSum
                                         ).toString()
-                                        break
+                                        return 'break'
                                     }
                                 }
                             }
                         }
                     }
                 }
+                var this_3 = this
+                for (var key in bidT3_1) {
+                    var state_1 = _loop_5(key)
+                    if (state_1 === 'break') break
+                }
             }
         }
-
         if (keyFound === 1 && this.exSum < TempExPrice) {
             this.maxBID['C17']['_text'] = (
                 Number(this.maxBID['C17']['_text'].slice(1, -1)) +
@@ -676,46 +619,43 @@ class CalculatePrice {
             ).toString()
         }
     }
-
-    public static GetAdjustedExcludePrice(): void {
-        const bidT3: object = this.eleBID['T3']
-        let code: string
-        let type: string
-
-        for (let key in bidT3) {
+    CalculatePrice.GetAdjustedExcludePrice = function () {
+        var bidT3 = this.eleBID['T3']
+        var code
+        var type
+        var _loop_6 = function (key) {
             code = JSON.stringify(bidT3[key]['C9']['_text'])
             type = JSON.stringify(bidT3[key]['C5']['_text'])[1]
-
             if (code !== undefined && type === 'S') {
-                let constNum: string = JSON.stringify(bidT3[key]['C1']['_text']).slice(1, -1)
-                let numVal: string = JSON.stringify(bidT3[key]['C2']['_text']).slice(1, -1)
-                let detailVal: string = JSON.stringify(bidT3[key]['C3']['_text']).slice(1, -1)
-                let curObject = DATA.Dic.get(constNum).find(
-                    (x) => x.WorkNum === numVal && x.DetailWorkNum === detailVal
-                )
-
+                var constNum = JSON.stringify(bidT3[key]['C1']['_text']).slice(1, -1)
+                var numVal_6 = JSON.stringify(bidT3[key]['C2']['_text']).slice(1, -1)
+                var detailVal_6 = JSON.stringify(bidT3[key]['C3']['_text']).slice(1, -1)
+                var curObject = Data_1.Data.Dic.get(constNum).find(function (x) {
+                    return x.WorkNum === numVal_6 && x.DetailWorkNum === detailVal_6
+                })
                 if (curObject.Item.localeCompare('제요율적용제외')) {
-                    DATA.AdjustedExMaterial += Number(bidT3[key]['C20']['_text'].slice(1, -1))
-                    DATA.AdjustedExLabor += Number(bidT3[key]['C21']['_text'].slice(1, -1))
-                    DATA.AdjustedExExpense += Number(bidT3[key]['C22']['_text'].slice(1, -1))
+                    Data_1.Data.AdjustedExMaterial += Number(
+                        bidT3[key]['C20']['_text'].slice(1, -1)
+                    )
+                    Data_1.Data.AdjustedExLabor += Number(bidT3[key]['C21']['_text'].slice(1, -1))
+                    Data_1.Data.AdjustedExExpense += Number(bidT3[key]['C22']['_text'].slice(1, -1))
                 }
             }
         }
+        for (var key in bidT3) {
+            _loop_6(key)
+        }
     }
-
-    public static SetPriceOfSuperConstruction(): void {
-        let firstConstruction: JSON = undefined
-        let secondConstruction: JSON = undefined
-        let thirdConstruction: JSON = undefined
-
-        const bidT3: object = this.eleBID['T3']
-        let code: string
-        let type: string
-
-        for (let key in bidT3) {
+    CalculatePrice.SetPriceOfSuperConstruction = function () {
+        var firstConstruction = undefined
+        var secondConstruction = undefined
+        var thirdConstruction = undefined
+        var bidT3 = this.eleBID['T3']
+        var code
+        var type
+        for (var key in bidT3) {
             code = JSON.stringify(bidT3[key]['C9']['_text'])
             type = JSON.stringify(bidT3[key]['C5']['_text'])[1]
-
             if (code !== undefined && type === 'G') {
                 if (bidT3[key]['C23']['_text'].slice(1, -1) === '0') {
                     if (
@@ -801,57 +741,52 @@ class CalculatePrice {
             }
         }
     }
-
-    public static SetBusinessInfo(): void {
-        const bidT1: object = this.eleBID['T1']
-
-        bidT1['C17']['_text'] = DATA.CompanyRegistrationNum
-        bidT1['C18']['_text'] = DATA.CompanyRegistrationName
+    CalculatePrice.SetBusinessInfo = function () {
+        var bidT1 = this.eleBID['T1']
+        bidT1['C17']['_text'] = Data_1.Data.CompanyRegistrationNum
+        bidT1['C18']['_text'] = Data_1.Data.CompanyRegistrationName
     }
-
-    public static SubstitutePrice(): void {
-        const bidT5: object = this.eleBID['T5']
-
-        for (let key in bidT5) {
+    CalculatePrice.SubstitutePrice = function () {
+        var bidT5 = this.eleBID['T5']
+        for (var key in bidT5) {
             if (
                 bidT5[key]['C4']['_text'].slice(1, -1) !== '이윤' &&
-                DATA.Bidding[bidT5[key]['C4']['_text'].slice(1, -1)]
+                Data_1.Data.Bidding[bidT5[key]['C4']['_text'].slice(1, -1)]
             ) {
                 bidT5[key]['C8']['_text'] =
-                    DATA.Bidding[bidT5[key]['C4']['_text'].slice(1, -1)].toString()
-            } else if (DATA.Rate1[bidT5[key]['C4']['_text'].slice(1, -1)]) {
+                    Data_1.Data.Bidding[bidT5[key]['C4']['_text'].slice(1, -1)].toString()
+            } else if (Data_1.Data.Rate1[bidT5[key]['C4']['_text'].slice(1, -1)]) {
                 bidT5[key]['C8']['_text'] =
-                    DATA.Bidding[bidT5[key]['C4']['_text'].slice(1, -1)].toString()
+                    Data_1.Data.Bidding[bidT5[key]['C4']['_text'].slice(1, -1)].toString()
             }
         }
-
-        fs.writeFileSync(DATA.folder + '\\OutputDATAFromBID.json', JSON.stringify(this.docBID))
-    }
-
-    public static CreateZipFile(xlsfiles: Array<string>): void {
-        if (fs.existsSync(DATA.folder + '\\WORK DIRCETORY\\입찰내역.zip')) {
-            fs.rmSync(DATA.folder + '\\WORK DIRCETORY\\입찰내역.zip')
-        }
-
-        const zip = new AdmZip()
-
-        for (let idx in xlsfiles) {
-            zip.addLocalFile(DATA.folder + '\\' + xlsfiles[idx])
-        }
-
-        zip.writeZip(DATA.work_path + '\\입찰내역.zip')
-    }
-
-    public static CreateFile(): void {
-        CRF.Create()
-        const files: Array<string> = fs.readdirSync(DATA.folder)
-        const xlsFiles: Array<string> = files.filter(
-            (file) => file.substring(file.length - 4, file.length).toLowerCase() === '.xls'
+        fs.writeFileSync(
+            Data_1.Data.folder + '\\OutputDataFromBID.json',
+            JSON.stringify(this.docBID)
         )
+    }
+    CalculatePrice.CreateZipFile = function (xlsfiles) {
+        if (fs.existsSync(Data_1.Data.folder + '\\WORK DIRCETORY\\입찰내역.zip')) {
+            fs.rmSync(Data_1.Data.folder + '\\WORK DIRCETORY\\입찰내역.zip')
+        }
+        var zip = new AdmZip()
+        for (var idx in xlsfiles) {
+            zip.addLocalFile('C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID\\' + xlsfiles[idx])
+        }
+        zip.writeZip(
+            'C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID\\WORK DIRECTORY' + '\\입찰내역.zip'
+        )
+    }
+    CalculatePrice.CreateFile = function () {
+        CreateResultFile_1.CreateResultFile.Create()
+        var files = fs.readdirSync(Data_1.Data.folder)
+        var xlsFiles = files.filter(function (file) {
+            return file.substring(file.length - 4, file.length).toLowerCase() === '.xls'
+        })
         this.CreateZipFile(xlsFiles)
     }
-}
-
-module.exports = CalculatePrice
-
+    CalculatePrice.exSum = 0
+    CalculatePrice.exCount = 0
+    return CalculatePrice
+})())
 // CalculatePrice.Calculation();
