@@ -1,8 +1,7 @@
-const path = require('path')
-const fs = require('fs')
+import path from 'path'
 
 export class Data {
-    public static folder: string = path.resolve(__dirname, '../AutoBID') //내 문서 폴더의 AutoBID 폴더로 지정 (23.02.02)
+    public static folder: string = path.resolve(__dirname, '../AutoBid') //내 문서 폴더의 AutoBID 폴더로 지정 (23.02.02)
     // WPF 앱 파일 관리 변수
     public static XlsText: string = ''
     public static XlsFiles: File[]
@@ -56,7 +55,7 @@ export class Data {
             return Math.floor(this.laborUnit * 10) / 10
         return this.laborUnit
     }
-    public set LavorUnit(value: number) {
+    public set LaborUnit(value: number) {
         this.laborUnit = value
     }
 
