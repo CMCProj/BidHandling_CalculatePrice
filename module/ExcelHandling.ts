@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import xls from 'exceljs'
-import Xlsx from 'exceljs'
+import { Xlsx } from 'exceljs'
 
 export class ExcelHandling {
     public static GetRow(sheet, rownum: number) {
