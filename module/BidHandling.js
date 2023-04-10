@@ -1,50 +1,63 @@
-var SetUnitPrice;
-(function (SetUnitPrice) {
-    var fs = require("fs");
-    var AdmZip = require('adm-zip');
-    var buffer = require("stream/consumers").buffer;
-    var convert = require("xml-js");
-    var filename = undefined;
-    function BidToJson() {
-        var copiedFolder = "C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID" + "\\EmptyBid";
-        var bidFile = fs.readdirSync(copiedFolder);
-        var myFile = bidFile.filter(function (file) { return file.substring(file.length - 4, file.length).toLowerCase() === ".bid"; })[0];
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BidHandling = void 0;
+//const { buffer } = require('stream/consumers')
+var xml_js_1 = __importDefault(require("xml-js"));
+var fs_1 = __importDefault(require("fs"));
+var adm_zip_1 = __importDefault(require("adm-zip"));
+var Setting_1 = require("./Setting");
+var Data_1 = require("./Data");
+//실행 위해 프로그램 내 폴더로 경로 변경
+var filename = undefined;
+var BidHandling = /** @class */ (function () {
+    function BidHandling() {
+    }
+    BidHandling.BidToJson = function () {
+        var copiedFolder = Data_1.Data.folder + '\\EmptyBid';
+        var bidFile = fs_1.default.readdirSync(copiedFolder);
+        var myFile = bidFile.filter(function (file) { return file.substring(file.length - 4, file.length).toLowerCase() === '.bid'; })[0];
         filename = myFile.substring(0, myFile.length - 4);
-        fs.copyFileSync(copiedFolder + "\\" + myFile, copiedFolder + "\\" + filename + ".zip");
-        fs.rmSync(copiedFolder + "\\" + myFile);
-        var zip = new AdmZip(copiedFolder + "\\" + filename + ".zip");
+        fs_1.default.copyFileSync(copiedFolder + '\\' + myFile, copiedFolder + '\\' + filename + '.zip');
+        fs_1.default.rmSync(copiedFolder + '\\' + myFile);
+        var zip = new adm_zip_1.default(copiedFolder + '\\' + filename + '.zip');
         zip.extractAllTo(copiedFolder, true);
-        bidFile = fs.readdirSync(copiedFolder);
-        myFile = bidFile.filter(function (file) { return file.substring(file.length - 4, file.length).toLowerCase() === ".bid"; })[0];
-        var text = fs.readFileSync(copiedFolder + "\\" + myFile, 'utf-8');
+        bidFile = fs_1.default.readdirSync(copiedFolder);
+        myFile = bidFile.filter(function (file) { return file.substring(file.length - 4, file.length).toLowerCase() === '.bid'; })[0];
+        var text = fs_1.default.readFileSync(copiedFolder + '\\' + myFile, 'utf-8');
         var decodeValue = Buffer.from(text, 'base64');
         text = decodeValue.toString('utf-8');
-        fs.writeFileSync("C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID" + "\\OutputDataFromBID.xml", text);
-        var xml = fs.readFileSync("C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID" + "\\OutputDataFromBID.xml", 'utf-8');
-        var json = convert.xml2json(xml, { compact: true, spaces: 4 });
-        fs.writeFileSync("C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID" + "\\OutputDataFromBID.json", json);
-        fs.rmSync(copiedFolder + "\\" + filename + ".zip");
-        fs.rmSync(copiedFolder + "\\" + myFile);
-        fs.rmSync("C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID" + "\\OutputDataFromBID.xml");
-    }
-    function JsonToBid() {
-        var resultFilePath = "C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID\\OutputDataFromBID.json";
-        var json = fs.readFileSync(resultFilePath, 'utf-8');
-        var xml = convert.json2xml(json, { compact: true, ignoreComment: true, space: 4 });
-        fs.writeFileSync("C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID" + "\\Result_Xml.xml", xml);
-        var text = fs.readFileSync("C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID\\Result_Xml.xml", 'utf-8');
+        fs_1.default.writeFileSync(Data_1.Data.folder + '\\OutputDataFromBID.xml', text);
+        var xml = fs_1.default.readFileSync(Data_1.Data.folder + '\\OutputDataFromBID.xml', 'utf-8');
+        var json = xml_js_1.default.xml2json(xml, { compact: true, spaces: 4 });
+        fs_1.default.writeFileSync(Data_1.Data.folder + '\\OutputDataFromBID.json', json);
+        fs_1.default.rmSync(copiedFolder + '\\' + filename + '.zip');
+        fs_1.default.rmSync(copiedFolder + '\\' + myFile);
+        fs_1.default.rmSync(Data_1.Data.folder + '\\OutputDataFromBID.xml');
+        Setting_1.Setting.GetData();
+    };
+    BidHandling.JsonToBid = function () {
+        var resultFilePath = Data_1.Data.folder + '\\OutputDataFromBID.json';
+        var json = fs_1.default.readFileSync(resultFilePath, 'utf-8');
+        var xml = xml_js_1.default.json2xml(json, { compact: true, ignoreComment: true, spaces: 4 });
+        fs_1.default.writeFileSync(Data_1.Data.folder + '\\Result_Xml.xml', xml);
+        var text = fs_1.default.readFileSync(Data_1.Data.folder + '\\Result_Xml.xml', 'utf-8');
         var encodeValue = Buffer.from(text, 'utf-8');
         text = encodeValue.toString('base64');
-        fs.writeFileSync("C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID" + "\\EmptyBid\\XmlToBID.BID", text);
-        var zip = new AdmZip();
-        zip.addLocalFile("C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID" + "\\EmptyBid\\XmlToBID.BID");
-        zip.writeZip("C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID" + "\\EmptyBid\\" + filename + ".zip");
-        fs.copyFileSync("C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID" + "\\EmptyBid\\" + filename + ".zip", "C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID" + "\\EmptyBid\\" + filename + ".BID");
-        fs.rmSync("C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID" + "\\EmptyBid\\" + filename + ".zip");
-        fs.rmSync(resultFilePath);
-        fs.rmSync("C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID" + "\\Result_Xml.xml");
-        fs.rmSync("C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID" + "\\EmptyBid\\XmlToBID.BID");
-    }
-    BidToJson();
-    //JsonToBid();
-})(SetUnitPrice || (SetUnitPrice = {}));
+        fs_1.default.writeFileSync(Data_1.Data.folder + '\\EmptyBid\\XmlToBID.BID', text);
+        var zip = new adm_zip_1.default();
+        zip.addLocalFile(Data_1.Data.folder + '\\EmptyBid\\XmlToBID.BID');
+        zip.writeZip(Data_1.Data.folder + '\\EmptyBid\\' + filename + '.zip');
+        fs_1.default.copyFileSync(Data_1.Data.folder + '\\EmptyBid\\' + filename + '.zip', Data_1.Data.folder + '\\EmptyBid\\' + filename + '.BID');
+        fs_1.default.rmSync(Data_1.Data.folder + '\\EmptyBid\\' + filename + '.zip');
+        fs_1.default.rmSync(resultFilePath);
+        fs_1.default.rmSync(Data_1.Data.folder + '\\Result_Xml.xml');
+        fs_1.default.rmSync(Data_1.Data.folder + '\\EmptyBid\\XmlToBID.BID');
+    };
+    return BidHandling;
+}());
+exports.BidHandling = BidHandling;
+// BidHandling.BidToJson();
+// BidHandling.JsonToBid();
