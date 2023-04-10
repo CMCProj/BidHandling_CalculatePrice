@@ -1,7 +1,7 @@
 import { Data } from './Data'
 import { ExcelHandling } from './ExcelHandling'
-import Enumerable from 'linq'
-import fs from 'fs'
+//import Enumerable from 'linq'
+import * as fs from 'fs'
 
 export class Setting {
     private static docBID: JSON
@@ -9,30 +9,30 @@ export class Setting {
 
     public static GetData(): void {
         const bidString: string = fs.readFileSync(Data.folder + '\\OutputDataFromBID.json', 'utf-8')
-        this.docBID = JSON.parse(bidString)
-        this.eleBID = this.docBID['data']
+        Setting.docBID = JSON.parse(bidString)
+        Setting.eleBID = Setting.docBID['data']
 
         //세부공사별 번호 Data.ConstructionNums 딕셔너리에 저장
-        this.GetConstructionNum()
+        Setting.GetConstructionNum()
 
         //세부공사별 리스트 생성(Dic -> key : 세부공사별 번호 / value : 세부공사별 리스트)
-        this.AddConstructionList()
+        Setting.AddConstructionList()
 
         //공내역 xml 파일 읽어들여 데이터 저장
-        this.GetDataFromBID()
+        Setting.GetDataFromBID()
 
         if (Data.XlsFiles != null) {
             //실내역으로부터 Data 객체에 단가세팅
-            this.SetUnitPrice()
+            Setting.SetUnitPrice()
         } else {
-            this.SetUnitPriceNoExcel() //실내역 없이 공내역만으로 Data 객체에 단가 세팅 (23.02.06)
+            Setting.SetUnitPriceNoExcel() //실내역 없이 공내역만으로 Data 객체에 단가 세팅 (23.02.06)
         }
 
         //고정금액 및 적용비율 저장
-        this.GetRate()
+        Setting.GetRate()
 
         //직공비 제외항목 및 고정금액 계산
-        this.GetPrices()
+        Setting.GetPrices()
 
         //표준시장단가 합계(조사금액) 저장
         Data.InvestigateStandardMarket =
@@ -40,7 +40,7 @@ export class Setting {
     }
 
     public static GetConstructionNum(): void {
-        const constNums: object = this.eleBID['T2']
+        const constNums: object = Setting.eleBID['T2']
         let index: string
         let construction: string
         for (let num in constNums) {
@@ -90,24 +90,42 @@ export class Setting {
 
     public static GetDataFromBID(): void {
         // 수정 필요
-        const works = (this.eleBID as unknown as any[])
-            .filter((work) => work.Name === 'T3')
-            .map((work) => {
-                return {
-                    Item: this.GetItem(work),
-                    ConstructionNum: work.Element('C1').Value.toString(),
-                    WorkNum: work.Element('C2').Value.toString(),
-                    DetailWorkNum: work.Element('C3').Value.toString(),
-                    Code: work.Element('C9').Value.toString(),
-                    Name: work.Element('C12').Value.toString(),
-                    Standard: work.Element('C13').Value.toString(),
-                    Unit: work.Element('C14').Value.toString(),
-                    Quantity: parseFloat(work.Element('C15').Value),
-                    MaterialUnit: parseFloat(work.Element('C28').Value),
-                    LaborUnit: parseFloat(work.Element('C29').Value),
-                    ExpenseUnit: parseFloat(work.Element('C30').Value),
-                }
-            })
+        //4.10 주석처리한 부분 수정함
+
+        var works = Setting.eleBID['T3'].map(function (work) {
+            return new Data(
+                Setting.GetItem(work),
+                work.C1._text, //null값 가능성O
+                work.C2._text, //null값 가능성O
+                work.C3._text, //null값 가능성O
+                work.C9._text, //null값 가능성O
+                work.C12._text, //null값 가능성O
+                work.C13._text, //null값 가능성O
+                work.C14._text, //null값 가능성O
+                parseFloat(work.C15._text),
+                parseFloat(work.C28._text),
+                parseFloat(work.C29._text),
+                parseFloat(work.C30._text)
+            )
+        })
+        // const works = (Setting.eleBID as unknown as any[])
+        //     .filter((work) => work.Name === 'T3')
+        //     .map((work) => {
+        //         return {
+        //             Item: Setting.GetItem(work),
+        //             ConstructionNum: work.Element('C1').Value.toString(),
+        //             WorkNum: work.Element('C2').Value.toString(),
+        //             DetailWorkNum: work.Element('C3').Value.toString(),
+        //             Code: work.Element('C9').Value.toString(),
+        //             Name: work.Element('C12').Value.toString(),
+        //             Standard: work.Element('C13').Value.toString(),
+        //             Unit: work.Element('C14').Value.toString(),
+        //             Quantity: parseFloat(work.Element('C15').Value),
+        //             MaterialUnit: parseFloat(work.Element('C28').Value),
+        //             LaborUnit: parseFloat(work.Element('C29').Value),
+        //             ExpenseUnit: parseFloat(work.Element('C30').Value),
+        //         }
+        //     })
         works.forEach((work) => {
             Data.Dic[work.ConstructionNum].set(work)
         })
@@ -185,14 +203,15 @@ export class Setting {
         })
     }
 
-    public static SetUnitPrice(): void { // 미완성(가장 마지막에 작성 예정)
+    public static SetUnitPrice(): void {
+        // 미완성(가장 마지막에 작성 예정)
         // let copiedFolder: string = Data.folder + "\\Actual Xlsx";
         // const dir = new DirectoryInfo(copiedFolder);
         // const files = dir.GetFiles();
     }
 
     public static SetUnitPriceNoExcel(): void {
-        const bidT3: object = this.eleBID['T3']
+        const bidT3: object = Setting.eleBID['T3']
         for (let key in bidT3) {
             if (
                 JSON.stringify(bidT3[key]['C9']['_text']) != null &&
@@ -228,15 +247,15 @@ export class Setting {
                 }
             })
         }
-        fs.writeFileSync(Data.work_path + '\\Setting_Xml.xml', JSON.stringify(this.docBID))
+        fs.writeFileSync(Data.work_path + '\\Setting_Xml.xml', JSON.stringify(Setting.docBID))
     }
 
     public static GetRate(): void {
-        const bidT1: object = this.eleBID['T1']
+        const bidT1: object = Setting.eleBID['T1']
         for (let key in bidT1) {
             Data.ConstructionTerm = Number(JSON.stringify(bidT1[key]['C29']['_text']))
         }
-        const bidT5: object = this.eleBID['T5']
+        const bidT5: object = Setting.eleBID['T5']
         for (let key in bidT5) {
             let name: string = JSON.stringify(bidT5[key]['C4']['_text'])
             let val1: string = JSON.stringify(bidT5[key]['C6']['_text'])

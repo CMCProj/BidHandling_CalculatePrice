@@ -1,9 +1,13 @@
 //"object is possibly 'undefined'"" -> tsconfig.json 으로 이동하여 "strictNullChecks":false를 추가
 //decimal, round사용 부분 수정 필요(라이브러리)
-const ExcelHandling = require('./ExcelHandling.ts')
-const Data = require('./Data.ts')
 
-class FillCostAccount {
+import { ExcelHandling } from './ExcelHandling'
+import { Data } from './Data'
+import fs from 'fs'
+import path from 'path'
+import Big from 'big.js'
+
+export class FillCostAccount {
     //원가계산서 항목별 조사금액 채움(관리자 보정 후)
     public static FillInvestigationCosts() {
         let costStatementPath: string = ''
@@ -378,7 +382,7 @@ class FillCostAccount {
             )
         )
         let exSum = Data.ExcludingMaterial + Data.ExcludingLabor + Data.ExcludingExpense
-        let exRate2 = Math.round(exSum / Data.Investigation.get('직공비'), 5) //수정-Math.round
+        let exRate2 = new Big(exSum).div(Data.Investigation.get('직공비')).round(5).toNumber() //소수점5자리 남기게 반올림
         Data.Rate2.set('제요율적용제외공종', exRate2)
         //4. 총원가
         Data.Investigation.set(
@@ -729,7 +733,8 @@ class FillCostAccount {
     public static ToLong(
         price: number //price: decimal
     ) {
-        return Math.floor(price) //Convert.ToInt64(Math.Truncate(price));
+        let bigNum = new Big(price).round(0, 0)
+        return bigNum.toNumber()
     }
 
     //공사이행보증서발급수수료 금액 계산 후 반환
@@ -764,15 +769,25 @@ class FillCostAccount {
         if (Data.Fixed.has(item)) return 100
         if (Data.Investigation.get(item) == 0 && Data.Bidding.get(item) == 0) return 100
         //원가계산제경비 옵션 적용 항목은 적용 전, 후의 비율 출력
-        // if (item==="간접노무비" || item==="기타경비" || item==="일반관리비" || item.==="공사손해보험료")
-        // {
-        //     var before:string = item + "before";
-        //     return Math.Round(Convert.ToDecimal(Data.Bidding[item]) / Data.Bidding[before], 7) * 100;
-        // }
-        // decimal rate = Math.Round(Convert.ToDecimal(Data.Bidding[item]) / Data.Investigation[item], 7);
-        // rate = rate * 100;
-        // return rate;
-        return 0
+        if (
+            item === '간접노무비' ||
+            item === '기타경비' ||
+            item === '일반관리비' ||
+            item === '공사손해보험료'
+        ) {
+            var before: string = item + 'before'
+            return new Big(Data.Bidding[item])
+                .div(Data.Bidding[before])
+                .round(7)
+                .times(100)
+                .toNumber()
+        }
+        let rate = new Big(Data.Bidding[item])
+            .div(Data.Investigation[item])
+            .round(7)
+            .times(100)
+            .toNumber()
+        return rate.toNumber()
     }
 
     //해당 공사에 특정 원가계산서 항목이 존재하지 않는 경우

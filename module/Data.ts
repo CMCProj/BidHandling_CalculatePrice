@@ -1,6 +1,33 @@
-import path from 'path'
+import * as path from 'path'
 
 export class Data {
+    constructor(
+        item,
+        constructionNum,
+        workNum,
+        detailWorkNum,
+        code,
+        name,
+        standard,
+        unit,
+        quantity,
+        materialUnit,
+        laborUnit,
+        expenseUnit
+    ) {
+        this.Item = item
+        this.ConstructionNum = constructionNum
+        this.WorkNum = workNum
+        this.DetailWorkNum = detailWorkNum
+        this.Code = code
+        this.Name = name
+        this.Standard = standard
+        this.Unit = unit
+        this.Quantity = quantity
+        this.MaterialUnit = materialUnit
+        this.LaborUnit = laborUnit
+        this.ExpenseUnit = expenseUnit
+    }
     public static folder: string = path.resolve(__dirname, '../AutoBid') //내 문서 폴더의 AutoBID 폴더로 지정 (23.02.02)
     // WPF 앱 파일 관리 변수
     public static XlsText: string = ''
