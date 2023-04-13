@@ -3,6 +3,7 @@
     "adm-zip": "^0.5.10",
     "big.js": "^6.2.1",
     "exceljs": "^4.3.0",
+    "xls-to-json": "^2.1.1",
     "xml-js": "^1.6.11"
   },
   "devDependencies": {

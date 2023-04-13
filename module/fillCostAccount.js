@@ -1,25 +1,46 @@
 "use strict";
 //"object is possibly 'undefined'"" -> tsconfig.json 으로 이동하여 "strictNullChecks":false를 추가
 //decimal, round사용 부분 수정 필요(라이브러리)
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FillCostAccount = void 0;
-var ExcelHandling_1 = require("./ExcelHandling");
-var Data_1 = require("./Data");
-var fs_1 = __importDefault(require("fs"));
-var path_1 = __importDefault(require("path"));
-var big_js_1 = __importDefault(require("big.js"));
-var FillCostAccount = /** @class */ (function () {
-    function FillCostAccount() {
-    }
+const ExcelHandling_1 = require("./ExcelHandling");
+const Data_1 = require("./Data");
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
+const big_js_1 = __importDefault(require("big.js"));
+class FillCostAccount {
     //원가계산서 항목별 조사금액 채움(관리자 보정 후)
-    FillCostAccount.FillInvestigationCosts = function () {
-        var costStatementPath = '';
+    static FillInvestigationCosts() {
+        let costStatementPath = '';
         //원가 계산서 양식 불러오기
-        var workbook = ExcelHandling_1.ExcelHandling.GetWorkbook('세부결과_원가계산서.xlsx', '.xlsx');
-        var sheet = workbook.GetSheetAt(0);
+        let workbook = ExcelHandling_1.ExcelHandling.GetWorkbook('세부결과_원가계산서.xlsx', '.xlsx');
+        let sheet = workbook.GetSheetAt(0);
         //적용비율1 작성
         ExcelHandling_1.ExcelHandling.GetCell(sheet, 7, 6).SetCellValue(Data_1.Data.Rate1.get('간접노무비') + ' %');
         ExcelHandling_1.ExcelHandling.GetCell(sheet, 10, 6).SetCellValue(Data_1.Data.Rate1.get('산재보험료') + ' %');
@@ -71,32 +92,32 @@ var FillCostAccount = /** @class */ (function () {
         ExcelHandling_1.ExcelHandling.GetCell(sheet, 32, 8).SetCellValue(0); //8. 매입세
         ExcelHandling_1.ExcelHandling.GetCell(sheet, 33, 8).SetCellValue(Data_1.Data.Investigation.get('도급비계')); //9. 도급비계
         //원가계산서 조사금액 세팅 시점에 CalculatePrice.cs에서 재계산 시, 초기화를 위한 조사금액 저장
-        var FM = Data_1.Data.FixedPriceDirectMaterial;
-        var FL = Data_1.Data.FixedPriceDirectLabor;
-        var FOE = Data_1.Data.FixedPriceOutputExpense;
-        var SM = Data_1.Data.StandardMaterial;
-        var SL = Data_1.Data.StandardLabor;
-        var SOE = Data_1.Data.StandardExpense;
+        let FM = Data_1.Data.FixedPriceDirectMaterial;
+        let FL = Data_1.Data.FixedPriceDirectLabor;
+        let FOE = Data_1.Data.FixedPriceOutputExpense;
+        let SM = Data_1.Data.StandardMaterial;
+        let SL = Data_1.Data.StandardLabor;
+        let SOE = Data_1.Data.StandardExpense;
         Data_1.Data.InvestigateFixedPriceDirectMaterial = FM;
         Data_1.Data.InvestigateFixedPriceDirectLabor = FL;
         Data_1.Data.InvestigateFixedPriceOutputExpense = FOE;
         Data_1.Data.InvestigateStandardMaterial = SM;
         Data_1.Data.InvestigateStandardLabor = SL;
         Data_1.Data.InvestigateStandardExpense = SOE;
-        if (fs_1.default.existsSync(Data_1.Data.work_path + '원가계산서.xlsx')) {
+        if (fs.existsSync(Data_1.Data.work_path + '원가계산서.xlsx')) {
             //먼저 기존 원가계산서 파일이 있다면 삭제한다. (23.02.02)
-            fs_1.default.unlinkSync(Data_1.Data.work_path + '원가계산서.xlsx');
+            fs.unlinkSync(Data_1.Data.work_path + '원가계산서.xlsx');
         }
-        costStatementPath = path_1.default.join(Data_1.Data.work_path, '원가계산서.xlsx');
+        costStatementPath = path.join(Data_1.Data.work_path, '원가계산서.xlsx');
         ExcelHandling_1.ExcelHandling.WriteExcel(workbook, costStatementPath);
-    };
+    }
     //원가계산서 항목별 입찰금액 채움
-    FillCostAccount.FillBiddingCosts = function () {
+    static FillBiddingCosts() {
         //조사금액을 채운 원가계산서_세부결과.xlsx의 경로
-        var costStatementPath = path_1.default.join(Data_1.Data.work_path, '원가계산서.xlsx');
+        let costStatementPath = path.join(Data_1.Data.work_path, '원가계산서.xlsx');
         //원가계산서_세부결과 파일 불러오기
-        var workbook = ExcelHandling_1.ExcelHandling.GetWorkbook(costStatementPath, '.xlsx');
-        var sheet = workbook.GetSheetAt(0);
+        let workbook = ExcelHandling_1.ExcelHandling.GetWorkbook(costStatementPath, '.xlsx');
+        let sheet = workbook.GetSheetAt(0);
         //적용비율 1, 2 적용금액 원가계산서 반영
         ExcelHandling_1.ExcelHandling.GetCell(sheet, 7, 9).SetCellValue(Data_1.Data.Bidding.get('간접노무비1'));
         ExcelHandling_1.ExcelHandling.GetCell(sheet, 10, 9).SetCellValue(Data_1.Data.Bidding.get('산재보험료1'));
@@ -170,12 +191,12 @@ var FillCostAccount = /** @class */ (function () {
         ExcelHandling_1.ExcelHandling.GetCell(sheet, 27, 20).SetCellValue(FillCostAccount.GetRate('제요율적용제외공종') + ' %'); //3.2 제요율적용제외공종
         ExcelHandling_1.ExcelHandling.GetCell(sheet, 29, 20).SetCellValue(FillCostAccount.GetRate('공사손해보험료') + ' %'); //5. 공사손해보험료
         ExcelHandling_1.ExcelHandling.GetCell(sheet, 33, 20).SetCellValue(FillCostAccount.GetRate('도급비계') + ' %'); //9. 도급비계
-        costStatementPath = path_1.default.join(Data_1.Data.work_path, '원가계산서_세부결과.xlsx');
+        costStatementPath = path.join(Data_1.Data.work_path, '원가계산서_세부결과.xlsx');
         ExcelHandling_1.ExcelHandling.WriteExcel(workbook, costStatementPath);
-    };
+    }
     //원가계산서 항목별 조사금액 구하여 Dictionary Investigation에 저장
     //보정의 경우, 매개변수로 보정할 항목의 이름(item)과 보정할 금액(price)를 받아 값을 적용
-    FillCostAccount.CalculateInvestigationCosts = function (correction //Dictionary<string, long>->Map<string, number>
+    static CalculateInvestigationCosts(correction //Dictionary<string, long>->Map<string, number>
     ) {
         //직공비
         Data_1.Data.Investigation.set('직공비', FillCostAccount.ToLong(Data_1.Data.RealDirectMaterial + Data_1.Data.RealDirectLabor + Data_1.Data.RealOutputExpense));
@@ -242,8 +263,8 @@ var FillCostAccount = /** @class */ (function () {
         Data_1.Data.Investigation.set('PS', FillCostAccount.ToLong(Data_1.Data.PsMaterial + Data_1.Data.PsLabor + Data_1.Data.PsExpense));
         //3.2 제요율적용제외공종
         Data_1.Data.Investigation.set('제요율적용제외공종', FillCostAccount.ToLong(Data_1.Data.ExcludingMaterial + Data_1.Data.ExcludingLabor + Data_1.Data.ExcludingExpense));
-        var exSum = Data_1.Data.ExcludingMaterial + Data_1.Data.ExcludingLabor + Data_1.Data.ExcludingExpense;
-        var exRate2 = new big_js_1.default(exSum).div(Data_1.Data.Investigation.get('직공비')).round(5).toNumber(); //소수점5자리 남기게 반올림
+        let exSum = Data_1.Data.ExcludingMaterial + Data_1.Data.ExcludingLabor + Data_1.Data.ExcludingExpense;
+        let exRate2 = new big_js_1.default(exSum).div(Data_1.Data.Investigation.get('직공비')).round(5).toNumber(); //소수점5자리 남기게 반올림
         Data_1.Data.Rate2.set('제요율적용제외공종', exRate2);
         //4. 총원가
         Data_1.Data.Investigation.set('총원가', Data_1.Data.Investigation.get('순공사원가') +
@@ -268,16 +289,16 @@ var FillCostAccount = /** @class */ (function () {
         //8. 매입세(입찰 공사 파일 중, 매입세 있는 공사 없음. 추후 추가할 수 있음)
         //9. 도급비계
         Data_1.Data.Investigation.set('도급비계', Data_1.Data.Investigation.get('소계') + Data_1.Data.Investigation.get('부가가치세'));
-    };
+    }
     //원가계산서 항목별 입찰금액 구하여 Bidding에 저장
-    FillCostAccount.CalculateBiddingCosts = function () {
+    static CalculateBiddingCosts() {
         //직공비
         Data_1.Data.Bidding.set('직공비', FillCostAccount.ToLong(Data_1.Data.RealDirectMaterial + Data_1.Data.RealDirectLabor + Data_1.Data.RealOutputExpense));
         //적용비율 2를 적용한 금액 계산
-        var undirectlabor2 = Data_1.Data.Bidding.get('직공비') * (Data_1.Data.Rate2.get('간접노무비') * 0.01);
-        var industrial2 = Data_1.Data.Bidding.get('직공비') * (Data_1.Data.Rate2.get('산재보험료') * 0.01);
-        var employ2 = Data_1.Data.Bidding.get('직공비') * (Data_1.Data.Rate2.get('고용보험료') * 0.01);
-        var etc2 = Data_1.Data.Bidding.get('직공비') * (Data_1.Data.Rate2.get('기타경비') * 0.01);
+        let undirectlabor2 = Data_1.Data.Bidding.get('직공비') * (Data_1.Data.Rate2.get('간접노무비') * 0.01);
+        let industrial2 = Data_1.Data.Bidding.get('직공비') * (Data_1.Data.Rate2.get('산재보험료') * 0.01);
+        let employ2 = Data_1.Data.Bidding.get('직공비') * (Data_1.Data.Rate2.get('고용보험료') * 0.01);
+        let etc2 = Data_1.Data.Bidding.get('직공비') * (Data_1.Data.Rate2.get('기타경비') * 0.01);
         //적용비율 2를 적용한 금액 저장
         Data_1.Data.Bidding.set('간접노무비2', FillCostAccount.ToLong(undirectlabor2));
         Data_1.Data.Bidding.set('산재보험료2', FillCostAccount.ToLong(industrial2));
@@ -417,8 +438,8 @@ var FillCostAccount = /** @class */ (function () {
         Data_1.Data.Bidding.set('도급비계', Data_1.Data.Bidding.get('소계') + Data_1.Data.Bidding.get('부가가치세'));
         //도급비계 1000원 단위 절상 옵션 적용시
         if (Data_1.Data.BidPriceRaise === '1') {
-            var raise = 1000 - (Data_1.Data.Bidding.get('도급비계') % 1000); //1000원 단위 절상 //Convert.ToDecimal(Data.Bidding.get("도급비계")) % 1000)
-            var addPrice = raise / 1.1; //decimal 1.1m
+            let raise = 1000 - (Data_1.Data.Bidding.get('도급비계') % 1000); //1000원 단위 절상 //Convert.ToDecimal(Data.Bidding.get("도급비계")) % 1000)
+            let addPrice = raise / 1.1; //decimal 1.1m
             Data_1.Data.Bidding.set('도급비계', FillCostAccount.ToLong(Data_1.Data.Bidding.get('도급비계') + raise));
             Data_1.Data.Bidding.set('일반관리비', FillCostAccount.ToLong(Data_1.Data.Bidding.get('일반관리비') + addPrice)); //절상에 필요한 가격을 일반관리비에 더해 금액을 맞추어줌
             //FillCostAccount.ToLong(Convert.ToDecimal(Data.Bidding.get("일반관리비")) + addPrice)
@@ -426,20 +447,20 @@ var FillCostAccount = /** @class */ (function () {
             Data_1.Data.Bidding.set('소계', FillCostAccount.ToLong(Data_1.Data.Bidding.get('소계') + addPrice)); //FillCostAccount.ToLong(Convert.ToDecimal(Data.Bidding.get("소계")) + addPrice)
             Data_1.Data.Bidding.set('부가가치세', FillCostAccount.ToLong(Data_1.Data.Bidding.get('소계') * (Data_1.Data.Rate1.get('부가가치세') * 0.01))); //decimal 0.01m
             //계산된 도급비계 금액이 천원 단위가 아닐 경우, 부가세 조정
-            var difference = Data_1.Data.Bidding.get('도급비계') -
+            let difference = Data_1.Data.Bidding.get('도급비계') -
                 (Data_1.Data.Bidding.get('소계') + Data_1.Data.Bidding.get('부가가치세'));
             Data_1.Data.Bidding.set('부가가치세', FillCostAccount.ToLong(Data_1.Data.Bidding.get('부가가치세') + difference));
             //Console.WriteLine("차이 : " + difference);
         }
-    };
+    }
     //decimal 금액 원 단위 절사
-    FillCostAccount.ToLong = function (price //price: decimal
+    static ToLong(price //price: decimal
     ) {
-        var bigNum = new big_js_1.default(price).round(0, 0);
+        let bigNum = new big_js_1.default(price).round(0, 0);
         return bigNum.toNumber();
-    };
+    }
     //공사이행보증서발급수수료 금액 계산 후 반환
-    FillCostAccount.GetConstructionGuaranteeFee = function (directSum //long directSum //수정시 자료형 재확인
+    static GetConstructionGuaranteeFee(directSum //long directSum //수정시 자료형 재확인
     ) {
         var guaranteeFee = 0; //long
         var rate = Data_1.Data.Rate1.get('공사이행보증서발급수수료') * 0.01; //decimal 0.01m
@@ -455,9 +476,9 @@ var FillCostAccount = /** @class */ (function () {
         else
             guaranteeFee = FillCostAccount.ToLong(((directSum - 50000000000) * rate + 10000000) * term);
         return guaranteeFee;
-    };
+    }
     //입찰 금액의 조사금액 대 비율 저장
-    FillCostAccount.GetRate = function (item) {
+    static GetRate(item) {
         if (Data_1.Data.Fixed.has(item))
             return 100;
         if (Data_1.Data.Investigation.get(item) == 0 && Data_1.Data.Bidding.get(item) == 0)
@@ -474,15 +495,15 @@ var FillCostAccount = /** @class */ (function () {
                 .times(100)
                 .toNumber();
         }
-        var rate = new big_js_1.default(Data_1.Data.Bidding[item])
+        let rate = new big_js_1.default(Data_1.Data.Bidding[item])
             .div(Data_1.Data.Investigation[item])
             .round(7)
             .times(100)
             .toNumber();
         return rate.toNumber();
-    };
+    }
     //해당 공사에 특정 원가계산서 항목이 존재하지 않는 경우
-    FillCostAccount.CheckKeyNotFound = function () {
+    static CheckKeyNotFound() {
         if (!Data_1.Data.Rate1.has('간접노무비'))
             Data_1.Data.Rate1.set('간접노무비', 0);
         if (!Data_1.Data.Rate1.has('산재보험료'))
@@ -527,7 +548,6 @@ var FillCostAccount = /** @class */ (function () {
             Data_1.Data.Rate2.set('고용보험료', 0);
         if (!Data_1.Data.Rate2.has('기타경비'))
             Data_1.Data.Rate2.set('기타경비', 0);
-    };
-    return FillCostAccount;
-}());
+    }
+}
 exports.FillCostAccount = FillCostAccount;
