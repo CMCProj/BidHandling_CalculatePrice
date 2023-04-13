@@ -1,33 +1,10 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Setting = void 0;
 var Data_1 = require("./Data");
 var ExcelHandling_1 = require("./ExcelHandling");
 //import Enumerable from 'linq'
-var fs = __importStar(require("fs"));
+var fs = require("fs");
 var Setting = /** @class */ (function () {
     function Setting() {
     }
@@ -82,6 +59,8 @@ var Setting = /** @class */ (function () {
                 else
                     item = '일반';
             }
+            else
+                item = '예외'; // null값이 발생해 예외 추가함
         }
         //해당 공종이 무대(입력불가)인 경우
         else if (bid['C7']['_text'] === '1')
@@ -126,26 +105,8 @@ var Setting = /** @class */ (function () {
             work.C14._text, //null값 가능성O
             parseFloat(work.C15._text), parseFloat(work.C28._text), parseFloat(work.C29._text), parseFloat(work.C30._text));
         });
-        // const works = (Setting.eleBID as unknown as any[])
-        //     .filter((work) => work.Name === 'T3')
-        //     .map((work) => {
-        //         return {
-        //             Item: Setting.GetItem(work),
-        //             ConstructionNum: work.Element('C1').Value.toString(),
-        //             WorkNum: work.Element('C2').Value.toString(),
-        //             DetailWorkNum: work.Element('C3').Value.toString(),
-        //             Code: work.Element('C9').Value.toString(),
-        //             Name: work.Element('C12').Value.toString(),
-        //             Standard: work.Element('C13').Value.toString(),
-        //             Unit: work.Element('C14').Value.toString(),
-        //             Quantity: parseFloat(work.Element('C15').Value),
-        //             MaterialUnit: parseFloat(work.Element('C28').Value),
-        //             LaborUnit: parseFloat(work.Element('C29').Value),
-        //             ExpenseUnit: parseFloat(work.Element('C30').Value),
-        //         }
-        //     })
         works.forEach(function (work) {
-            Data_1.Data.Dic[work.ConstructionNum].set(work);
+            Data_1.Data.Dic.set(work.ConstructionNum, work);
         });
     };
     Setting.MatchConstructionNum = function (filePath) {
@@ -261,10 +222,7 @@ var Setting = /** @class */ (function () {
         fs.writeFileSync(Data_1.Data.work_path + '\\Setting_Xml.xml', JSON.stringify(Setting.docBID));
     };
     Setting.GetRate = function () {
-        var bidT1 = Setting.eleBID['T1'];
-        for (var key in bidT1) {
-            Data_1.Data.ConstructionTerm = Number(JSON.stringify(bidT1[key]['C29']['_text']));
-        }
+        Data_1.Data.ConstructionTerm = Number(Setting.eleBID['T1']['C29']['_text']);
         var bidT5 = Setting.eleBID['T5'];
         for (var key in bidT5) {
             var name_2 = JSON.stringify(bidT5[key]['C4']['_text']);

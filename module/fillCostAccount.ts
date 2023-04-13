@@ -3,8 +3,8 @@
 
 import { ExcelHandling } from './ExcelHandling'
 import { Data } from './Data'
-import fs from 'fs'
-import path from 'path'
+import * as fs from 'fs'
+import * as path from 'path'
 import Big from 'big.js'
 
 export class FillCostAccount {
@@ -787,7 +787,7 @@ export class FillCostAccount {
             .round(7)
             .times(100)
             .toNumber()
-        return rate.toNumber()
+        return rate.toNumber();
     }
 
     //해당 공사에 특정 원가계산서 항목이 존재하지 않는 경우

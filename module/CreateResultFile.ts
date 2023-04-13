@@ -1,7 +1,7 @@
 import { Data } from './Data'
-import path from 'path'
-import fs from 'fs'
-import exceljs from 'exceljs'
+import * as path from 'path'
+import * as fs from 'fs'
+import * as exceljs from 'exceljs'
 
 export class CreateResultFile {
     public static Create(): void {
@@ -34,7 +34,7 @@ export class CreateResultFile {
             const sheet = workbook.GetSheetAt(0)
             let resultPath: string
             let path: string
-            for (let i = 0; i < dic.values.Count; i++) {
+            for (let i = 0; i < dic.values.length; i++) {
                 if (dic.values[i].Item === '일반') {
                     //엑셀핸들링
                 }

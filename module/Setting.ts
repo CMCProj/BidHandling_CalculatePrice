@@ -64,7 +64,7 @@ export class Setting {
             if (bid['C5']['_text'] === 'S') {
                 if (bid['C10']['_text'] === '') item = '표준시장단가'
                 else item = '일반'
-            }
+            } else item = '예외' // null값이 발생해 예외 추가함
         }
         //해당 공종이 무대(입력불가)인 경우
         else if (bid['C7']['_text'] === '1') item = '공종(입력불가)'
@@ -108,26 +108,9 @@ export class Setting {
                 parseFloat(work.C30._text)
             )
         })
-        // const works = (Setting.eleBID as unknown as any[])
-        //     .filter((work) => work.Name === 'T3')
-        //     .map((work) => {
-        //         return {
-        //             Item: Setting.GetItem(work),
-        //             ConstructionNum: work.Element('C1').Value.toString(),
-        //             WorkNum: work.Element('C2').Value.toString(),
-        //             DetailWorkNum: work.Element('C3').Value.toString(),
-        //             Code: work.Element('C9').Value.toString(),
-        //             Name: work.Element('C12').Value.toString(),
-        //             Standard: work.Element('C13').Value.toString(),
-        //             Unit: work.Element('C14').Value.toString(),
-        //             Quantity: parseFloat(work.Element('C15').Value),
-        //             MaterialUnit: parseFloat(work.Element('C28').Value),
-        //             LaborUnit: parseFloat(work.Element('C29').Value),
-        //             ExpenseUnit: parseFloat(work.Element('C30').Value),
-        //         }
-        //     })
+
         works.forEach((work) => {
-            Data.Dic[work.ConstructionNum].set(work)
+            Data.Dic.set(work.ConstructionNum, work)
         })
     }
 
@@ -251,10 +234,8 @@ export class Setting {
     }
 
     public static GetRate(): void {
-        const bidT1: object = Setting.eleBID['T1']
-        for (let key in bidT1) {
-            Data.ConstructionTerm = Number(JSON.stringify(bidT1[key]['C29']['_text']))
-        }
+        Data.ConstructionTerm = Number(Setting.eleBID['T1']['C29']['_text'])
+
         const bidT5: object = Setting.eleBID['T5']
         for (let key in bidT5) {
             let name: string = JSON.stringify(bidT5[key]['C4']['_text'])
