@@ -18,7 +18,7 @@ export class CalculatePrice {
     private static exCount: number = 0 //제요율적용제외공종 항목 수량 합계
 
     public static Calculation(): void {
-        const bidString: string = fs.readFileSync(Data.folder + '\\OutputDataFromBID.json', 'utf-8')
+        const bidString: string = fs.readFileSync(Data.folder + '\\Setting_Json.json', 'utf-8')
         this.docBID = JSON.parse(bidString)
         this.eleBID = this.docBID['data']
 

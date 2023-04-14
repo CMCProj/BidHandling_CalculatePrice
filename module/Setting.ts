@@ -3,6 +3,8 @@ import { ExcelHandling } from './ExcelHandling'
 //import Enumerable from 'linq'
 import * as fs from 'fs'
 
+//4.14 Setting.SetUnitPriceNoExcel에서 값 입력되지 않음.
+
 export class Setting {
     private static docBID: JSON
     private static eleBID: JSON
@@ -44,19 +46,26 @@ export class Setting {
         let index: string
         let construction: string
         for (let num in constNums) {
-            index = JSON.stringify(constNums[num]['C1']['_text'])
-            construction = JSON.stringify(constNums[num]['C3']['_text'])
+            index = constNums[num]['C1']['_text']
+            construction = constNums[num]['C3']['_text']
             if (Data.ConstructionNums.has(construction)) {
                 construction += '2'
             }
+            console.log(
+                '키:',
+                index,
+                '값:',
+                construction,
+                '으로 Data.ConstructionNums에 <string, string> 추가'
+            )
             Data.ConstructionNums.set(index, construction)
         }
     }
 
     public static AddConstructionList(): void {
         Data.ConstructionNums.forEach(function (value, key) {
-            console.log('키:', key, '값:', value, '으로 Data.Dic에 array 추가')
             Data.Dic.set(key, new Array<Data>())
+            console.log('키:', key, '값:', Data.Dic.get(key), '으로 Data.Dic에 <string, []> 추가')
         }) // Data.Dic자료구조 체크하기 <string. Data[]>가 맞는지, <string, Array[]>로 해야하는지
     }
 
@@ -113,7 +122,13 @@ export class Setting {
         })
 
         works.forEach((work) => {
-            Data.Dic.set(work.ConstructionNum, work)
+            Data.Dic.get(work.ConstructionNum).push({ ...work })
+            console.log(
+                'Data.Dic의',
+                'arrray에',
+                Data.Dic.get(work.ConstructionNum)[Data.Dic.get(work.ConstructionNum).length - 1],
+                '추가'
+            )
         })
     }
 
@@ -199,10 +214,8 @@ export class Setting {
     public static SetUnitPriceNoExcel(): void {
         const bidT3: object = Setting.eleBID['T3']
         for (let key in bidT3) {
-            if (
-                JSON.stringify(bidT3[key]['C9']['_text']) != null &&
-                JSON.stringify(bidT3[key]['C5']['_text']) === 'S'
-            ) {
+            if (bidT3[key]['C9']['_text'] != null && bidT3[key]['C5']['_text'] === 'S') {
+                console.log('Setting UnitPrice!')
                 let constNum: string = bidT3[key]['C1']['_text']
                 let numVal: string = bidT3[key]['C2']['_text']
                 let detailVal: string = bidT3[key]['C3']['_text']
@@ -259,7 +272,7 @@ export class Setting {
     public static GetPrices(): void {
         for (let value of Array.from(Data.Dic.values())) {
             for (let item of value) {
-                console.log(item)
+                //console.log(item)
                 if (item.Item === '관급') {
                     Data.GovernmentMaterial += item.Material
                     Data.GovernmentLabor += item.Labor
