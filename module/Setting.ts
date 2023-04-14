@@ -54,7 +54,10 @@ export class Setting {
     }
 
     public static AddConstructionList(): void {
-        Data.ConstructionNums.forEach((key, value) => Data.Dic.set(key, new Array<Data>())) // Data.Dic자료구조 체크하기 <string. Data[]>가 맞는지, <string, Array[]>로 해야하는지
+        Data.ConstructionNums.forEach(function (value, key) {
+            console.log('키:', key, '값:', value, '으로 Data.Dic에 array 추가')
+            Data.Dic.set(key, new Array<Data>())
+        }) // Data.Dic자료구조 체크하기 <string. Data[]>가 맞는지, <string, Array[]>로 해야하는지
     }
 
     public static GetItem(bid): string {
@@ -203,7 +206,7 @@ export class Setting {
                 let constNum: string = bidT3[key]['C1']['_text']
                 let numVal: string = bidT3[key]['C2']['_text']
                 let detailVal: string = bidT3[key]['C3']['_text']
-                let curObject = Data.Dic[constNum].Find(
+                let curObject = Data.Dic.get(constNum).find(
                     (x) => x.WorkNum === numVal && x.DetailWorkNum === detailVal
                 )
 
@@ -223,14 +226,14 @@ export class Setting {
                 }
             }
         }
-        if (fs.existsSync(Data.work_path + '\\Setting_Xml.xml')) {
-            fs.unlink(Data.work_path + '\\Setting_Xml.xml', (err) => {
+        if (fs.existsSync(Data.work_path + '\\Setting_Json.json')) {
+            fs.unlink(Data.work_path + '\\Setting_Json.json', (err) => {
                 if (err.code == 'ENOENT') {
                     console.log('파일 삭제 Error 발생')
                 }
             })
         }
-        fs.writeFileSync(Data.work_path + '\\Setting_Xml.xml', JSON.stringify(Setting.docBID))
+        fs.writeFileSync(Data.work_path + '\\Setting_Json.json', JSON.stringify(Setting.docBID))
     }
 
     public static GetRate(): void {
@@ -254,8 +257,9 @@ export class Setting {
     }
 
     public static GetPrices(): void {
-        Data.Dic.forEach((value, key) => {
-            value.forEach((item) => {
+        for (let value of Array.from(Data.Dic.values())) {
+            for (let item of value) {
+                console.log(item)
                 if (item.Item === '관급') {
                     Data.GovernmentMaterial += item.Material
                     Data.GovernmentLabor += item.Labor
@@ -322,7 +326,7 @@ export class Setting {
                     Data.ByProduct += item.Labor
                     Data.ByProduct += item.Expense
                 }
-            })
-        })
+            }
+        }
     }
 }
