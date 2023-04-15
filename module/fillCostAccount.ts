@@ -9,10 +9,10 @@ import Big from 'big.js'
 
 export class FillCostAccount {
     //원가계산서 항목별 조사금액 채움(관리자 보정 후)
-    public static FillInvestigationCosts() {
+    public static async FillInvestigationCosts() {
         let costStatementPath: string = ''
         //원가 계산서 양식 불러오기
-        let workbook = ExcelHandling.GetWorkbook('세부결과_원가계산서.xlsx', '.xlsx')
+        let workbook = await ExcelHandling.GetWorkbook('세부결과_원가계산서.xlsx', '.xlsx')
         let sheet = workbook.GetSheetAt(0)
         //적용비율1 작성
         ExcelHandling.GetCell(sheet, 7, 6).SetCellValue(Data.Rate1.get('간접노무비') + ' %')
