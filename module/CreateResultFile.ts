@@ -1,7 +1,7 @@
 import { Data } from './Data'
-import path from 'path'
-import fs from 'fs'
-import exceljs from 'exceljs'
+import * as  path from 'path'
+import * as fs from 'fs'
+import * as exceljs from 'exceljs'
 import {ExcelHandling} from "./ExcelHandling";
 export class CreateResultFile {
     public static Create(): void {
@@ -27,8 +27,8 @@ export class CreateResultFile {
                 fs.unlink(xls, (err) => (err ? console.log(err) : console.log('${xls} 삭제 완료')))
             });
         });
-        Data.Dic.forEach((value, key) => {
-            let workbook = ExcelHandling.GetWorkbook("입찰내역.xls", "xls");
+        Data.Dic.forEach(async (value, key) => {
+            let workbook = await ExcelHandling.GetWorkbook("입찰내역.xls", "xls");
             let sheet = workbook.getWorksheet(0);
             let resultPath: string;
             let Path: string;
