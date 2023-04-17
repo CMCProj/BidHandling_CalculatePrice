@@ -1,20 +1,7 @@
 import * as path from 'path'
 
 export class Data {
-    constructor(
-        item,
-        constructionNum,
-        workNum,
-        detailWorkNum,
-        code,
-        name,
-        standard,
-        unit,
-        quantity,
-        materialUnit,
-        laborUnit,
-        expenseUnit
-    ) {
+    constructor(item, constructionNum, workNum, detailWorkNum, code, name, standard, unit, quantity, materialUnit, laborUnit, expenseUnit) {
         this.Item = item
         this.ConstructionNum = constructionNum
         this.WorkNum = workNum
@@ -24,9 +11,9 @@ export class Data {
         this.Standard = standard
         this.Unit = unit
         this.Quantity = quantity
-        this.MaterialUnit = materialUnit
-        this.LaborUnit = laborUnit
-        this.ExpenseUnit = expenseUnit
+        this.materialUnit = materialUnit
+        this.laborUnit = laborUnit
+        this.expenseUnit = expenseUnit
     }
     public static folder: string = path.resolve(__dirname, '../AutoBid') //내 문서 폴더의 AutoBID 폴더로 지정 (23.02.02)
     // WPF 앱 파일 관리 변수
@@ -60,16 +47,19 @@ export class Data {
     public Standard: string = '' //규격
     public Unit: string = '' //단위
     public Quantity: number = 0 //수량
-    //재료비 단가
-    public get MaterialUnit() {
-        //사용자가 단가 정수처리를 원한다면("2") 정수 값으로 return / Reset 함수를 쓰지 않은 경우의 조건 추가 (23.02.06)
+
+    /**재료비 단가*/
+    public get MaterialUnit(): number {
+        // //사용자가 단가 정수처리를 원한다면("2") 정수 값으로 return / Reset 함수를 쓰지 않은 경우의 조건 추가 (23.02.06)
+        console.log("dkdkkdk");
         if (Data.UnitPriceTrimming === '2' && Data.ExecuteReset === '0')
             return Math.ceil(this.materialUnit)
         else if (Data.UnitPriceTrimming === '1' || Data.ExecuteReset === '1')
             // 사용자가 단가 소수점 처리를 원하거나 Reset 함수를 썼다면 소수 첫째 자리 아래로 절사 (23.02.06)
             return Math.floor(this.materialUnit * 10) / 10
-        return this.materialUnit //Default는 있는 그대로의 값을 return
+        return this.materialUnit; //Default는 있는 그대로의 값을 return
     }
+
     public set MaterialUnit(value: number) {
         this.materialUnit = value
     }

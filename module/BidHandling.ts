@@ -9,7 +9,7 @@ import { Data } from './Data'
 let filename = undefined
 
 export class BidHandling {
-    public static BidToJson() {
+    public static BidToJson() : void {
         const copiedFolder: string = Data.folder + '\\EmptyBid' // EmptyBid폴더 주소 저장 / 폴더 경로 수정 (23.02.02)
         let bidFile = fs.readdirSync(copiedFolder)
         let myFile = bidFile.filter(
@@ -44,10 +44,10 @@ export class BidHandling {
         fs.rmSync(copiedFolder + '\\' + myFile)
         fs.rmSync(Data.folder + '\\OutputDataFromBID.xml')
 
-        // Setting.GetData()
+        Setting.GetData()
     }
 
-    public static JsonToBid() {
+    public static JsonToBid() : void {
         const resultFilePath = Data.folder + '\\OutputDataFromBID.json'
         const json = fs.readFileSync(resultFilePath, 'utf-8') // json파일 읽기
         const xml = convert.json2xml(json, { compact: true, ignoreComment: true, spaces: 4 }) // json파일을 xml파일로 교체

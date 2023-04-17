@@ -891,7 +891,7 @@ export class CalculatePrice {
 
         // 단순하게 JSON 포멧인 docBID를 string으로 변환하고 OutputDataFromBID.json 파일에 덮어쓰기
         fs.writeFileSync(
-            'C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID' + '\\OutputDataFromBID.json',
+            Data.folder + '\\OutputDataFromBID.json',
             JSON.stringify(this.docBID)
         )
     }
@@ -899,23 +899,23 @@ export class CalculatePrice {
     public static CreateZipFile(xlsfiles: Array<string>): void {
         if (
             fs.existsSync(
-                'C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID' + '\\WORK DIRCETORY\\입찰내역.zip'
+                Data.folder + '\\WORK DIRCETORY\\입찰내역.zip'
             )
         ) {
             //기존 입찰내역.zip 파일은 삭제한다. (23.02.02)
             fs.rmSync(
-                'C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID' + '\\WORK DIRCETORY\\입찰내역.zip'
+                Data.folder + '\\WORK DIRCETORY\\입찰내역.zip'
             )
         }
 
         const zip = new AdmZip()
 
         for (let idx in xlsfiles) {
-            zip.addLocalFile('C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID\\' + xlsfiles[idx]) //만들어진 xls파일들을 압축
+            zip.addLocalFile(Data.folder + "\\" + xlsfiles[idx]) //만들어진 xls파일들을 압축
         }
 
         zip.writeZip(
-            'C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID\\WORK DIRECTORY' + '\\입찰내역.zip'
+            Data.folder + '\\WORK DIRECTORY\\입찰내역.zip'
         )
     }
 
@@ -923,7 +923,7 @@ export class CalculatePrice {
         //최종 입찰내역 파일 세부공사별로 생성
         CreateResultFile.Create()
         //생성된 입찰내역 파일 압축
-        const files: Array<string> = fs.readdirSync('C:\\\\Users\\joung\\OneDrive\\문서\\AutoBID')
+        const files: Array<string> = fs.readdirSync(Data.folder)
         const xlsFiles: Array<string> = files.filter(
             (file) => file.substring(file.length - 4, file.length).toLowerCase() === '.xls'
         )

@@ -27,14 +27,15 @@ var Data = exports.Data = /** @class */ (function () {
         this.Standard = standard;
         this.Unit = unit;
         this.Quantity = quantity;
-        this.MaterialUnit = materialUnit;
-        this.LaborUnit = laborUnit;
-        this.ExpenseUnit = expenseUnit;
+        this.materialUnit = materialUnit;
+        this.laborUnit = laborUnit;
+        this.expenseUnit = expenseUnit;
     }
     Object.defineProperty(Data.prototype, "MaterialUnit", {
-        //재료비 단가
+        /**재료비 단가*/
         get: function () {
-            //사용자가 단가 정수처리를 원한다면("2") 정수 값으로 return / Reset 함수를 쓰지 않은 경우의 조건 추가 (23.02.06)
+            // //사용자가 단가 정수처리를 원한다면("2") 정수 값으로 return / Reset 함수를 쓰지 않은 경우의 조건 추가 (23.02.06)
+            console.log("dkdkkdk");
             if (Data.UnitPriceTrimming === '2' && Data.ExecuteReset === '0')
                 return Math.ceil(this.materialUnit);
             else if (Data.UnitPriceTrimming === '1' || Data.ExecuteReset === '1')

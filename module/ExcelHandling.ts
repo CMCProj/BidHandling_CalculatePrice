@@ -24,7 +24,9 @@ export class ExcelHandling {
         return this.GetCell2(row, cellnum)
     }
 
-    /** exceljs의 read 메소드가 비동기 메소드이기에 return형이 Promise<exceljs.Workbook>임.
+    /** 
+     * exceljs의 read 메소드가 비동기 메소드이기에 return형이 Promise<exceljs.Workbook>임.
+     * 
      * 이를 사용하는 함수 혹은 메소드는 비동기(async / await)로 만들어야 제대로 된 exceljs.Workbook으로 쓸 수 있음.
     */
     public static GetWorkbook(filename: string, version: string): Promise<exceljs.Workbook> {

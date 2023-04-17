@@ -1,3 +1,4 @@
+import { stringify } from 'querystring'
 import { Data } from './Data'
 import { ExcelHandling } from './ExcelHandling'
 //import Enumerable from 'linq'
@@ -12,7 +13,7 @@ export class Setting {
     public static GetData(): void {
         const bidString: string = fs.readFileSync(Data.folder + '\\OutputDataFromBID.json', 'utf-8')
         Setting.docBID = JSON.parse(bidString)
-        Setting.eleBID = Setting.docBID['data']
+        Setting.eleBID = this.docBID['data']
 
         //세부공사별 번호 Data.ConstructionNums 딕셔너리에 저장
         Setting.GetConstructionNum()
@@ -23,7 +24,7 @@ export class Setting {
         //공내역 xml 파일 읽어들여 데이터 저장
         Setting.GetDataFromBID()
 
-        if (Data.XlsFiles != null) {
+        if (Data.XlsFiles !== undefined) {
             //실내역으로부터 Data 객체에 단가세팅
             Setting.SetUnitPrice()
         } else {
@@ -74,7 +75,7 @@ export class Setting {
         //해당 공종이 일반, 표준시장단가 및 공종(입력불가) 항목인 경우
         if (bid['C7']['_text'] === '0') {
             if (bid['C5']['_text'] === 'S') {
-                if (bid['C10']['_text'] === '') item = '표준시장단가'
+                if (bid['C10']['_text'] !== undefined) item = '표준시장단가'
                 else item = '일반'
             } else item = '예외' // null값이 발생해 예외 추가함
         }
@@ -132,17 +133,16 @@ export class Setting {
         })
     }
 
-    public static MatchConstructionNum(filePath: string): void {
+    public static async MatchConstructionNum(filePath: string): Promise<void> {
         // public static Dic = new Map<string, Data[]>() //key : 세부공사별 번호 / value : 세부공사별 리스트
-        const workbook = ExcelHandling.GetWorkbook(filePath, '.xlsx')
-        const copySheetIndex = workbook.GetSheetIndex('내역서')
-        const sheet = workbook.GetSheetAt(copySheetIndex)
+        const workbook = await ExcelHandling.GetWorkbook(filePath, '.xlsx')
+        const sheet = workbook.getWorksheet('내역서');
         let check: number //실내역 파일과 세부공사의 데이터가 일치하는 횟수
         Data.Dic.forEach((value, key) => {
             check = 0
             for (let i = 0; i < 5; i++) {
-                let row = sheet.GetRow(i + 4)
-                let sameName: boolean = value[i].Name === row.GetCell(4).StringCallValue
+                let row = sheet.getRow(i + 4)
+                let sameName: boolean = value[i].Name === row.getCell(4).value.toString();
                 if (sameName) check++
                 if (check == 3) {
                     Data.MatchedConstNum.set(filePath, key)
@@ -153,13 +153,12 @@ export class Setting {
         Data.IsFileMatch = false
     }
 
-    public static CopyFile(filePath: string): void {
-        const workbook = ExcelHandling.GetWorkbook(filePath, '.xlsx')
-        const copySheetIndex = workbook.GetSheetIndex('내역서')
-        const sheet = workbook.GetSheetAt(copySheetIndex)
+    public static async CopyFile(filePath: string): Promise<void> {
+        const workbook = await ExcelHandling.GetWorkbook(filePath, '.xlsx')
+        const sheet = workbook.getWorksheet('내역서');
 
         const constNum = Data.MatchedConstNum[filePath]
-        const lastRowNum = sheet.LastRowNum
+        const lastRowNum = sheet.rowCount;
         let rowIndex = 4
         Data.Dic[constNum].forEach((curObj) => {
             const dcode: string = curObj.Code
@@ -170,14 +169,14 @@ export class Setting {
             const dunit = curObj.Unit
             const dquantity = curObj.Quantity
             while (true) {
-                const row = sheet.GetRow(rowIndex)
-                const code = row.GetCell(1).StringCellValue
-                const name = row.GetCell(4).StringCellValue
-                const unit = row.GetCell(6).StringCellValue
+                const row = sheet.getRow(rowIndex)
+                const code = row.getCell(1).value.toString();
+                const name = row.getCell(4).value.toString();
+                const unit = row.getCell(6).value.toString();
                 let quantity: number = 0.0
 
                 try {
-                    let quantity: number = Number(row.GetCell(7).NumericCellValue)
+                    let quantity: number = Number(row.getCell(7).value)
                 } catch {
                     rowIndex++
                     if (rowIndex == lastRowNum) break
@@ -190,9 +189,9 @@ export class Setting {
                 let sameQuantity: boolean = quantity === dquantity
 
                 if ((sameName || sameCode) && (sameUnit || sameQuantity)) {
-                    curObj.MaterialUnit = Number(row.GetCell(8).NumericCellValue)
-                    curObj.LaborUnit = Number(row.GetCell(10).NumericCellValue)
-                    curObj.ExpenseUnit = Number(row.GetCell(12).NumericCellValue)
+                    curObj.MaterialUnit = Number(row.getCell(8).value)
+                    curObj.LaborUnit = Number(row.getCell(10).value)
+                    curObj.ExpenseUnit = Number(row.getCell(12).value)
                     rowIndex++
                     break
                 } else {
@@ -212,41 +211,42 @@ export class Setting {
     }
 
     public static SetUnitPriceNoExcel(): void {
-        const bidT3: object = Setting.eleBID['T3']
-        for (let key in bidT3) {
-            if (bidT3[key]['C9']['_text'] != null && bidT3[key]['C5']['_text'] === 'S') {
-                console.log('Setting UnitPrice!')
-                let constNum: string = bidT3[key]['C1']['_text']
-                let numVal: string = bidT3[key]['C2']['_text']
-                let detailVal: string = bidT3[key]['C3']['_text']
-                let curObject = Data.Dic.get(constNum).find(
-                    (x) => x.WorkNum === numVal && x.DetailWorkNum === detailVal
-                )
+        const bidT3: object = this.eleBID['T3'];
+        let code: string;
+        let type: string;
 
-                if (
-                    curObject.Item === '일반' ||
-                    curObject.Item === '재요율적용제외' ||
-                    curObject.Item === '표준시장단가'
-                ) {
-                    bidT3[key]['C16']['_text'] = curObject.MaterialUnit.toString()
-                    bidT3[key]['C17']['_text'] = curObject.LaborUnit.toString()
-                    bidT3[key]['C18']['_text'] = curObject.ExpenseUnit.toString()
-                    bidT3[key]['C19']['_text'] = curObject.UnitPriceSum.toString()
-                    bidT3[key]['C20']['_text'] = curObject.Material.toString()
-                    bidT3[key]['C21']['_text'] = curObject.Labor.toString()
-                    bidT3[key]['C22']['_text'] = curObject.Expense.toString()
-                    bidT3[key]['C23']['_text'] = curObject.PriceSum.toString()
+        for (let key in bidT3) {
+            code = JSON.stringify(bidT3[key]['C9']['_text']);
+            type = JSON.stringify(bidT3[key]['C5']['_text'])[1];
+
+            if (code !== undefined && type === 'S') {
+                let constNum: string = bidT3[key]['C1']['_text'];
+                let numVal: string = bidT3[key]['C2']['_text'];
+                let detailVal: string = bidT3[key]['C3']['_text'];
+                let curObject: Data = Data.Dic.get(constNum).find((x) => x.WorkNum === numVal && x.DetailWorkNum === detailVal);
+
+                if (curObject.Item === '일반' || curObject.Item === '재요율적용제외' || curObject.Item === '표준시장단가' && curObject !== undefined) {
+                    bidT3[key]['C16']['_text'] = curObject.MaterialUnit;
+                    bidT3[key]['C17']['_text'] = curObject.LaborUnit;
+                    bidT3[key]['C18']['_text'] = curObject.ExpenseUnit;
+                    bidT3[key]['C19']['_text'] = curObject.UnitPriceSum;
+                    bidT3[key]['C20']['_text'] = curObject.Material;
+                    bidT3[key]['C21']['_text'] = curObject.Labor;
+                    bidT3[key]['C22']['_text'] = curObject.Expense;
+                    bidT3[key]['C23']['_text'] = curObject.PriceSum;
+                    console.log(curObject.MaterialUnit); // Data의 getter가 작동하지 않음! (curObject.MaterialUnit ===return===> undefined)
                 }
             }
         }
         if (fs.existsSync(Data.work_path + '\\Setting_Json.json')) {
             fs.unlink(Data.work_path + '\\Setting_Json.json', (err) => {
-                if (err.code == 'ENOENT') {
+                if (err && err.code == 'ENOENT') {
                     console.log('파일 삭제 Error 발생')
                 }
             })
         }
-        fs.writeFileSync(Data.work_path + '\\Setting_Json.json', JSON.stringify(Setting.docBID))
+
+        fs.writeFileSync(Data.work_path + '\\Setting_Json.json', JSON.stringify(this.docBID))
     }
 
     public static GetRate(): void {
@@ -343,3 +343,5 @@ export class Setting {
         }
     }
 }
+
+Setting.GetData();
