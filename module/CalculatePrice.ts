@@ -18,7 +18,7 @@ export class CalculatePrice {
     private static exCount: number = 0 //제요율적용제외공종 항목 수량 합계
 
     public static Calculation(): void {
-        const bidString: string = fs.readFileSync(Data.folder + '\\Setting_Json.json', 'utf-8')
+        const bidString: string = fs.readFileSync(Data.work_path + '\\Setting_Json.json', 'utf-8')
         this.docBID = JSON.parse(bidString)
         this.eleBID = this.docBID['data']
 
@@ -890,33 +890,22 @@ export class CalculatePrice {
         }
 
         // 단순하게 JSON 포멧인 docBID를 string으로 변환하고 OutputDataFromBID.json 파일에 덮어쓰기
-        fs.writeFileSync(
-            Data.folder + '\\OutputDataFromBID.json',
-            JSON.stringify(this.docBID)
-        )
+        fs.writeFileSync(Data.folder + '\\OutputDataFromBID.json', JSON.stringify(this.docBID))
     }
 
     public static CreateZipFile(xlsfiles: Array<string>): void {
-        if (
-            fs.existsSync(
-                Data.folder + '\\WORK DIRCETORY\\입찰내역.zip'
-            )
-        ) {
+        if (fs.existsSync(Data.folder + '\\WORK DIRCETORY\\입찰내역.zip')) {
             //기존 입찰내역.zip 파일은 삭제한다. (23.02.02)
-            fs.rmSync(
-                Data.folder + '\\WORK DIRCETORY\\입찰내역.zip'
-            )
+            fs.rmSync(Data.folder + '\\WORK DIRCETORY\\입찰내역.zip')
         }
 
         const zip = new AdmZip()
 
         for (let idx in xlsfiles) {
-            zip.addLocalFile(Data.folder + "\\" + xlsfiles[idx]) //만들어진 xls파일들을 압축
+            zip.addLocalFile(Data.folder + '\\' + xlsfiles[idx]) //만들어진 xls파일들을 압축
         }
 
-        zip.writeZip(
-            Data.folder + '\\WORK DIRECTORY\\입찰내역.zip'
-        )
+        zip.writeZip(Data.folder + '\\WORK DIRECTORY\\입찰내역.zip')
     }
 
     public static CreateFile(): void {
