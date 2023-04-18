@@ -13,73 +13,60 @@ export class FillCostAccount {
         let costStatementPath: string = ''
         //원가 계산서 양식 불러오기
         let workbook = await ExcelHandling.GetWorkbook('세부결과_원가계산서.xlsx', '.xlsx')
-        let sheet = workbook.GetSheetAt(0)
+        let sheet = workbook.getWorksheet(0);
         //적용비율1 작성
-        ExcelHandling.GetCell(sheet, 7, 6).SetCellValue(Data.Rate1.get('간접노무비') + ' %')
-        ExcelHandling.GetCell(sheet, 10, 6).SetCellValue(Data.Rate1.get('산재보험료') + ' %')
-        ExcelHandling.GetCell(sheet, 11, 6).SetCellValue(Data.Rate1.get('고용보험료') + ' %')
-        ExcelHandling.GetCell(sheet, 19, 6).SetCellValue(Data.Rate1.get('환경보전비') + ' %')
-        ExcelHandling.GetCell(sheet, 20, 6).SetCellValue(
-            Data.Rate1.get('공사이행보증서발급수수료') + ' %'
-        )
-        ExcelHandling.GetCell(sheet, 21, 6).SetCellValue(
-            Data.Rate1.get('건설하도급보증수수료') + ' %'
-        )
-        ExcelHandling.GetCell(sheet, 22, 6).SetCellValue(
-            Data.Rate1.get('건설기계대여대금 지급보증서발급금액') + ' %'
-        )
-        ExcelHandling.GetCell(sheet, 23, 6).SetCellValue(Data.Rate1.get('기타경비') + ' %')
-        ExcelHandling.GetCell(sheet, 24, 6).SetCellValue(Data.Rate1.get('일반관리비') + ' %')
-        ExcelHandling.GetCell(sheet, 29, 6).SetCellValue(Data.Rate1.get('공사손해보험료') + ' %')
-        ExcelHandling.GetCell(sheet, 31, 6).SetCellValue(Data.Rate1.get('부가가치세') + ' %')
+        ExcelHandling.GetCell(sheet, 7, 6).value = Data.Rate1.get('간접노무비') + ' %';
+        ExcelHandling.GetCell(sheet, 7, 6).value = Data.Rate1.get('간접노무비') + ' %';
+        ExcelHandling.GetCell(sheet, 10, 6).value = Data.Rate1.get('산재보험료') + ' %';
+        ExcelHandling.GetCell(sheet, 11, 6).value = Data.Rate1.get('고용보험료') + ' %';
+        ExcelHandling.GetCell(sheet, 19, 6).value = Data.Rate1.get('환경보전비') + ' %';
+        ExcelHandling.GetCell(sheet, 20, 6).value = Data.Rate1.get('공사이행보증서발급수수료') + ' %';
+        ExcelHandling.GetCell(sheet, 21, 6).value = Data.Rate1.get('건설하도급보증수수료') + ' %';
+        ExcelHandling.GetCell(sheet, 22, 6).value = Data.Rate1.get('건설기계대여대금 지급보증서발급금액') + ' %';
+        ExcelHandling.GetCell(sheet, 23, 6).value = Data.Rate1.get('기타경비') + ' %';
+        ExcelHandling.GetCell(sheet, 24, 6).value = Data.Rate1.get('일반관리비') + ' %';
+        ExcelHandling.GetCell(sheet, 29, 6).value = Data.Rate1.get('공사손해보험료') + ' %';
+        ExcelHandling.GetCell(sheet, 31, 6).value = Data.Rate1.get('부가가치세') + ' %';
 
         //적용비율 2 작성
-        ExcelHandling.GetCell(sheet, 7, 7).SetCellValue(Data.Rate2.get('간접노무비') + ' %')
-        ExcelHandling.GetCell(sheet, 10, 7).SetCellValue(Data.Rate2.get('산재보험료') + ' %')
-        ExcelHandling.GetCell(sheet, 11, 7).SetCellValue(Data.Rate2.get('고용보험료') + ' %')
-        ExcelHandling.GetCell(sheet, 23, 7).SetCellValue(Data.Rate2.get('기타경비') + ' %')
+        ExcelHandling.GetCell(sheet, 7, 7).value = Data.Rate2.get('간접노무비') + ' %'
+        ExcelHandling.GetCell(sheet, 10, 7).value = Data.Rate2.get('산재보험료') + ' %'
+        ExcelHandling.GetCell(sheet, 11, 7).value = Data.Rate2.get('고용보험료') + ' %'
+        ExcelHandling.GetCell(sheet, 23, 7).value = Data.Rate2.get('기타경비') + ' %'
 
         //금액 세팅
-        ExcelHandling.GetCell(sheet, 2, 8).SetCellValue(Data.Investigation.get('순공사원가')) //1. 순공사원가
-        ExcelHandling.GetCell(sheet, 3, 8).SetCellValue(Data.Investigation.get('직접재료비')) //가. 재료비
-        ExcelHandling.GetCell(sheet, 4, 8).SetCellValue(Data.Investigation.get('직접재료비')) //가-1. 직접재료비
-        ExcelHandling.GetCell(sheet, 5, 8).SetCellValue(Data.Investigation.get('노무비')) //나. 노무비
-        ExcelHandling.GetCell(sheet, 6, 8).SetCellValue(Data.Investigation.get('직접노무비')) //나-1. 직접노무비
-        ExcelHandling.GetCell(sheet, 7, 8).SetCellValue(Data.Investigation.get('간접노무비')) //나-2. 간접노무비
-        ExcelHandling.GetCell(sheet, 8, 8).SetCellValue(Data.Investigation.get('경비')) //다. 경비
-        ExcelHandling.GetCell(sheet, 9, 8).SetCellValue(Data.Investigation.get('산출경비')) //다-1. 산출경비
-        ExcelHandling.GetCell(sheet, 10, 8).SetCellValue(Data.Investigation.get('산재보험료')) //다-2. 산재보험료
-        ExcelHandling.GetCell(sheet, 11, 8).SetCellValue(Data.Investigation.get('고용보험료')) //다-3. 고용보험료
-        ExcelHandling.GetCell(sheet, 12, 8).SetCellValue(Data.Fixed.get('국민건강보험료')) //다-4. 국민건강보험료
-        ExcelHandling.GetCell(sheet, 13, 8).SetCellValue(Data.Fixed.get('노인장기요양보험')) //다-5. 노인장기요양보험
-        ExcelHandling.GetCell(sheet, 14, 8).SetCellValue(Data.Fixed.get('국민연금보험료')) //다-6. 국민연금보험료
-        ExcelHandling.GetCell(sheet, 15, 8).SetCellValue(Data.Fixed.get('퇴직공제부금')) //다-7. 퇴직공제부금
-        ExcelHandling.GetCell(sheet, 16, 8).SetCellValue(Data.Fixed.get('산업안전보건관리비')) //다-8. 산업안전보건관리비
-        ExcelHandling.GetCell(sheet, 17, 8).SetCellValue(Data.Fixed.get('안전관리비')) //다-9. 안전관리비
-        ExcelHandling.GetCell(sheet, 18, 8).SetCellValue(Data.Fixed.get('품질관리비')) //다-10. 품질관리비
-        ExcelHandling.GetCell(sheet, 19, 8).SetCellValue(Data.Investigation.get('환경보전비')) //다-11. 환경보전비
-        ExcelHandling.GetCell(sheet, 20, 8).SetCellValue(
-            Data.Investigation.get('공사이행보증서발급수수료')
-        ) //다-12. 공사이행보증수수료
-        ExcelHandling.GetCell(sheet, 21, 8).SetCellValue(
-            Data.Investigation.get('건설하도급보증수수료')
-        ) //다-13. 하도급대금지급 보증수수료
-        ExcelHandling.GetCell(sheet, 22, 8).SetCellValue(
-            Data.Investigation.get('건설기계대여대금 지급보증서발급금액')
-        ) //다-14. 건설기계대여대금 지급보증서 발급금액
-        ExcelHandling.GetCell(sheet, 23, 8).SetCellValue(Data.Investigation.get('기타경비')) //다-15. 기타경비
-        ExcelHandling.GetCell(sheet, 24, 8).SetCellValue(Data.Investigation.get('일반관리비')) //2. 일반관리비
-        ExcelHandling.GetCell(sheet, 25, 8).SetCellValue(Data.Investigation.get('이윤')) //3. 이윤
-        ExcelHandling.GetCell(sheet, 26, 8).SetCellValue(Data.Investigation.get('PS')) //3.1 PS
-        ExcelHandling.GetCell(sheet, 27, 8).SetCellValue(
-            Data.Investigation.get('제요율적용제외공종')
-        ) //3.2 제요율적용제외공종
-        ExcelHandling.GetCell(sheet, 28, 8).SetCellValue(Data.Investigation.get('총원가')) //4. 총원가
-        ExcelHandling.GetCell(sheet, 29, 8).SetCellValue(Data.Investigation.get('공사손해보험료')) //5. 공사손해보험료
-        ExcelHandling.GetCell(sheet, 30, 8).SetCellValue(Data.Investigation.get('소계')) //6. 소계
-        ExcelHandling.GetCell(sheet, 31, 8).SetCellValue(Data.Investigation.get('부가가치세')) //7. 부가가치세
-        ExcelHandling.GetCell(sheet, 32, 8).SetCellValue(0) //8. 매입세
-        ExcelHandling.GetCell(sheet, 33, 8).SetCellValue(Data.Investigation.get('도급비계')) //9. 도급비계
+        ExcelHandling.GetCell(sheet, 2, 8).value = Data.Investigation.get('순공사원가') //1. 순공사원가
+        ExcelHandling.GetCell(sheet, 3, 8).value = Data.Investigation.get('직접재료비') //가. 재료비
+        ExcelHandling.GetCell(sheet, 4, 8).value = Data.Investigation.get('직접재료비') //가-1. 직접재료비
+        ExcelHandling.GetCell(sheet, 5, 8).value = Data.Investigation.get('노무비') //나. 노무비
+        ExcelHandling.GetCell(sheet, 6, 8).value = Data.Investigation.get('직접노무비') //나-1. 직접노무비
+        ExcelHandling.GetCell(sheet, 7, 8).value = Data.Investigation.get('간접노무비') //나-2. 간접노무비
+        ExcelHandling.GetCell(sheet, 8, 8).value = Data.Investigation.get('경비') //다. 경비
+        ExcelHandling.GetCell(sheet, 9, 8).value = Data.Investigation.get('산출경비') //다-1. 산출경비
+        ExcelHandling.GetCell(sheet, 10, 8).value = Data.Investigation.get('산재보험료') //다-2. 산재보험료
+        ExcelHandling.GetCell(sheet, 11, 8).value = Data.Investigation.get('고용보험료') //다-3. 고용보험료
+        ExcelHandling.GetCell(sheet, 12, 8).value = Data.Fixed.get('국민건강보험료') //다-4. 국민건강보험료
+        ExcelHandling.GetCell(sheet, 13, 8).value = Data.Fixed.get('노인장기요양보험') //다-5. 노인장기요양보험
+        ExcelHandling.GetCell(sheet, 14, 8).value = Data.Fixed.get('국민연금보험료') //다-6. 국민연금보험료
+        ExcelHandling.GetCell(sheet, 15, 8).value = Data.Fixed.get('퇴직공제부금') //다-7. 퇴직공제부금
+        ExcelHandling.GetCell(sheet, 16, 8).value = Data.Fixed.get('산업안전보건관리비') //다-8. 산업안전보건관리비
+        ExcelHandling.GetCell(sheet, 17, 8).value = Data.Fixed.get('안전관리비') //다-9. 안전관리비
+        ExcelHandling.GetCell(sheet, 18, 8).value = Data.Fixed.get('품질관리비') //다-10. 품질관리비
+        ExcelHandling.GetCell(sheet, 19, 8).value = Data.Investigation.get('환경보전비') //다-11. 환경보전비
+        ExcelHandling.GetCell(sheet, 20, 8).value = Data.Investigation.get('공사이행보증서발급수수료') //다-12. 공사이행보증수수료
+        ExcelHandling.GetCell(sheet, 21, 8).value = Data.Investigation.get('건설하도급보증수수료') //다-13. 하도급대금지급 보증수수료
+        ExcelHandling.GetCell(sheet, 22, 8).value = Data.Investigation.get('건설기계대여대금 지급보증서발급금액') //다-14. 건설기계대여대금 지급보증서 발급금액
+        ExcelHandling.GetCell(sheet, 23, 8).value = Data.Investigation.get('기타경비') //다-15. 기타경비
+        ExcelHandling.GetCell(sheet, 24, 8).value = Data.Investigation.get('일반관리비') //2. 일반관리비
+        ExcelHandling.GetCell(sheet, 25, 8).value = Data.Investigation.get('이윤') //3. 이윤
+        ExcelHandling.GetCell(sheet, 26, 8).value = Data.Investigation.get('PS') //3.1 PS
+        ExcelHandling.GetCell(sheet, 27, 8).value = Data.Investigation.get('제요율적용제외공종') //3.2 제요율적용제외공종
+        ExcelHandling.GetCell(sheet, 28, 8).value = Data.Investigation.get('총원가') //4. 총원가
+        ExcelHandling.GetCell(sheet, 29, 8).value = Data.Investigation.get('공사손해보험료') //5. 공사손해보험료
+        ExcelHandling.GetCell(sheet, 30, 8).value = Data.Investigation.get('소계') //6. 소계
+        ExcelHandling.GetCell(sheet, 31, 8).value = Data.Investigation.get('부가가치세') //7. 부가가치세
+        ExcelHandling.GetCell(sheet, 32, 8).value = 0 //8. 매입세
+        ExcelHandling.GetCell(sheet, 33, 8).value = Data.Investigation.get('도급비계') //9. 도급비계
 
         //원가계산서 조사금액 세팅 시점에 CalculatePrice.cs에서 재계산 시, 초기화를 위한 조사금액 저장
         let FM = Data.FixedPriceDirectMaterial
@@ -106,136 +93,90 @@ export class FillCostAccount {
     }
 
     //원가계산서 항목별 입찰금액 채움
-    public static FillBiddingCosts() {
+    public static async FillBiddingCosts() {
         //조사금액을 채운 원가계산서_세부결과.xlsx의 경로
         let costStatementPath: string = path.join(Data.work_path, '원가계산서.xlsx')
         //원가계산서_세부결과 파일 불러오기
-        let workbook = ExcelHandling.GetWorkbook(costStatementPath, '.xlsx')
+        let workbook = await ExcelHandling.GetWorkbook(costStatementPath, '.xlsx')
 
-        let sheet = workbook.GetSheetAt(0)
+        let sheet = workbook.getWorksheet(0)
 
         //적용비율 1, 2 적용금액 원가계산서 반영
-        ExcelHandling.GetCell(sheet, 7, 9).SetCellValue(Data.Bidding.get('간접노무비1'))
-        ExcelHandling.GetCell(sheet, 10, 9).SetCellValue(Data.Bidding.get('산재보험료1'))
-        ExcelHandling.GetCell(sheet, 11, 9).SetCellValue(Data.Bidding.get('고용보험료1'))
-        ExcelHandling.GetCell(sheet, 23, 9).SetCellValue(Data.Bidding.get('기타경비1'))
-        ExcelHandling.GetCell(sheet, 7, 10).SetCellValue(Data.Bidding.get('간접노무비2'))
-        ExcelHandling.GetCell(sheet, 10, 10).SetCellValue(Data.Bidding.get('산재보험료2'))
-        ExcelHandling.GetCell(sheet, 11, 10).SetCellValue(Data.Bidding.get('고용보험료2'))
-        ExcelHandling.GetCell(sheet, 23, 10).SetCellValue(Data.Bidding.get('기타경비2'))
+        ExcelHandling.GetCell(sheet, 7, 9).value = Data.Bidding.get('간접노무비1')
+        ExcelHandling.GetCell(sheet, 10, 9).value = Data.Bidding.get('산재보험료1')
+        ExcelHandling.GetCell(sheet, 11, 9).value = Data.Bidding.get('고용보험료1')
+        ExcelHandling.GetCell(sheet, 23, 9).value = Data.Bidding.get('기타경비1')
+        ExcelHandling.GetCell(sheet, 7, 10).value = Data.Bidding.get('간접노무비2')
+        ExcelHandling.GetCell(sheet, 10, 10).value = Data.Bidding.get('산재보험료2')
+        ExcelHandling.GetCell(sheet, 11, 10).value = Data.Bidding.get('고용보험료2')
+        ExcelHandling.GetCell(sheet, 23, 10).value = Data.Bidding.get('기타경비2')
 
         //적용비율 1, 2 적용 금액 중, 큰 금액 세팅
-        ExcelHandling.GetCell(sheet, 7, 11).SetCellValue(Data.Bidding.get('간접노무비max'))
-        ExcelHandling.GetCell(sheet, 10, 11).SetCellValue(Data.Bidding.get('산재보험료max'))
-        ExcelHandling.GetCell(sheet, 11, 11).SetCellValue(Data.Bidding.get('고용보험료max'))
-        ExcelHandling.GetCell(sheet, 23, 11).SetCellValue(Data.Bidding.get('기타경비max'))
+        ExcelHandling.GetCell(sheet, 7, 11).value = Data.Bidding.get('간접노무비max')
+        ExcelHandling.GetCell(sheet, 10, 11).value = Data.Bidding.get('산재보험료max')
+        ExcelHandling.GetCell(sheet, 11, 11).value = Data.Bidding.get('고용보험료max')
+        ExcelHandling.GetCell(sheet, 23, 11).value = Data.Bidding.get('기타경비max')
 
         //금액 세팅
-        ExcelHandling.GetCell(sheet, 2, 19).SetCellValue(Data.Bidding.get('순공사원가')) //1. 순공사원가
-        ExcelHandling.GetCell(sheet, 3, 19).SetCellValue(Data.Bidding.get('직접재료비')) //가. 재료비
-        ExcelHandling.GetCell(sheet, 4, 19).SetCellValue(Data.Bidding.get('직접재료비')) //가-1. 직접재료비
-        ExcelHandling.GetCell(sheet, 5, 19).SetCellValue(Data.Bidding.get('노무비')) //나. 노무비
-        ExcelHandling.GetCell(sheet, 6, 19).SetCellValue(Data.Bidding.get('직접노무비')) //나-1. 직접노무비
-        ExcelHandling.GetCell(sheet, 7, 19).SetCellValue(Data.Bidding.get('간접노무비')) //나-2. 간접노무비
-        ExcelHandling.GetCell(sheet, 8, 19).SetCellValue(Data.Bidding.get('경비')) //다. 경비
-        ExcelHandling.GetCell(sheet, 9, 19).SetCellValue(Data.Bidding.get('산출경비')) //다-1. 산출경비
-        ExcelHandling.GetCell(sheet, 10, 19).SetCellValue(Data.Bidding.get('산재보험료')) //다-2. 산재보험료
-        ExcelHandling.GetCell(sheet, 11, 19).SetCellValue(Data.Bidding.get('고용보험료')) //다-3. 고용보험료
-        ExcelHandling.GetCell(sheet, 12, 19).SetCellValue(Data.Fixed.get('국민건강보험료')) //다-4. 국민건강보험료
-        ExcelHandling.GetCell(sheet, 13, 19).SetCellValue(Data.Fixed.get('노인장기요양보험')) //다-5. 노인장기요양보험
-        ExcelHandling.GetCell(sheet, 14, 19).SetCellValue(Data.Fixed.get('국민연금보험료')) //다-6. 국민연금보험료
-        ExcelHandling.GetCell(sheet, 15, 19).SetCellValue(Data.Fixed.get('퇴직공제부금')) //다-7. 퇴직공제부금
-        ExcelHandling.GetCell(sheet, 16, 19).SetCellValue(Data.Fixed.get('산업안전보건관리비')) //다-8. 산업안전보건관리비
-        ExcelHandling.GetCell(sheet, 17, 19).SetCellValue(Data.Fixed.get('안전관리비')) //다-9. 안전관리비
-        ExcelHandling.GetCell(sheet, 18, 19).SetCellValue(Data.Fixed.get('품질관리비')) //다-10. 품질관리비
-        ExcelHandling.GetCell(sheet, 19, 19).SetCellValue(Data.Bidding.get('환경보전비')) //다-11. 환경보전비
-        ExcelHandling.GetCell(sheet, 20, 19).SetCellValue(
-            Data.Bidding.get('공사이행보증서발급수수료')
-        ) //다-12. 공사이행보증수수료
-        ExcelHandling.GetCell(sheet, 21, 19).SetCellValue(Data.Bidding.get('건설하도급보증수수료')) //다-13. 하도급대금지급 보증수수료
-        ExcelHandling.GetCell(sheet, 22, 19).SetCellValue(
-            Data.Bidding.get('건설기계대여대금 지급보증서발급금액')
-        ) //다-14. 건설기계대여대금 지급보증서 발급금액
-        ExcelHandling.GetCell(sheet, 23, 19).SetCellValue(Data.Bidding.get('기타경비')) //다-15. 기타경비
-        ExcelHandling.GetCell(sheet, 24, 19).SetCellValue(Data.Bidding.get('일반관리비')) //2. 일반관리비
-        ExcelHandling.GetCell(sheet, 25, 19).SetCellValue(Data.Bidding.get('이윤')) //3. 이윤
-        ExcelHandling.GetCell(sheet, 26, 19).SetCellValue(Data.Bidding.get('PS')) //3.1 PS
-        ExcelHandling.GetCell(sheet, 27, 19).SetCellValue(Data.Bidding.get('제요율적용제외공종')) //3.2 제요율적용제외공종
-        ExcelHandling.GetCell(sheet, 28, 19).SetCellValue(Data.Bidding.get('총원가')) //4. 총원가
-        ExcelHandling.GetCell(sheet, 29, 19).SetCellValue(Data.Bidding.get('공사손해보험료')) //5. 공사손해보험료
-        ExcelHandling.GetCell(sheet, 30, 19).SetCellValue(Data.Bidding.get('소계')) //6. 소계
-        ExcelHandling.GetCell(sheet, 31, 19).SetCellValue(Data.Bidding.get('부가가치세')) //7. 부가가치세
-        ExcelHandling.GetCell(sheet, 32, 19).SetCellValue(0) //8. 매입세
-        ExcelHandling.GetCell(sheet, 33, 19).SetCellValue(Data.Bidding.get('도급비계')) //9. 도급비계
+        ExcelHandling.GetCell(sheet, 2, 19).value = Data.Bidding.get('순공사원가') //1. 순공사원가
+        ExcelHandling.GetCell(sheet, 3, 19).value = Data.Bidding.get('직접재료비') //가. 재료비
+        ExcelHandling.GetCell(sheet, 4, 19).value = Data.Bidding.get('직접재료비') //가-1. 직접재료비
+        ExcelHandling.GetCell(sheet, 5, 19).value = Data.Bidding.get('노무비') //나. 노무비
+        ExcelHandling.GetCell(sheet, 6, 19).value = Data.Bidding.get('직접노무비') //나-1. 직접노무비
+        ExcelHandling.GetCell(sheet, 7, 19).value = Data.Bidding.get('간접노무비') //나-2. 간접노무비
+        ExcelHandling.GetCell(sheet, 8, 19).value = Data.Bidding.get('경비') //다. 경비
+        ExcelHandling.GetCell(sheet, 9, 19).value = Data.Bidding.get('산출경비') //다-1. 산출경비
+        ExcelHandling.GetCell(sheet, 10, 19).value = Data.Bidding.get('산재보험료') //다-2. 산재보험료
+        ExcelHandling.GetCell(sheet, 11, 19).value = Data.Bidding.get('고용보험료') //다-3. 고용보험료
+        ExcelHandling.GetCell(sheet, 12, 19).value = Data.Fixed.get('국민건강보험료') //다-4. 국민건강보험료
+        ExcelHandling.GetCell(sheet, 13, 19).value = Data.Fixed.get('노인장기요양보험') //다-5. 노인장기요양보험
+        ExcelHandling.GetCell(sheet, 14, 19).value = Data.Fixed.get('국민연금보험료') //다-6. 국민연금보험료
+        ExcelHandling.GetCell(sheet, 15, 19).value = Data.Fixed.get('퇴직공제부금') //다-7. 퇴직공제부금
+        ExcelHandling.GetCell(sheet, 16, 19).value = Data.Fixed.get('산업안전보건관리비') //다-8. 산업안전보건관리비
+        ExcelHandling.GetCell(sheet, 17, 19).value = Data.Fixed.get('안전관리비') //다-9. 안전관리비
+        ExcelHandling.GetCell(sheet, 18, 19).value = Data.Fixed.get('품질관리비') //다-10. 품질관리비
+        ExcelHandling.GetCell(sheet, 19, 19).value = Data.Bidding.get('환경보전비') //다-11. 환경보전비
+        ExcelHandling.GetCell(sheet, 20, 19).value = Data.Bidding.get('공사이행보증서발급수수료') //다-12. 공사이행보증수수료
+        ExcelHandling.GetCell(sheet, 21, 19).value = Data.Bidding.get('건설하도급보증수수료') //다-13. 하도급대금지급 보증수수료
+        ExcelHandling.GetCell(sheet, 22, 19).value = Data.Bidding.get('건설기계대여대금 지급보증서발급금액') //다-14. 건설기계대여대금 지급보증서 발급금액
+        ExcelHandling.GetCell(sheet, 23, 19).value = Data.Bidding.get('기타경비') //다-15. 기타경비
+        ExcelHandling.GetCell(sheet, 24, 19).value = Data.Bidding.get('일반관리비') //2. 일반관리비
+        ExcelHandling.GetCell(sheet, 25, 19).value = Data.Bidding.get('이윤') //3. 이윤
+        ExcelHandling.GetCell(sheet, 26, 19).value = Data.Bidding.get('PS') //3.1 PS
+        ExcelHandling.GetCell(sheet, 27, 19).value = Data.Bidding.get('제요율적용제외공종') //3.2 제요율적용제외공종
+        ExcelHandling.GetCell(sheet, 28, 19).value = Data.Bidding.get('총원가') //4. 총원가
+        ExcelHandling.GetCell(sheet, 29, 19).value = Data.Bidding.get('공사손해보험료') //5. 공사손해보험료
+        ExcelHandling.GetCell(sheet, 30, 19).value = Data.Bidding.get('소계') //6. 소계
+        ExcelHandling.GetCell(sheet, 31, 19).value = Data.Bidding.get('부가가치세') //7. 부가가치세
+        ExcelHandling.GetCell(sheet, 32, 19).value = 0 //8. 매입세
+        ExcelHandling.GetCell(sheet, 33, 19).value = Data.Bidding.get('도급비계') //9. 도급비계
 
         //비율 세팅
         //C#: FillCostAccount.GetRate() 결과 (double)로 형식 변환
-        ExcelHandling.GetCell(sheet, 4, 20).SetCellValue(
-            FillCostAccount.GetRate('직접재료비') + '%'
-        ) //가-1. 직접재료비
-        ExcelHandling.GetCell(sheet, 6, 20).SetCellValue(
-            FillCostAccount.GetRate('직접노무비') + ' %'
-        ) //나-1. 직접노무비
-        ExcelHandling.GetCell(sheet, 7, 20).SetCellValue(
-            FillCostAccount.GetRate('간접노무비') + ' %'
-        ) //나-2. 간접노무비
-        ExcelHandling.GetCell(sheet, 9, 20).SetCellValue(FillCostAccount.GetRate('산출경비') + ' %') //다-1. 산출경비
-        ExcelHandling.GetCell(sheet, 10, 20).SetCellValue(
-            FillCostAccount.GetRate('산재보험료') + ' %'
-        ) //다-2. 산재보험료
-        ExcelHandling.GetCell(sheet, 11, 20).SetCellValue(
-            FillCostAccount.GetRate('고용보험료') + ' %'
-        ) //다-3. 고용보험료
-        ExcelHandling.GetCell(sheet, 12, 20).SetCellValue(
-            FillCostAccount.GetRate('국민건강보험료') + ' %'
-        ) //다-4. 국민건강보험료
-        ExcelHandling.GetCell(sheet, 13, 20).SetCellValue(
-            FillCostAccount.GetRate('노인장기요양보험') + ' %'
-        ) //다-5. 노인장기요양보험
-        ExcelHandling.GetCell(sheet, 14, 20).SetCellValue(
-            FillCostAccount.GetRate('국민연금보험료') + ' %'
-        ) //다-6. 국민연금보험료
-        ExcelHandling.GetCell(sheet, 15, 20).SetCellValue(
-            FillCostAccount.GetRate('퇴직공제부금') + ' %'
-        ) //다-7. 퇴직공제부금
-        ExcelHandling.GetCell(sheet, 16, 20).SetCellValue(
-            FillCostAccount.GetRate('산업안전보건관리비') + ' %'
-        ) //다-8. 산업안전보건관리비
-        ExcelHandling.GetCell(sheet, 17, 20).SetCellValue(
-            FillCostAccount.GetRate('안전관리비') + ' %'
-        ) //다-9. 안전관리비
-        ExcelHandling.GetCell(sheet, 18, 20).SetCellValue(
-            FillCostAccount.GetRate('품질관리비') + ' %'
-        ) //다-10. 품질관리비
-        ExcelHandling.GetCell(sheet, 19, 20).SetCellValue(
-            FillCostAccount.GetRate('환경보전비') + ' %'
-        ) //다-11. 환경보전비
-        ExcelHandling.GetCell(sheet, 20, 20).SetCellValue(
-            FillCostAccount.GetRate('공사이행보증서발급수수료') + ' %'
-        ) //다-12. 공사이행보증수수료
-        ExcelHandling.GetCell(sheet, 21, 20).SetCellValue(
-            FillCostAccount.GetRate('건설하도급보증수수료') + ' %'
-        ) //다-13. 하도급대금지급 보증수수료
-        ExcelHandling.GetCell(sheet, 22, 20).SetCellValue(
-            FillCostAccount.GetRate('건설기계대여대금 지급보증서발급금액') + ' %'
-        ) //다-14. 건설기계대여대금 지급보증서 발급금액
-        ExcelHandling.GetCell(sheet, 23, 20).SetCellValue(
-            FillCostAccount.GetRate('기타경비') + ' %'
-        ) //다-15. 기타경비
-        ExcelHandling.GetCell(sheet, 24, 20).SetCellValue(
-            FillCostAccount.GetRate('일반관리비') + ' %'
-        ) //2. 일반관리비
-        ExcelHandling.GetCell(sheet, 25, 20).SetCellValue('0%') //3. 이윤
-        ExcelHandling.GetCell(sheet, 26, 20).SetCellValue(FillCostAccount.GetRate('PS') + ' %') //3.1 PS
-        ExcelHandling.GetCell(sheet, 27, 20).SetCellValue(
-            FillCostAccount.GetRate('제요율적용제외공종') + ' %'
-        ) //3.2 제요율적용제외공종
-        ExcelHandling.GetCell(sheet, 29, 20).SetCellValue(
-            FillCostAccount.GetRate('공사손해보험료') + ' %'
-        ) //5. 공사손해보험료
-        ExcelHandling.GetCell(sheet, 33, 20).SetCellValue(
-            FillCostAccount.GetRate('도급비계') + ' %'
-        ) //9. 도급비계
+        ExcelHandling.GetCell(sheet, 4, 20).value = FillCostAccount.GetRate('직접재료비') + '%' //가-1. 직접재료비
+        ExcelHandling.GetCell(sheet, 6, 20).value = FillCostAccount.GetRate('직접노무비') + ' %' //나-1. 직접노무비
+        ExcelHandling.GetCell(sheet, 7, 20).value = FillCostAccount.GetRate('간접노무비') + ' %' //나-2. 간접노무비
+        ExcelHandling.GetCell(sheet, 9, 20).value = FillCostAccount.GetRate('산출경비') + ' %' //다-1. 산출경비
+        ExcelHandling.GetCell(sheet, 10, 20).value = FillCostAccount.GetRate('산재보험료') + ' %' //다-2. 산재보험료
+        ExcelHandling.GetCell(sheet, 11, 20).value = FillCostAccount.GetRate('고용보험료') + ' %' //다-3. 고용보험료
+        ExcelHandling.GetCell(sheet, 12, 20).value = FillCostAccount.GetRate('국민건강보험료') + ' %' //다-4. 국민건강보험료
+        ExcelHandling.GetCell(sheet, 13, 20).value = FillCostAccount.GetRate('노인장기요양보험') + ' %' //다-5. 노인장기요양보험
+        ExcelHandling.GetCell(sheet, 14, 20).value = FillCostAccount.GetRate('국민연금보험료') + ' %' //다-6. 국민연금보험료
+        ExcelHandling.GetCell(sheet, 15, 20).value = FillCostAccount.GetRate('퇴직공제부금') + ' %' //다-7. 퇴직공제부금
+        ExcelHandling.GetCell(sheet, 16, 20).value = FillCostAccount.GetRate('산업안전보건관리비') + ' %' //다-8. 산업안전보건관리비
+        ExcelHandling.GetCell(sheet, 17, 20).value = FillCostAccount.GetRate('안전관리비') + ' %' //다-9. 안전관리비
+        ExcelHandling.GetCell(sheet, 18, 20).value = FillCostAccount.GetRate('품질관리비') + ' %' //다-10. 품질관리비
+        ExcelHandling.GetCell(sheet, 19, 20).value = FillCostAccount.GetRate('환경보전비') + ' %' //다-11. 환경보전비
+        ExcelHandling.GetCell(sheet, 20, 20).value = FillCostAccount.GetRate('공사이행보증서발급수수료') + ' %' //다-12. 공사이행보증수수료
+        ExcelHandling.GetCell(sheet, 21, 20).value = FillCostAccount.GetRate('건설하도급보증수수료') + ' %' //다-13. 하도급대금지급 보증수수료
+        ExcelHandling.GetCell(sheet, 22, 20).value = FillCostAccount.GetRate('건설기계대여대금 지급보증서발급금액') + ' %' //다-14. 건설기계대여대금 지급보증서 발급금액
+        ExcelHandling.GetCell(sheet, 23, 20).value = FillCostAccount.GetRate('기타경비') + ' %' //다-15. 기타경비
+        ExcelHandling.GetCell(sheet, 24, 20).value = FillCostAccount.GetRate('일반관리비') + ' %' //2. 일반관리비
+        ExcelHandling.GetCell(sheet, 25, 20).value = '0%' //3. 이윤
+        ExcelHandling.GetCell(sheet, 26, 20).value = FillCostAccount.GetRate('PS') + ' %' //3.1 PS
+        ExcelHandling.GetCell(sheet, 27, 20).value = FillCostAccount.GetRate('제요율적용제외공종') + ' %' //3.2 제요율적용제외공종
+        ExcelHandling.GetCell(sheet, 29, 20).value = FillCostAccount.GetRate('공사손해보험료') + ' %' //5. 공사손해보험료
+        ExcelHandling.GetCell(sheet, 33, 20).value = FillCostAccount.GetRate('도급비계') + ' %' //9. 도급비계
 
         costStatementPath = path.join(Data.work_path, '원가계산서_세부결과.xlsx')
         ExcelHandling.WriteExcel(workbook, costStatementPath)
@@ -314,7 +255,7 @@ export class FillCostAccount {
             '건설기계대여대금 지급보증서발급금액',
             FillCostAccount.ToLong(
                 Data.Investigation.get('직공비') *
-                    (Data.Rate1.get('건설기계대여대금 지급보증서발급금액') * 0.01)
+                (Data.Rate1.get('건설기계대여대금 지급보증서발급금액') * 0.01)
             )
         ) //0.01m->0.01
         //다-15. 기타경비
@@ -322,34 +263,34 @@ export class FillCostAccount {
             '기타경비',
             FillCostAccount.ToLong(
                 (Data.Investigation.get('직접재료비') + Data.Investigation.get('노무비')) *
-                    (Data.Rate1.get('기타경비') * 0.01)
+                (Data.Rate1.get('기타경비') * 0.01)
             )
         ) //0.01m->0.01
         //다. 경비
         Data.Investigation.set(
             '경비',
             Data.Investigation.get('산출경비') +
-                Data.Investigation.get('산재보험료') +
-                Data.Investigation.get('고용보험료') +
-                Data.Fixed.get('국민건강보험료') +
-                Data.Fixed.get('노인장기요양보험') +
-                Data.Fixed.get('국민연금보험료') +
-                Data.Fixed.get('퇴직공제부금') +
-                Data.Fixed.get('산업안전보건관리비') +
-                Data.Fixed.get('안전관리비') +
-                Data.Fixed.get('품질관리비') +
-                Data.Investigation.get('환경보전비') +
-                Data.Investigation.get('공사이행보증서발급수수료') +
-                Data.Investigation.get('건설하도급보증수수료') +
-                Data.Investigation.get('건설기계대여대금 지급보증서발급금액') +
-                Data.Investigation.get('기타경비')
+            Data.Investigation.get('산재보험료') +
+            Data.Investigation.get('고용보험료') +
+            Data.Fixed.get('국민건강보험료') +
+            Data.Fixed.get('노인장기요양보험') +
+            Data.Fixed.get('국민연금보험료') +
+            Data.Fixed.get('퇴직공제부금') +
+            Data.Fixed.get('산업안전보건관리비') +
+            Data.Fixed.get('안전관리비') +
+            Data.Fixed.get('품질관리비') +
+            Data.Investigation.get('환경보전비') +
+            Data.Investigation.get('공사이행보증서발급수수료') +
+            Data.Investigation.get('건설하도급보증수수료') +
+            Data.Investigation.get('건설기계대여대금 지급보증서발급금액') +
+            Data.Investigation.get('기타경비')
         )
         //1. 순공사원가
         Data.Investigation.set(
             '순공사원가',
             Data.Investigation.get('직접재료비') +
-                Data.Investigation.get('노무비') +
-                Data.Investigation.get('경비')
+            Data.Investigation.get('노무비') +
+            Data.Investigation.get('경비')
         )
         //2. 일반관리비
         Data.Investigation.set(
@@ -365,7 +306,7 @@ export class FillCostAccount {
                 (Data.Investigation.get('노무비') +
                     Data.Investigation.get('경비') +
                     Data.Investigation.get('일반관리비')) *
-                    0.12
+                0.12
             )
         ) //0.12m->0.12
         if (correction.has('이윤')) Data.Investigation.set('이윤', correction.get('이윤'))
@@ -388,10 +329,10 @@ export class FillCostAccount {
         Data.Investigation.set(
             '총원가',
             Data.Investigation.get('순공사원가') +
-                Data.Investigation.get('일반관리비') +
-                Data.Investigation.get('이윤') +
-                Data.Investigation.get('PS') +
-                Data.Investigation.get('제요율적용제외공종')
+            Data.Investigation.get('일반관리비') +
+            Data.Investigation.get('이윤') +
+            Data.Investigation.get('PS') +
+            Data.Investigation.get('제요율적용제외공종')
         )
         //5. 공사손해보험료
         Data.Investigation.set(
@@ -408,8 +349,8 @@ export class FillCostAccount {
         Data.Investigation.set(
             '소계',
             Data.Investigation.get('총원가') +
-                Data.Investigation.get('공사손해보험료') +
-                Data.Investigation.get('작업설 등')
+            Data.Investigation.get('공사손해보험료') +
+            Data.Investigation.get('작업설 등')
         ) //전체 가격 계산에 작업설 추가 (23.02.06)
         //7. 부가가치세
         Data.Investigation.set(
@@ -479,8 +420,8 @@ export class FillCostAccount {
                     FillCostAccount.ToLong(
                         Math.ceil(
                             Data.Bidding.get('직접노무비') *
-                                (Data.Rate1.get('간접노무비') * 0.01) *
-                                0.997
+                            (Data.Rate1.get('간접노무비') * 0.01) *
+                            0.997
                         )
                     )
                 )
@@ -543,7 +484,7 @@ export class FillCostAccount {
             '건설기계대여대금 지급보증서발급금액',
             FillCostAccount.ToLong(
                 Data.Bidding.get('직공비') *
-                    (Data.Rate1.get('건설기계대여대금 지급보증서발급금액') * 0.01)
+                (Data.Rate1.get('건설기계대여대금 지급보증서발급금액') * 0.01)
             )
         )
         //다-15. 기타경비
@@ -551,7 +492,7 @@ export class FillCostAccount {
             '기타경비1',
             FillCostAccount.ToLong(
                 (Data.Bidding.get('직접재료비') + Data.Bidding.get('노무비')) *
-                    (Data.Rate1.get('기타경비') * 0.01)
+                (Data.Rate1.get('기타경비') * 0.01)
             )
         )
         if (Data.Bidding.get('기타경비1') < Data.Bidding.get('기타경비2')) {
@@ -570,8 +511,8 @@ export class FillCostAccount {
                     FillCostAccount.ToLong(
                         Math.ceil(
                             (Data.Bidding.get('직접재료비') + Data.Bidding.get('노무비')) *
-                                (Data.Rate1.get('기타경비') * 0.01) *
-                                0.997
+                            (Data.Rate1.get('기타경비') * 0.01) *
+                            0.997
                         )
                     )
                 ) //decimal 0.01m 0.997m
@@ -580,20 +521,20 @@ export class FillCostAccount {
         Data.Bidding.set(
             '경비',
             Data.Bidding.get('산출경비') +
-                Data.Bidding.get('산재보험료') +
-                Data.Bidding.get('고용보험료') +
-                Data.Fixed.get('국민건강보험료') +
-                Data.Fixed.get('노인장기요양보험') +
-                Data.Fixed.get('국민연금보험료') +
-                Data.Fixed.get('퇴직공제부금') +
-                Data.Fixed.get('산업안전보건관리비') +
-                Data.Fixed.get('안전관리비') +
-                Data.Fixed.get('품질관리비') +
-                Data.Bidding.get('환경보전비') +
-                Data.Bidding.get('공사이행보증서발급수수료') +
-                Data.Bidding.get('건설하도급보증수수료') +
-                Data.Bidding.get('건설기계대여대금 지급보증서발급금액') +
-                Data.Bidding.get('기타경비')
+            Data.Bidding.get('산재보험료') +
+            Data.Bidding.get('고용보험료') +
+            Data.Fixed.get('국민건강보험료') +
+            Data.Fixed.get('노인장기요양보험') +
+            Data.Fixed.get('국민연금보험료') +
+            Data.Fixed.get('퇴직공제부금') +
+            Data.Fixed.get('산업안전보건관리비') +
+            Data.Fixed.get('안전관리비') +
+            Data.Fixed.get('품질관리비') +
+            Data.Bidding.get('환경보전비') +
+            Data.Bidding.get('공사이행보증서발급수수료') +
+            Data.Bidding.get('건설하도급보증수수료') +
+            Data.Bidding.get('건설기계대여대금 지급보증서발급금액') +
+            Data.Bidding.get('기타경비')
         )
         //1. 순공사원가
         Data.Bidding.set(
@@ -625,8 +566,8 @@ export class FillCostAccount {
                 FillCostAccount.ToLong(
                     Math.ceil(
                         Data.Bidding.get('순공사원가') *
-                            (Data.Rate1.get('일반관리비') * 0.01) *
-                            0.997
+                        (Data.Rate1.get('일반관리비') * 0.01) *
+                        0.997
                     )
                 )
             ) //decimal 0.01m 0.997m
@@ -649,10 +590,10 @@ export class FillCostAccount {
         Data.Bidding.set(
             '총원가',
             Data.Bidding.get('순공사원가') +
-                Data.Bidding.get('일반관리비') +
-                Data.Bidding.get('이윤') +
-                Data.Bidding.get('PS') +
-                Data.Bidding.get('제요율적용제외공종')
+            Data.Bidding.get('일반관리비') +
+            Data.Bidding.get('이윤') +
+            Data.Bidding.get('PS') +
+            Data.Bidding.get('제요율적용제외공종')
         )
         //5. 공사손해보험료
         Data.Bidding.set(
@@ -683,8 +624,8 @@ export class FillCostAccount {
         Data.Bidding.set(
             '소계',
             Data.Bidding.get('총원가') +
-                Data.Bidding.get('공사손해보험료') +
-                Data.Bidding.get('작업설 등')
+            Data.Bidding.get('공사손해보험료') +
+            Data.Bidding.get('작업설 등')
         ) //전체 가격 계산에 작업설 추가 (23.02.06)
         //7. 부가가치세
         Data.Bidding.set(
@@ -697,7 +638,7 @@ export class FillCostAccount {
 
         //도급비계 1000원 단위 절상 옵션 적용시
         if (Data.BidPriceRaise === '1') {
-            let raise = 1000 - (Data.Bidding.get('도급비계') % 1000) //1000원 단위 절상 //Convert.ToDecimal(Data.Bidding.get("도급비계")) % 1000)
+            let raise = 1000 - (Data.Bidding.get('도급비계') % 1000) //1000원 단위 절상 //Convert.ToDecimal (Data.Bidding.get("도급비계")) % 1000)
             let addPrice = raise / 1.1 //decimal 1.1m
             Data.Bidding.set(
                 '도급비계',
@@ -707,10 +648,10 @@ export class FillCostAccount {
                 '일반관리비',
                 FillCostAccount.ToLong(Data.Bidding.get('일반관리비') + addPrice)
             ) //절상에 필요한 가격을 일반관리비에 더해 금액을 맞추어줌
-            //FillCostAccount.ToLong(Convert.ToDecimal(Data.Bidding.get("일반관리비")) + addPrice)
+            //FillCostAccount.ToLong(Convert.ToDecimal (Data.Bidding.get("일반관리비")) + addPrice)
 
             //일반관리비 증가에 따른 타 금액 변경
-            Data.Bidding.set('소계', FillCostAccount.ToLong(Data.Bidding.get('소계') + addPrice)) //FillCostAccount.ToLong(Convert.ToDecimal(Data.Bidding.get("소계")) + addPrice)
+            Data.Bidding.set('소계', FillCostAccount.ToLong(Data.Bidding.get('소계') + addPrice)) //FillCostAccount.ToLong(Convert.ToDecimal (Data.Bidding.get("소계")) + addPrice)
             Data.Bidding.set(
                 '부가가치세',
                 FillCostAccount.ToLong(
@@ -787,7 +728,7 @@ export class FillCostAccount {
             .round(7)
             .times(100)
             .toNumber()
-        return rate.toNumber();
+        return rate;
     }
 
     //해당 공사에 특정 원가계산서 항목이 존재하지 않는 경우

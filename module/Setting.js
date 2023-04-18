@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -80,6 +69,7 @@ var Setting = /** @class */ (function () {
         //표준시장단가 합계(조사금액) 저장
         Data_1.Data.InvestigateStandardMarket =
             Data_1.Data.StandardMaterial + Data_1.Data.StandardLabor + Data_1.Data.StandardExpense;
+        //console.log(Data.StandardMaterial);
     };
     Setting.GetConstructionNum = function () {
         var constNums = Setting.eleBID['T2'];
@@ -91,14 +81,20 @@ var Setting = /** @class */ (function () {
             if (Data_1.Data.ConstructionNums.has(construction)) {
                 construction += '2';
             }
-            console.log('키:', index, '값:', construction, '으로 Data.ConstructionNums에 <string, string> 추가');
+            // console.log(
+            //     '키:',
+            //     index,
+            //     '값:',
+            //     construction,
+            //     '으로 Data.ConstructionNums에 <string, string> 추가'
+            // )
             Data_1.Data.ConstructionNums.set(index, construction);
         }
     };
     Setting.AddConstructionList = function () {
         Data_1.Data.ConstructionNums.forEach(function (value, key) {
             Data_1.Data.Dic.set(key, new Array());
-            console.log('키:', key, '값:', Data_1.Data.Dic.get(key), '으로 Data.Dic에 <string, []> 추가');
+            //console.log('키:', key, '값:', Data.Dic.get(key), '으로 Data.Dic에 <string, []> 추가')
         }); // Data.Dic자료구조 체크하기 <string. Data[]>가 맞는지, <string, Array[]>로 해야하는지
     };
     Setting.GetItem = function (bid) {
@@ -155,11 +151,11 @@ var Setting = /** @class */ (function () {
             work.C12._text, //null값 가능성O
             work.C13._text, //null값 가능성O
             work.C14._text, //null값 가능성O
-            parseFloat(work.C15._text), parseFloat(work.C28._text), parseFloat(work.C29._text), parseFloat(work.C30._text));
+            Number(work.C15._text), Number(work.C28._text), Number(work.C29._text), Number(work.C30._text));
         });
         works.forEach(function (work) {
-            Data_1.Data.Dic.get(work.ConstructionNum).push(__assign({}, work));
-            console.log('Data.Dic의', 'arrray에', Data_1.Data.Dic.get(work.ConstructionNum)[Data_1.Data.Dic.get(work.ConstructionNum).length - 1], '추가');
+            Data_1.Data.Dic.get(work.ConstructionNum).push(work);
+            // console.log('Data.Dic의', 'arrray에', Data.Dic.get(work.ConstructionNum)[Data.Dic.get(work.ConstructionNum).length - 1], '추가')
         });
     };
     Setting.MatchConstructionNum = function (filePath) {
@@ -269,15 +265,14 @@ var Setting = /** @class */ (function () {
                 var detailVal_1 = bidT3[key]['C3']['_text'];
                 var curObject = Data_1.Data.Dic.get(constNum).find(function (x) { return x.WorkNum === numVal_1 && x.DetailWorkNum === detailVal_1; });
                 if (curObject.Item === '일반' || curObject.Item === '재요율적용제외' || curObject.Item === '표준시장단가' && curObject !== undefined) {
-                    bidT3[key]['C16']['_text'] = curObject.MaterialUnit;
-                    bidT3[key]['C17']['_text'] = curObject.LaborUnit;
-                    bidT3[key]['C18']['_text'] = curObject.ExpenseUnit;
-                    bidT3[key]['C19']['_text'] = curObject.UnitPriceSum;
-                    bidT3[key]['C20']['_text'] = curObject.Material;
-                    bidT3[key]['C21']['_text'] = curObject.Labor;
-                    bidT3[key]['C22']['_text'] = curObject.Expense;
-                    bidT3[key]['C23']['_text'] = curObject.PriceSum;
-                    console.log(curObject.MaterialUnit);
+                    bidT3[key]['C16']['_text'] = curObject.MaterialUnit.toString();
+                    bidT3[key]['C17']['_text'] = curObject.LaborUnit.toString();
+                    bidT3[key]['C18']['_text'] = curObject.ExpenseUnit.toString();
+                    bidT3[key]['C19']['_text'] = curObject.UnitPriceSum.toString();
+                    bidT3[key]['C20']['_text'] = curObject.Material.toString();
+                    bidT3[key]['C21']['_text'] = curObject.Labor.toString();
+                    bidT3[key]['C22']['_text'] = curObject.Expense.toString();
+                    bidT3[key]['C23']['_text'] = curObject.PriceSum.toString();
                 }
             }
         };
@@ -296,12 +291,13 @@ var Setting = /** @class */ (function () {
     Setting.GetRate = function () {
         Data_1.Data.ConstructionTerm = Number(Setting.eleBID['T1']['C29']['_text']);
         var bidT5 = Setting.eleBID['T5'];
+        //console.log()
         for (var key in bidT5) {
             var name_2 = JSON.stringify(bidT5[key]['C4']['_text']);
-            var val1 = JSON.stringify(bidT5[key]['C6']['_text']);
-            var val2 = JSON.stringify(bidT5[key]['C7']['_text']);
-            if (JSON.stringify(bidT5[key]['C5']['_text']) === '7') {
-                var fixedPrice = Number(JSON.stringify(bidT5[key]['C8']['_text']));
+            var val1 = bidT5[key]['C6']['_text'];
+            var val2 = bidT5[key]['C7']['_text'];
+            if (bidT5[key]['C5']['_text'] === '7') {
+                var fixedPrice = Number(bidT5[key]['C8']['_text']);
                 Data_1.Data.Fixed.set(name_2, fixedPrice);
             }
             else {
