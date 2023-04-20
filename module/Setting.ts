@@ -40,6 +40,8 @@ export class Setting {
         //표준시장단가 합계(조사금액) 저장
         Data.InvestigateStandardMarket =
             Data.StandardMaterial + Data.StandardLabor + Data.StandardExpense
+
+        //console.log(Data.StandardMaterial);
     }
 
     public static GetConstructionNum(): void {
@@ -52,13 +54,13 @@ export class Setting {
             if (Data.ConstructionNums.has(construction)) {
                 construction += '2'
             }
-            console.log(
-                '키:',
-                index,
-                '값:',
-                construction,
-                '으로 Data.ConstructionNums에 <string, string> 추가'
-            )
+            // console.log(
+            //     '키:',
+            //     index,
+            //     '값:',
+            //     construction,
+            //     '으로 Data.ConstructionNums에 <string, string> 추가'
+            // )
             Data.ConstructionNums.set(index, construction)
         }
     }
@@ -66,7 +68,7 @@ export class Setting {
     public static AddConstructionList(): void {
         Data.ConstructionNums.forEach(function (value, key) {
             Data.Dic.set(key, new Array<Data>())
-            console.log('키:', key, '값:', Data.Dic.get(key), '으로 Data.Dic에 <string, []> 추가')
+            //console.log('키:', key, '값:', Data.Dic.get(key), '으로 Data.Dic에 <string, []> 추가')
         }) // Data.Dic자료구조 체크하기 <string. Data[]>가 맞는지, <string, Array[]>로 해야하는지
     }
 
@@ -115,21 +117,16 @@ export class Setting {
                 work.C12._text, //null값 가능성O
                 work.C13._text, //null값 가능성O
                 work.C14._text, //null값 가능성O
-                parseFloat(work.C15._text),
-                parseFloat(work.C28._text),
-                parseFloat(work.C29._text),
-                parseFloat(work.C30._text)
+                Number(work.C15._text),
+                Number(work.C28._text),
+                Number(work.C29._text),
+                Number(work.C30._text)
             )
         })
 
         works.forEach((work) => {
-            Data.Dic.get(work.ConstructionNum).push({ ...work })
-            console.log(
-                'Data.Dic의',
-                'arrray에',
-                Data.Dic.get(work.ConstructionNum)[Data.Dic.get(work.ConstructionNum).length - 1],
-                '추가'
-            )
+            Data.Dic.get(work.ConstructionNum).push(work)
+            // console.log('Data.Dic의', 'arrray에', Data.Dic.get(work.ConstructionNum)[Data.Dic.get(work.ConstructionNum).length - 1], '추가')
         })
     }
 
@@ -226,15 +223,14 @@ export class Setting {
                 let curObject: Data = Data.Dic.get(constNum).find((x) => x.WorkNum === numVal && x.DetailWorkNum === detailVal);
 
                 if (curObject.Item === '일반' || curObject.Item === '재요율적용제외' || curObject.Item === '표준시장단가' && curObject !== undefined) {
-                    bidT3[key]['C16']['_text'] = curObject.MaterialUnit;
-                    bidT3[key]['C17']['_text'] = curObject.LaborUnit;
-                    bidT3[key]['C18']['_text'] = curObject.ExpenseUnit;
-                    bidT3[key]['C19']['_text'] = curObject.UnitPriceSum;
-                    bidT3[key]['C20']['_text'] = curObject.Material;
-                    bidT3[key]['C21']['_text'] = curObject.Labor;
-                    bidT3[key]['C22']['_text'] = curObject.Expense;
-                    bidT3[key]['C23']['_text'] = curObject.PriceSum;
-                    console.log(curObject.MaterialUnit); // Data의 getter가 작동하지 않음! (curObject.MaterialUnit ===return===> undefined)
+                    bidT3[key]['C16']['_text'] = curObject.MaterialUnit.toString();
+                    bidT3[key]['C17']['_text'] = curObject.LaborUnit.toString();
+                    bidT3[key]['C18']['_text'] = curObject.ExpenseUnit.toString();
+                    bidT3[key]['C19']['_text'] = curObject.UnitPriceSum.toString();
+                    bidT3[key]['C20']['_text'] = curObject.Material.toString();
+                    bidT3[key]['C21']['_text'] = curObject.Labor.toString();
+                    bidT3[key]['C22']['_text'] = curObject.Expense.toString();
+                    bidT3[key]['C23']['_text'] = curObject.PriceSum.toString();
                 }
             }
         }
@@ -251,14 +247,15 @@ export class Setting {
 
     public static GetRate(): void {
         Data.ConstructionTerm = Number(Setting.eleBID['T1']['C29']['_text'])
-
         const bidT5: object = Setting.eleBID['T5']
+        //console.log()
         for (let key in bidT5) {
             let name: string = JSON.stringify(bidT5[key]['C4']['_text'])
-            let val1: string = JSON.stringify(bidT5[key]['C6']['_text'])
-            let val2: string = JSON.stringify(bidT5[key]['C7']['_text'])
-            if (JSON.stringify(bidT5[key]['C5']['_text']) === '7') {
-                let fixedPrice: number = Number(JSON.stringify(bidT5[key]['C8']['_text']))
+            let val1: string = bidT5[key]['C6']['_text']
+            let val2: string = bidT5[key]['C7']['_text']
+
+            if (bidT5[key]['C5']['_text'] === '7') {
+                let fixedPrice: number = Number(bidT5[key]['C8']['_text'])
                 Data.Fixed.set(name, fixedPrice)
             } else {
                 let applicationRate1: number = Number(val1)
@@ -344,4 +341,4 @@ export class Setting {
     }
 }
 
-Setting.GetData();
+// Setting.GetData();

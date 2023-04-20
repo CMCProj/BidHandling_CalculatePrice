@@ -21,15 +21,14 @@ var ExcelHandling = /** @class */ (function () {
         // }
         return cell;
     };
+    /**해당 워크시트의 행, 열의 값을 return */
     ExcelHandling.GetCell = function (sheet, rownum, cellnum) {
         var row = this.GetRow(sheet, rownum);
         return this.GetCell2(row, cellnum);
     };
-    /**
-     * exceljs의 read 메소드가 비동기 메소드이기에 return형이 Promise<exceljs.Workbook>임.
+    /** exceljs의 read 메소드가 비동기 메소드이기에 return형이 Promise<exceljs.Workbook>임.
      *
-     * 이를 사용하는 함수 혹은 메소드는 비동기(async / await)로 만들어야 제대로 된 exceljs.Workbook으로 쓸 수 있음.
-    */
+     * 이를 사용하는 함수 혹은 메소드는 비동기(async / await)로 만들어야 제대로 된 exceljs.Workbook으로 쓸 수 있음.*/
     ExcelHandling.GetWorkbook = function (filename, version) {
         // 파일을 열고 파일 내용을 읽기/쓰기용 스트림으로 가져옴
         var workbook = new exceljs.Workbook();

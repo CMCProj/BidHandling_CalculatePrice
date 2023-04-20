@@ -34,12 +34,9 @@ var Data = exports.Data = /** @class */ (function () {
     Object.defineProperty(Data.prototype, "MaterialUnit", {
         /**재료비 단가*/
         get: function () {
-            // //사용자가 단가 정수처리를 원한다면("2") 정수 값으로 return / Reset 함수를 쓰지 않은 경우의 조건 추가 (23.02.06)
-            console.log("dkdkkdk");
             if (Data.UnitPriceTrimming === '2' && Data.ExecuteReset === '0')
                 return Math.ceil(this.materialUnit);
-            else if (Data.UnitPriceTrimming === '1' || Data.ExecuteReset === '1')
-                // 사용자가 단가 소수점 처리를 원하거나 Reset 함수를 썼다면 소수 첫째 자리 아래로 절사 (23.02.06)
+            else if (Data.UnitPriceTrimming === '1' || Data.ExecuteReset === '1') // 사용자가 단가 소수점 처리를 원하거나 Reset 함수를 썼다면 소수 첫째 자리 아래로 절사 (23.02.06)
                 return Math.floor(this.materialUnit * 10) / 10;
             return this.materialUnit; //Default는 있는 그대로의 값을 return
         },
@@ -156,6 +153,40 @@ var Data = exports.Data = /** @class */ (function () {
     Data.CompanyRegistrationName = ''; // 2.02 회사명 추가
     // 프로그램 폴더로 위치 변경
     Data.work_path = path.join(Data.folder, 'WORK DIRECTORY'); //작업폴더(WORK DIRECTORY) 경로
+    Data.RealDirectMaterial = 0; //실내역 직접 재료비(일반, - , 표준시장단가)
+    Data.RealDirectLabor = 0; //실내역 직접 노무비(일반, - , 표준시장단가)
+    Data.RealOutputExpense = 0; //실내역 산출 경비(일반, - , 표준시장단가)
+    Data.FixedPriceDirectMaterial = 0; //고정금액 항목 직접 재료비
+    Data.FixedPriceDirectLabor = 0; //고정금액 항목 직접 노무비
+    Data.FixedPriceOutputExpense = 0; //고정금액 항목 산출 경비
+    Data.RealPriceDirectMaterial = 0; //일반항목 직접 재료비
+    Data.RealPriceDirectLabor = 0; //일반항목 직접 노무비
+    Data.RealPriceOutputExpense = 0; //일반항목 산출 경비
+    Data.InvestigateFixedPriceDirectMaterial = 0; //고정금액 항목 직접 재료비(조사금액)
+    Data.InvestigateFixedPriceDirectLabor = 0; //고정금액 항목 직접 노무비(조사금액)
+    Data.InvestigateFixedPriceOutputExpense = 0; //고정금액 항목 산출 경비(조사금액)
+    Data.InvestigateStandardMaterial = 0; //표준시장단가 재료비(조사금액)
+    Data.InvestigateStandardLabor = 0; //표준시장단가 노무비(조사금액)
+    Data.InvestigateStandardExpense = 0; //표준시장단가 산출경비(조사금액)
+    Data.PsMaterial = 0; //PS(재료비) 금액(직접 재료비에서 제외)
+    Data.PsLabor = 0; //PS(노무비) 금액(직접 노무비에서 제외)
+    Data.PsExpense = 0; //PS(경비) 금액(산출 경비에서 제외)
+    Data.ExcludingMaterial = 0; //제요율적용제외(재료비) 금액(직접 재료비에서 제외)
+    Data.ExcludingLabor = 0; //제요율적용제외(노무비) 금액(직접 노무비에서 제외)
+    Data.ExcludingExpense = 0; //제요율적용제외(경비) 금액(산출 경비에서 제외)
+    Data.AdjustedExMaterial = 0; //사정율 적용한 제요율적용제외 금액(재료비)
+    Data.AdjustedExLabor = 0; //사정율 적용한 제요율적용제외 금액(노무비)
+    Data.AdjustedExExpense = 0; //사정율 적용한 제요율적용제외 금액(경비)
+    Data.GovernmentMaterial = 0; //관급자재요소(재료비) 금액(직접 재료비에서 제외)
+    Data.GovernmentLabor = 0; //관급자재요소(노무비) 금액(직접 노무비에서 제외)
+    Data.GovernmentExpense = 0; //관급자재요소(경비) 금액(산출 경비에서 제외)
+    Data.SafetyPrice = 0; //안전관리비(산출 경비에서 제외)
+    Data.StandardMaterial = 0; //표준시장단가 재료비
+    Data.StandardLabor = 0; //표준시장단가 노무비
+    Data.StandardExpense = 0; //표준시장단가 산출경비
+    Data.InvestigateStandardMarket = 0; //표준시장단가 합계(조사내역)
+    Data.FixedPricePercent = 0; //고정금액 비중
+    Data.ByProduct = 0; //작업설
     Data.Dic = new Map(); //key : 세부공사별 번호 / value : 세부공사별 리스트
     Data.ConstructionNums = new Map(); //세부 공사별 번호 저장
     Data.MatchedConstNum = new Map(); //실내역과 세부공사별 번호의 매칭 결과

@@ -19,25 +19,24 @@ export class ExcelHandling {
         return cell;
     }
 
+    /**해당 워크시트의 행, 열의 값을 return */
     public static GetCell(sheet: exceljs.Worksheet, rownum: number, cellnum: number): exceljs.Cell {
         let row = this.GetRow(sheet, rownum)
         return this.GetCell2(row, cellnum)
     }
 
-    /** 
-     * exceljs의 read 메소드가 비동기 메소드이기에 return형이 Promise<exceljs.Workbook>임.
+    /** exceljs의 read 메소드가 비동기 메소드이기에 return형이 Promise<exceljs.Workbook>임.
      * 
-     * 이를 사용하는 함수 혹은 메소드는 비동기(async / await)로 만들어야 제대로 된 exceljs.Workbook으로 쓸 수 있음.
-    */
+     * 이를 사용하는 함수 혹은 메소드는 비동기(async / await)로 만들어야 제대로 된 exceljs.Workbook으로 쓸 수 있음.*/
     public static GetWorkbook(filename: string, version: string): Promise<exceljs.Workbook> {
         // 파일을 열고 파일 내용을 읽기/쓰기용 스트림으로 가져옴
         let workbook = new exceljs.Workbook();
         let stream = fs.createReadStream(filename + version, { flags: 'r+' })
 
         if (version === '.xls') {
-            node_xj({ input: filename + version, output: filename + '.json'}, function (err, result) {
+            node_xj({ input: filename + version, output: filename + '.json' }, function (err, result) {
                 if (err) throw err
-                else{
+                else {
                     //xls -> json으로 변환
                     const readJson = fs.readFileSync(filename + '.json', 'utf-8');
                     let xlsx = JSON.parse(readJson);
@@ -49,15 +48,15 @@ export class ExcelHandling {
                     XLSX.writeFile(book, filename + '.xlsx');
 
                     fs.rmSync(filename + '.json');
-                    stream = fs.createReadStream(filename + '.xlsx', { flags: 'r+'})
+                    stream = fs.createReadStream(filename + '.xlsx', { flags: 'r+' })
                 }
             })
 
             return workbook.xlsx.read(stream);
         }
-        else if(version === '.xlsx')
+        else if (version === '.xlsx')
             return workbook.xlsx.read(stream);
-        
+
         throw new Error('올바른 Excel파일 형식(.xls/.xlsx)이 아닙니다. 파일을 다시 한 번 확인해주세요.');
     }
 

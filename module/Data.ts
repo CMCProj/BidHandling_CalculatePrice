@@ -2,18 +2,18 @@ import * as path from 'path'
 
 export class Data {
     constructor(
-        item,
-        constructionNum,
-        workNum,
-        detailWorkNum,
-        code,
-        name,
-        standard,
-        unit,
-        quantity,
-        materialUnit,
-        laborUnit,
-        expenseUnit
+        item: string,
+        constructionNum: string,
+        workNum: string,
+        detailWorkNum: string,
+        code: string,
+        name: string,
+        standard: string,
+        unit: string,
+        quantity: number,
+        materialUnit: number,
+        laborUnit: number,
+        expenseUnit: number
     ) {
         this.Item = item
         this.ConstructionNum = constructionNum
@@ -60,8 +60,9 @@ export class Data {
     public Standard: string = '' //규격
     public Unit: string = '' //단위
     public Quantity: number = 0 //수량
-    //재료비 단가
-    public get MaterialUnit() {
+
+    /**재료비 단가*/
+    public get MaterialUnit(): number {
         //사용자가 단가 정수처리를 원한다면("2") 정수 값으로 return / Reset 함수를 쓰지 않은 경우의 조건 추가 (23.02.06)
         if (Data.UnitPriceTrimming === '2' && Data.ExecuteReset === '0')
             return Math.ceil(this.materialUnit)
@@ -122,40 +123,40 @@ export class Data {
 
     //원가계산서에 필요한 데이터
     public static ConstructionTerm: number //공사 기간
-    public static RealDirectMaterial: number //실내역 직접 재료비(일반, - , 표준시장단가)
-    public static RealDirectLabor: number //실내역 직접 노무비(일반, - , 표준시장단가)
-    public static RealOutputExpense: number //실내역 산출 경비(일반, - , 표준시장단가)
-    public static FixedPriceDirectMaterial: number //고정금액 항목 직접 재료비
-    public static FixedPriceDirectLabor: number //고정금액 항목 직접 노무비
-    public static FixedPriceOutputExpense: number //고정금액 항목 산출 경비
-    public static RealPriceDirectMaterial: number //일반항목 직접 재료비
-    public static RealPriceDirectLabor: number //일반항목 직접 노무비
-    public static RealPriceOutputExpense: number //일반항목 산출 경비
-    public static InvestigateFixedPriceDirectMaterial: number //고정금액 항목 직접 재료비(조사금액)
-    public static InvestigateFixedPriceDirectLabor: number //고정금액 항목 직접 노무비(조사금액)
-    public static InvestigateFixedPriceOutputExpense: number //고정금액 항목 산출 경비(조사금액)
-    public static InvestigateStandardMaterial: number //표준시장단가 재료비(조사금액)
-    public static InvestigateStandardLabor: number //표준시장단가 노무비(조사금액)
-    public static InvestigateStandardExpense: number //표준시장단가 산출경비(조사금액)
-    public static PsMaterial: number //PS(재료비) 금액(직접 재료비에서 제외)
-    public static PsLabor: number //PS(노무비) 금액(직접 노무비에서 제외)
-    public static PsExpense: number //PS(경비) 금액(산출 경비에서 제외)
-    public static ExcludingMaterial: number //제요율적용제외(재료비) 금액(직접 재료비에서 제외)
-    public static ExcludingLabor: number //제요율적용제외(노무비) 금액(직접 노무비에서 제외)
-    public static ExcludingExpense: number //제요율적용제외(경비) 금액(산출 경비에서 제외)
-    public static AdjustedExMaterial: number //사정율 적용한 제요율적용제외 금액(재료비)
-    public static AdjustedExLabor: number //사정율 적용한 제요율적용제외 금액(노무비)
-    public static AdjustedExExpense: number //사정율 적용한 제요율적용제외 금액(경비)
-    public static GovernmentMaterial: number //관급자재요소(재료비) 금액(직접 재료비에서 제외)
-    public static GovernmentLabor: number //관급자재요소(노무비) 금액(직접 노무비에서 제외)
-    public static GovernmentExpense: number //관급자재요소(경비) 금액(산출 경비에서 제외)
-    public static SafetyPrice: number //안전관리비(산출 경비에서 제외)
-    public static StandardMaterial: number //표준시장단가 재료비
-    public static StandardLabor: number //표준시장단가 노무비
-    public static StandardExpense: number //표준시장단가 산출경비
-    public static InvestigateStandardMarket: number //표준시장단가 합계(조사내역)
-    public static FixedPricePercent: number //고정금액 비중
-    public static ByProduct: number //작업설
+    public static RealDirectMaterial: number = 0 //실내역 직접 재료비(일반, - , 표준시장단가)
+    public static RealDirectLabor: number = 0 //실내역 직접 노무비(일반, - , 표준시장단가)
+    public static RealOutputExpense: number = 0 //실내역 산출 경비(일반, - , 표준시장단가)
+    public static FixedPriceDirectMaterial: number = 0 //고정금액 항목 직접 재료비
+    public static FixedPriceDirectLabor: number = 0 //고정금액 항목 직접 노무비
+    public static FixedPriceOutputExpense: number = 0 //고정금액 항목 산출 경비
+    public static RealPriceDirectMaterial: number = 0 //일반항목 직접 재료비
+    public static RealPriceDirectLabor: number = 0 //일반항목 직접 노무비
+    public static RealPriceOutputExpense: number = 0 //일반항목 산출 경비
+    public static InvestigateFixedPriceDirectMaterial: number = 0 //고정금액 항목 직접 재료비(조사금액)
+    public static InvestigateFixedPriceDirectLabor: number = 0 //고정금액 항목 직접 노무비(조사금액)
+    public static InvestigateFixedPriceOutputExpense: number = 0 //고정금액 항목 산출 경비(조사금액)
+    public static InvestigateStandardMaterial: number = 0 //표준시장단가 재료비(조사금액)
+    public static InvestigateStandardLabor: number = 0 //표준시장단가 노무비(조사금액)
+    public static InvestigateStandardExpense: number = 0 //표준시장단가 산출경비(조사금액)
+    public static PsMaterial: number = 0 //PS(재료비) 금액(직접 재료비에서 제외)
+    public static PsLabor: number = 0 //PS(노무비) 금액(직접 노무비에서 제외)
+    public static PsExpense: number = 0 //PS(경비) 금액(산출 경비에서 제외)
+    public static ExcludingMaterial: number = 0 //제요율적용제외(재료비) 금액(직접 재료비에서 제외)
+    public static ExcludingLabor: number = 0 //제요율적용제외(노무비) 금액(직접 노무비에서 제외)
+    public static ExcludingExpense: number = 0 //제요율적용제외(경비) 금액(산출 경비에서 제외)
+    public static AdjustedExMaterial: number = 0 //사정율 적용한 제요율적용제외 금액(재료비)
+    public static AdjustedExLabor: number = 0 //사정율 적용한 제요율적용제외 금액(노무비)
+    public static AdjustedExExpense: number = 0 //사정율 적용한 제요율적용제외 금액(경비)
+    public static GovernmentMaterial: number = 0 //관급자재요소(재료비) 금액(직접 재료비에서 제외)
+    public static GovernmentLabor: number = 0 //관급자재요소(노무비) 금액(직접 노무비에서 제외)
+    public static GovernmentExpense: number = 0 //관급자재요소(경비) 금액(산출 경비에서 제외)
+    public static SafetyPrice: number = 0 //안전관리비(산출 경비에서 제외)
+    public static StandardMaterial: number = 0 //표준시장단가 재료비
+    public static StandardLabor: number = 0 //표준시장단가 노무비
+    public static StandardExpense: number = 0 //표준시장단가 산출경비
+    public static InvestigateStandardMarket: number = 0 //표준시장단가 합계(조사내역)
+    public static FixedPricePercent: number = 0 //고정금액 비중
+    public static ByProduct: number = 0 //작업설
 
     public static Dic = new Map<string, Array<Data>>() //key : 세부공사별 번호 / value : 세부공사별 리스트
     public static ConstructionNums = new Map<string, string>() //세부 공사별 번호 저장
