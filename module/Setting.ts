@@ -41,7 +41,7 @@ export class Setting {
         Data.InvestigateStandardMarket =
             Data.StandardMaterial + Data.StandardLabor + Data.StandardExpense
 
-        console.log('세팉끝')
+        console.log('세팅끝')
     }
 
     public static GetConstructionNum(): void {
@@ -89,7 +89,7 @@ export class Setting {
         //해당 공종이 PS인 경우
         else if (bid['C7']['_text'] === '4') item = 'PS'
         //해당 공종이 제요율적용제외공종인 경우
-        else if (bid['C7']['_text'] === '5') item = '재요율적용제외'
+        else if (bid['C7']['_text'] === '5') item = '제요율적용제외'
         //해당 공종이 PS내역인 경우
         else if (bid['C7']['_text'] === '7') item = 'PS내역'
         //해당 공종이 음의 가격 공종인 경우
@@ -226,7 +226,7 @@ export class Setting {
 
                 if (
                     curObject.Item === '일반' ||
-                    curObject.Item === '재요율적용제외' ||
+                    curObject.Item === '제요율적용제외' ||
                     (curObject.Item === '표준시장단가' && curObject !== undefined)
                 ) {
                     bidT3[key]['C16']['_text'] = curObject.MaterialUnit.toString()
@@ -256,7 +256,7 @@ export class Setting {
         const bidT5: object = Setting.eleBID['T5']
         //console.log()
         for (let key in bidT5) {
-            let name: string = JSON.stringify(bidT5[key]['C4']['_text'])
+            let name: string = bidT5[key]['C4']['_text']
             let val1: string = bidT5[key]['C6']['_text']
             let val2: string = bidT5[key]['C7']['_text']
 

@@ -44,20 +44,8 @@ function SetBusinessInfoBtnClick(CompanyName, CompanyNum) {
 }
 console.log('sdfsfd')
 
-//BidHandling_1.BidHandling.BidToJson()
-Setting_1.Setting.GetData() //BidToJson 생략하고 Setting 테스트
-
-FillCostAccount_1.FillCostAccount.CheckKeyNotFound()
-FillCostAccount_1.FillCostAccount.CalculateInvestigationCosts(Data_1.Data.Correction)
-FillCostAccount_1.FillCostAccount.CalculateInvestigationCosts(Data_1.Data.Correction)
-
-var FillInvestigationCostsFN = FillCostAccount_1.FillCostAccount.FillInvestigationCosts()
-
-FillInvestigationCostsFN.then(() => {
-    console.log('then!')
-}).catch(() => {
-    console.log('catch!')
-})
+BidHandling_1.BidHandling.BidToJson()
+//Setting_1.Setting.GetData() //BidToJson 생략하고 Setting 테스트
 
 RadioDecimal_Check('1')
 CheckStandardPrice('1')

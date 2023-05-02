@@ -62,7 +62,7 @@ class CreateResultFile {
             });
         });
         Data_1.Data.Dic.forEach((value, key) => __awaiter(this, void 0, void 0, function* () {
-            let workbook = yield ExcelHandling_1.ExcelHandling.GetWorkbook("입찰내역.xls", "xls");
+            let workbook = yield ExcelHandling_1.ExcelHandling.GetWorkbook("/AutoBid/Excel_Templates/입찰내역", "xls"); //입찰 내역 양식 불러오기
             let sheet = workbook.getWorksheet(0);
             let resultPath;
             let Path;

@@ -5,7 +5,6 @@ import { ExcelHandling } from './ExcelHandling'
 import { Data } from './Data'
 import * as fs from 'fs'
 import * as path from 'path'
-import Big from 'big.js'
 
 export class FillCostAccount {
     //원가계산서 항목별 조사금액 채움(관리자 보정 후)
@@ -337,7 +336,7 @@ export class FillCostAccount {
             )
         )
         let exSum = Data.ExcludingMaterial + Data.ExcludingLabor + Data.ExcludingExpense
-        let exRate2 = new Big(exSum).div(Data.Investigation.get('직공비')).round(5).toNumber() //소수점5자리 남기게 반올림
+        let exRate2 = Math.trunc((exSum / Data.Investigation.get('직공비')) * 100000) / 100000;
         Data.Rate2.set('제요율적용제외공종', exRate2)
         //4. 총원가
         Data.Investigation.set(
@@ -383,7 +382,7 @@ export class FillCostAccount {
         )
     }
 
-    //원가계산서 항목별 입찰금액 구하여 Bidding에 저장
+    /**원가계산서 항목별 입찰금액 구하여 Bidding에 저장*/
     public static CalculateBiddingCosts() {
         //직공비
         Data.Bidding.set(
@@ -685,11 +684,9 @@ export class FillCostAccount {
     }
 
     //decimal 금액 원 단위 절사
-    public static ToLong(
-        price: number //price: decimal
-    ) {
-        let bigNum = new Big(price).round(0, 0)
-        return bigNum.toNumber()
+    public static ToLong(price: number) {//price: decimal
+        let bigNum = Math.trunc(price);
+        return bigNum
     }
 
     //공사이행보증서발급수수료 금액 계산 후 반환
@@ -731,18 +728,10 @@ export class FillCostAccount {
             item === '공사손해보험료'
         ) {
             var before: string = item + 'before'
-            return new Big(Data.Bidding[item])
-                .div(Data.Bidding[before])
-                .round(7)
-                .times(100)
-                .toNumber()
+            return Math.round(Data.Bidding[item] / Data.Bidding[before] * 10000000) / 10000000 * 100;
         }
-        let rate = new Big(Data.Bidding[item])
-            .div(Data.Investigation[item])
-            .round(7)
-            .times(100)
-            .toNumber()
-        return rate
+        let rate = Math.round(Data.Bidding[item] / Data.Bidding[before] * 10000000) / 10000000;
+        return rate;
     }
 
     //해당 공사에 특정 원가계산서 항목이 존재하지 않는 경우

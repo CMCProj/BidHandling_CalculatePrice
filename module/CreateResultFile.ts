@@ -2,7 +2,7 @@ import { Data } from './Data'
 import * as  path from 'path'
 import * as fs from 'fs'
 import * as exceljs from 'exceljs'
-import {ExcelHandling} from "./ExcelHandling";
+import { ExcelHandling } from "./ExcelHandling";
 export class CreateResultFile {
     public static Create(): void {
         const directoryPath = Data.folder // 파일 경로
@@ -20,6 +20,7 @@ export class CreateResultFile {
                 }
             });
         })
+
         xlsList.forEach((xls) => {
             // 기존의 엑셀 파일을 모두 삭제한다.
             fs.access(xls, fs.constants.F_OK, (err) => {
@@ -27,9 +28,12 @@ export class CreateResultFile {
                 fs.unlink(xls, (err) => (err ? console.log(err) : console.log('${xls} 삭제 완료')))
             });
         });
+
         Data.Dic.forEach(async (value, key) => {
-            let workbook = await ExcelHandling.GetWorkbook("입찰내역.xls", "xls");
+            let workbook = await ExcelHandling.GetWorkbook("/AutoBid/Excel_Templates/입찰내역", "xls"); //입찰 내역 양식 불러오기
             let sheet = workbook.getWorksheet(0);
+
+
             let resultPath: string;
             let Path: string;
 
@@ -62,13 +66,11 @@ export class CreateResultFile {
                 sheet.getCell(i + 1, 14).value = pricesum;
                 sheet.getCell(i + 1, 18).value = value[i].Code;
 
-                if (value[i].Item === '표준시장단가')
-                {
-                    sheet.getCell(i+1, 16).value = Number(value[i].Item);
-                    sheet.getCell(i+1, 17).value = Number(value[i].Code);
+                if (value[i].Item === '표준시장단가') {
+                    sheet.getCell(i + 1, 16).value = Number(value[i].Item);
+                    sheet.getCell(i + 1, 17).value = Number(value[i].Code);
                 }
-                else
-                {
+                else {
                     sheet.getCell(i + 1, 15).value = value[i].Item;
                 }
             }

@@ -65,6 +65,7 @@ export class Data {
     public get MaterialUnit(): number {
         //사용자가 단가 정수처리를 원한다면("2") 정수 값으로 return / Reset 함수를 쓰지 않은 경우의 조건 추가 (23.02.06)
         if (Data.UnitPriceTrimming === '2' && Data.ExecuteReset === '0')
+            // return Math.ceil(this.materialUnit)
             return Math.ceil(this.materialUnit)
         else if (Data.UnitPriceTrimming === '1' || Data.ExecuteReset === '1')
             // 사용자가 단가 소수점 처리를 원하거나 Reset 함수를 썼다면 소수 첫째 자리 아래로 절사 (23.02.06)
@@ -109,10 +110,13 @@ export class Data {
         return Math.floor(this.Quantity * this.ExpenseUnit)
     } //경비
     public get UnitPriceSum() {
-        return this.MaterialUnit + this.LaborUnit + this.ExpenseUnit
+        return (
+            Math.round((this.MaterialUnit + this.LaborUnit + this.ExpenseUnit) * 10000000) /
+            10000000
+        ) //자바스크립트 소수점 계산 오류를 막기 위해 소수점 8자리에서 반올림 처리
     } //합계단가
     public get PriceSum() {
-        return this.Material + this.Labor + this.Expense
+        return Math.round((this.Material + this.Labor + this.Expense) * 10000000) / 10000000 //자바스크립트 소수점 계산 오류를 막기 위해 소수점 8자리에서 반올림 처리
     } //합계(세부공종별 금액의 합계)
 
     public Weight: number = 0 //가중치
