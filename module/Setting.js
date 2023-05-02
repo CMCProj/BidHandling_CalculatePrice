@@ -67,8 +67,7 @@ var Setting = /** @class */ (function () {
         //직공비 제외항목 및 고정금액 계산
         Setting.GetPrices();
         //표준시장단가 합계(조사금액) 저장
-        Data_1.Data.InvestigateStandardMarket =
-            Data_1.Data.StandardMaterial + Data_1.Data.StandardLabor + Data_1.Data.StandardExpense;
+        Data_1.Data.InvestigateStandardMarket = Data_1.Data.StandardMaterial + Data_1.Data.StandardLabor + Data_1.Data.StandardExpense;
         //console.log(Data.StandardMaterial);
     };
     Setting.GetConstructionNum = function () {
@@ -293,7 +292,7 @@ var Setting = /** @class */ (function () {
         var bidT5 = Setting.eleBID['T5'];
         //console.log()
         for (var key in bidT5) {
-            var name_2 = JSON.stringify(bidT5[key]['C4']['_text']);
+            var name_2 = bidT5[key]['C4']['_text'];
             var val1 = bidT5[key]['C6']['_text'];
             var val2 = bidT5[key]['C7']['_text'];
             if (bidT5[key]['C5']['_text'] === '7') {
@@ -388,4 +387,4 @@ var Setting = /** @class */ (function () {
     return Setting;
 }());
 exports.Setting = Setting;
-Setting.GetData();
+// Setting.GetData();

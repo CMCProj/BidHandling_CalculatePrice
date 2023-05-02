@@ -9,7 +9,7 @@ import { Data } from './Data'
 let filename = undefined
 
 export class BidHandling {
-    public static BidToJson() : void {
+    public static BidToJson(): void {
         const copiedFolder: string = Data.folder + '\\EmptyBid' // EmptyBid폴더 주소 저장 / 폴더 경로 수정 (23.02.02)
         let bidFile = fs.readdirSync(copiedFolder)
         let myFile = bidFile.filter(
@@ -47,7 +47,7 @@ export class BidHandling {
         Setting.GetData()
     }
 
-    public static JsonToBid() : void {
+    public static JsonToBid(): void {
         const resultFilePath = Data.folder + '\\OutputDataFromBID.json'
         const json = fs.readFileSync(resultFilePath, 'utf-8') // json파일 읽기
         const xml = convert.json2xml(json, { compact: true, ignoreComment: true, spaces: 4 }) // json파일을 xml파일로 교체
@@ -64,10 +64,7 @@ export class BidHandling {
         zip.addLocalFile(Data.folder + '\\EmptyBid\\XmlToBID.BID')
         zip.writeZip(Data.folder + '\\EmptyBid\\' + filename + '.zip') // XmlToBID.BID파일을 .zip파일로 압축
 
-        fs.copyFileSync(
-            Data.folder + '\\EmptyBid\\' + filename + '.zip',
-            Data.folder + '\\EmptyBid\\' + filename + '.BID'
-        )
+        fs.copyFileSync(Data.folder + '\\EmptyBid\\' + filename + '.zip', Data.folder + '\\EmptyBid\\' + filename + '.BID')
 
         //======이 과정에서 만들어진 파일들은 전부 삭제======
         fs.rmSync(Data.folder + '\\EmptyBid\\' + filename + '.zip')

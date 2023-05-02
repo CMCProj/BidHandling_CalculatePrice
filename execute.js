@@ -42,8 +42,8 @@ function SetBusinessInfoBtnClick(CompanyName, CompanyNum) {
     Data_1.Data.CompanyRegistrationNum = CompanyNum
 }
 
-//BidHandling_1.BidHandling.BidToJson()
-Setting_1.Setting.GetData() //BidToJson 생략하고 Setting 테스트
+BidHandling_1.BidHandling.BidToJson()
+//Setting_1.Setting.GetData() //BidToJson 생략하고 Setting 테스트
 RadioDecimal_Check('1')
 CheckStandardPrice('1')
 CheckWeightValue('1')

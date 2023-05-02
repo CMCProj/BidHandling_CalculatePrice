@@ -102,7 +102,7 @@ var Data = exports.Data = /** @class */ (function () {
     });
     Object.defineProperty(Data.prototype, "UnitPriceSum", {
         get: function () {
-            return this.MaterialUnit + this.LaborUnit + this.ExpenseUnit;
+            return Math.round((this.MaterialUnit + this.LaborUnit + this.ExpenseUnit) * 10000000) / 10000000; //자바스크립트 소수점 계산 오류를 막기 위해 소수점 8자리에서 반올림 처리
         } //합계단가
         ,
         enumerable: false,
@@ -110,7 +110,7 @@ var Data = exports.Data = /** @class */ (function () {
     });
     Object.defineProperty(Data.prototype, "PriceSum", {
         get: function () {
-            return this.Material + this.Labor + this.Expense;
+            return Math.round((this.Material + this.Labor + this.Expense) * 10000000) / 10000000; //자바스크립트 소수점 계산 오류를 막기 위해 소수점 8자리에서 반올림 처리
         } //합계(세부공종별 금액의 합계)
         ,
         enumerable: false,

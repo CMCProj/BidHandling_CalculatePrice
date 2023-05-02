@@ -38,8 +38,7 @@ export class Setting {
         Setting.GetPrices()
 
         //표준시장단가 합계(조사금액) 저장
-        Data.InvestigateStandardMarket =
-            Data.StandardMaterial + Data.StandardLabor + Data.StandardExpense
+        Data.InvestigateStandardMarket = Data.StandardMaterial + Data.StandardLabor + Data.StandardExpense
 
         //console.log(Data.StandardMaterial);
     }
@@ -250,7 +249,7 @@ export class Setting {
         const bidT5: object = Setting.eleBID['T5']
         //console.log()
         for (let key in bidT5) {
-            let name: string = JSON.stringify(bidT5[key]['C4']['_text'])
+            let name: string = bidT5[key]['C4']['_text']
             let val1: string = bidT5[key]['C6']['_text']
             let val2: string = bidT5[key]['C7']['_text']
 

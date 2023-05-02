@@ -4,10 +4,8 @@ exports.CalculatePrice = void 0;
 var Data_1 = require("./Data");
 var fillCostAccount_1 = require("./fillCostAccount");
 var CreateResultFile_1 = require("./CreateResultFile");
-var Setting_1 = require("./Setting");
 var fs = require("fs");
 var AdmZip = require('adm-zip');
-var Big = require('big.js');
 //실행 위해 프로그램 내 폴더로 경로 변경
 var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
     function CalculatePrice() {
@@ -16,10 +14,12 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
         var bidString = fs.readFileSync(Data_1.Data.folder + '\\WORK DIRECTORY\\Setting_Json.json', 'utf-8');
         this.docBID = JSON.parse(bidString);
         this.eleBID = this.docBID['data'];
+        fillCostAccount_1.FillCostAccount.CheckKeyNotFound();
+        fillCostAccount_1.FillCostAccount.CalculateInvestigationCosts(Data_1.Data.Correction);
         //가격 재세팅 후 리셋 함수 실행 횟수 증가
         this.Reset();
         //최저네고단가율 계산 전, 표준시장단가 99.7% 적용옵션에 따른 분기처리
-        if (Data_1.Data.StandardMarketDeduction.localeCompare('1'))
+        if (Data_1.Data.StandardMarketDeduction === '1')
             this.ApplyStandardPriceOption();
         this.GetFixedPriceRate(); //직공비 대비 고정금액 비중 계산
         this.FindMyPercent(); //최저네고단가율 계산
@@ -38,9 +38,9 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
     };
     CalculatePrice.Reset = function () {
         Data_1.Data.ExecuteReset = '1'; //Reset 함수 사용 여부
-        var DM = Data_1.Data.Investigation['직접재료비'];
-        var DL = Data_1.Data.Investigation['직접노무비'];
-        var OE = Data_1.Data.Investigation['산출경비'];
+        var DM = Data_1.Data.Investigation.get('직접재료비');
+        var DL = Data_1.Data.Investigation.get('직접노무비');
+        var OE = Data_1.Data.Investigation.get('산출경비');
         var FM = Data_1.Data.InvestigateFixedPriceDirectMaterial;
         var FL = Data_1.Data.InvestigateFixedPriceDirectLabor;
         var FOE = Data_1.Data.InvestigateFixedPriceOutputExpense;
@@ -71,9 +71,9 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
                 var detailVal_1 = JSON.stringify(bidT3[key]['C3']['_text']).slice(1, -1); //세부 공종 번호
                 //현재 탐색 공종
                 var curObject = Data_1.Data.Dic.get(constNum).find(function (x) { return x.WorkNum === numVal_1 && x.DetailWorkNum === detailVal_1; });
-                curObject.MaterialUnit = Number(bidT3[key]['C16']['_text'].slice(1, -1));
-                curObject.LaborUnit = Number(bidT3[key]['C17']['_text'].slice(1, -1));
-                curObject.ExpenseUnit = Number(bidT3[key]['C18']['_text'].slice(1, -1));
+                curObject.MaterialUnit = Number(bidT3[key]['C16']['_text']);
+                curObject.LaborUnit = Number(bidT3[key]['C17']['_text']);
+                curObject.ExpenseUnit = Number(bidT3[key]['C18']['_text']);
             }
         };
         for (var key in bidT3) {
@@ -94,27 +94,24 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
                 var numVal_2 = JSON.stringify(bidT3[key]['C2']['_text']).slice(1, -1); //세부공종 번호
                 var detailVal_2 = JSON.stringify(bidT3[key]['C3']['_text']).slice(1, -1); //세부 공종 번호
                 var curObject = Data_1.Data.Dic.get(constNum).find(function (x) { return x.WorkNum === numVal_2 && x.DetailWorkNum === detailVal_2; });
-                if (curObject.Item.localeCompare('표준시장단가')) {
+                if (curObject.Item === '표준시장단가') {
                     //직공비, 고정금액, 표준시장단가 금액 재계산
-                    Data_1.Data.RealDirectMaterial -= +JSON.stringify(bidT3[key]['C20']['_text']).slice(1, -1);
-                    Data_1.Data.RealDirectLabor -= +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1);
-                    Data_1.Data.RealOutputExpense -= +JSON.stringify(bidT3[key]['C22']['_text']).slice(1, -1);
-                    Data_1.Data.FixedPriceDirectMaterial -= +JSON.stringify(bidT3[key]['C20']['_text']).slice(1, -1);
-                    Data_1.Data.FixedPriceDirectLabor -= +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1);
-                    Data_1.Data.FixedPriceOutputExpense -= +JSON.stringify(bidT3[key]['C22']['_text']).slice(1, -1);
-                    Data_1.Data.StandardMaterial -= +JSON.stringify(bidT3[key]['C20']['_text']).slice(1, -1);
-                    Data_1.Data.StandardLabor -= +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1);
-                    Data_1.Data.StandardExpense -= +JSON.stringify(bidT3[key]['C22']['_text']).slice(1, -1);
+                    Data_1.Data.RealDirectMaterial -= Number(bidT3[key]['C20']['_text']);
+                    Data_1.Data.RealDirectLabor -= Number(bidT3[key]['C21']['_text']);
+                    Data_1.Data.RealOutputExpense -= Number(bidT3[key]['C22']['_text']);
+                    Data_1.Data.FixedPriceDirectMaterial -= Number(bidT3[key]['C20']['_text']);
+                    Data_1.Data.FixedPriceDirectLabor -= Number(bidT3[key]['C21']['_text']);
+                    Data_1.Data.FixedPriceOutputExpense -= Number(bidT3[key]['C22']['_text']);
+                    Data_1.Data.StandardMaterial -= Number(bidT3[key]['C20']['_text']);
+                    Data_1.Data.StandardLabor -= Number(bidT3[key]['C21']['_text']);
+                    Data_1.Data.StandardExpense -= Number(bidT3[key]['C22']['_text']);
                     //표준시장단가 99.7% 적용
                     if (curObject.MaterialUnit !== 0)
-                        curObject.MaterialUnit =
-                            Math.trunc(curObject.MaterialUnit * 0.997 * 10) / 10 + 1.0;
+                        curObject.MaterialUnit = Math.trunc(curObject.MaterialUnit * 0.997 * 10) / 10 + 1.0;
                     if (curObject.LaborUnit !== 0)
-                        curObject.LaborUnit =
-                            Math.trunc(curObject.LaborUnit * 0.997 * 10) / 10 + 0.1;
+                        curObject.LaborUnit = Math.trunc(curObject.LaborUnit * 0.997 * 10) / 10 + 0.1;
                     if (curObject.ExpenseUnit !== 0)
-                        curObject.ExpenseUnit =
-                            Math.trunc(curObject.ExpenseUnit * 0.997 * 10) / 10 + 0.1;
+                        curObject.ExpenseUnit = Math.trunc(curObject.ExpenseUnit * 0.997 * 10) / 10 + 0.1;
                     //단가 변경사항 JSON에 적용
                     bidT3[key]['C16']['_text'] = curObject.MaterialUnit.toString(); //재료비 단가
                     bidT3[key]['C17']['_text'] = curObject.LaborUnit.toString(); //노무비 단가
@@ -125,15 +122,15 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
                     bidT3[key]['C22']['_text'] = curObject.Expense.toString(); //경비
                     bidT3[key]['C23']['_text'] = curObject.PriceSum.toString(); //합계
                     //붙여넣기한 각 객체의 재료비, 노무비, 경비를 직접재료비, 직접노무비, 산출 경비에 더해나감
-                    Data_1.Data.RealDirectMaterial += +JSON.stringify(bidT3[key]['C20']['_text']).slice(1, -1);
-                    Data_1.Data.RealDirectLabor += +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1);
-                    Data_1.Data.RealOutputExpense += +JSON.stringify(bidT3[key]['C22']['_text']).slice(1, -1);
-                    Data_1.Data.FixedPriceDirectMaterial += +JSON.stringify(bidT3[key]['C20']['_text']).slice(1, -1);
-                    Data_1.Data.FixedPriceDirectLabor += +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1);
-                    Data_1.Data.FixedPriceOutputExpense += +JSON.stringify(bidT3[key]['C22']['_text']).slice(1, -1);
-                    Data_1.Data.StandardMaterial += +JSON.stringify(bidT3[key]['C20']['_text']).slice(1, -1);
-                    Data_1.Data.StandardLabor += +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1);
-                    Data_1.Data.StandardExpense += +JSON.stringify(bidT3[key]['C22']['_text']).slice(1, -1);
+                    Data_1.Data.RealDirectMaterial += Number(bidT3[key]['C20']['_text']);
+                    Data_1.Data.RealDirectLabor += Number(bidT3[key]['C21']['_text']);
+                    Data_1.Data.RealOutputExpense += Number(bidT3[key]['C22']['_text']);
+                    Data_1.Data.FixedPriceDirectMaterial += Number(bidT3[key]['C20']['_text']);
+                    Data_1.Data.FixedPriceDirectLabor += Number(bidT3[key]['C21']['_text']);
+                    Data_1.Data.FixedPriceOutputExpense += Number(bidT3[key]['C22']['_text']);
+                    Data_1.Data.StandardMaterial += Number(bidT3[key]['C20']['_text']);
+                    Data_1.Data.StandardLabor += Number(bidT3[key]['C21']['_text']);
+                    Data_1.Data.StandardExpense += Number(bidT3[key]['C22']['_text']);
                 }
             }
         };
@@ -144,9 +141,7 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
     CalculatePrice.GetFixedPriceRate = function () {
         //고정금액 비율 계산
         var directConstPrice = Data_1.Data.Investigation['직공비'];
-        var fixCostSum = Data_1.Data.InvestigateFixedPriceDirectMaterial +
-            Data_1.Data.InvestigateFixedPriceDirectLabor +
-            Data_1.Data.InvestigateFixedPriceOutputExpense;
+        var fixCostSum = Data_1.Data.InvestigateFixedPriceDirectMaterial + Data_1.Data.InvestigateFixedPriceDirectLabor + Data_1.Data.InvestigateFixedPriceOutputExpense;
         Data_1.Data.FixedPricePercent = Math.trunc((fixCostSum / directConstPrice) * 100 * 10000) / 10000; // 고정금액 비중 계산 / 고정금액 소수점 5자리 수에서 절사 (23.02.06)
     };
     CalculatePrice.FindMyPercent = function () {
@@ -174,12 +169,11 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
         var max;
         Data_1.Data.Dic.forEach(function (value, _) {
             for (var idx in value) {
-                if (value[idx].Item.localeCompare('일반')) {
+                if (value[idx].Item === '일반') {
                     var material = value[idx].Material;
                     var labor = value[idx].Labor;
                     var expense = value[idx].Expense;
-                    weight =
-                        Math.round(((material + labor + expense) / varCostSum) * 1000000) / 1000000; //소숫점 일곱 자리 반올림
+                    weight = Math.round(((material + labor + expense) / varCostSum) * 1000000) / 1000000; //소숫점 일곱 자리 반올림
                     weightSum += weight; //가중치를 더함
                     if (maxWeight < weight) {
                         //최대 가중치 갱신
@@ -198,28 +192,19 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
     };
     CalculatePrice.CalculateRate = function (presonalRate, balancedRate) {
         //Target Rate 계산
-        var unitPrice = Big(100);
-        presonalRate = Big(presonalRate);
-        balancedRate = Big(balancedRate);
-        this.balancedUnitPriceRate =
-            (0.9 * unitPrice * (1.0 + balancedRate / 100) * this.myPercent) /
-                (1.0 - 0.1 * this.myPercent) /
-                100; //균형단가율
-        this.targetRate =
-            ((unitPrice * (1.0 + presonalRate / 100) * 0.9 +
-                unitPrice * this.balancedUnitPriceRate * 0.1) *
-                this.myPercent) /
-                100; //Target_Rate
+        var unitPrice = 100;
+        this.balancedUnitPriceRate = (0.9 * unitPrice * (1.0 + balancedRate / 100) * this.myPercent) / (1.0 - 0.1 * this.myPercent) / 100; //균형단가율
+        this.targetRate = ((unitPrice * (1.0 + presonalRate / 100) * 0.9 + unitPrice * this.balancedUnitPriceRate * 0.1) * this.myPercent) / 100; //Target_Rate
         this.targetRate = Math.trunc(this.targetRate * 1000000) / 1000000;
     };
     CalculatePrice.RoundOrTruncate = function (Rate, Object, refMyMaterialUnit, refMyLaborUnit, refMyExpenseUnit) {
         //절사,반올림 옵션
-        if (Data_1.Data.UnitPriceTrimming.localeCompare('1')) {
+        if (Data_1.Data.UnitPriceTrimming === '1') {
             refMyMaterialUnit.value = Math.trunc(Object.MaterialUnit * Rate * 10) / 10;
             refMyLaborUnit.value = Math.trunc(Object.LaborUnit * Rate * 10) / 10;
             refMyExpenseUnit.value = Math.trunc(Object.ExpenseUnit * Rate * 10) / 10;
         }
-        else if (Data_1.Data.UnitPriceTrimming.localeCompare('2')) {
+        else if (Data_1.Data.UnitPriceTrimming === '2') {
             refMyMaterialUnit.value = Math.ceil(Object.MaterialUnit * Rate);
             refMyLaborUnit.value = Math.ceil(Object.LaborUnit * Rate);
             refMyExpenseUnit.value = Math.ceil(Object.ExpenseUnit * Rate);
@@ -252,19 +237,18 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
                 var detailVal_3 = JSON.stringify(bidT3[key]['C3']['_text']).slice(1, -1); //세부 공종 번호
                 var curObject = Data_1.Data.Dic.get(constNum).find(function (x) { return x.WorkNum === numVal_3 && x.DetailWorkNum === detailVal_3; });
                 //일반 항목인 경우
-                if (curObject.Item.localeCompare('일반')) {
+                if (curObject.Item === '일반') {
                     //직접공사비 재계산
-                    Data_1.Data.RealDirectMaterial -= +JSON.stringify(bidT3[key]['C20']['_text']).slice(1, -1);
-                    Data_1.Data.RealDirectLabor -= +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1);
-                    Data_1.Data.RealOutputExpense -= +JSON.stringify(bidT3[key]['C22']['_text']).slice(1, -1);
-                    var targetPrice = (curObject.MaterialUnit + curObject.LaborUnit + curObject.ExpenseUnit) *
-                        this_1.targetRate; //Target 단가 합계
+                    Data_1.Data.RealDirectMaterial -= Number(bidT3[key]['C20']['_text']);
+                    Data_1.Data.RealDirectLabor -= Number(bidT3[key]['C21']['_text']);
+                    Data_1.Data.RealOutputExpense -= Number(bidT3[key]['C22']['_text']);
+                    var targetPrice = (curObject.MaterialUnit + curObject.LaborUnit + curObject.ExpenseUnit) * this_1.targetRate; //Target 단가 합계
                     //my 단가를 구하는 과정도 사용자의 옵션에 따라 소수 첫째 자리 아래로 절사(1) / 정수(2)로 나뉜다.
                     var myMaterialUnit = { value: 0 }; //reference로 값을 넘겨주기 위해 number를 object로 감싸서 만듬
                     var myLaborUnit = { value: 0 }; //reference로 값을 넘겨주기 위해 number를 object로 감싸서 만듬
                     var myExpenseUnit = { value: 0 }; //reference로 값을 넘겨주기 위해 number를 object로 감싸서 만듬
                     var myPrice = void 0;
-                    if (Data_1.Data.ZeroWeightDeduction.localeCompare('1')) {
+                    if (Data_1.Data.ZeroWeightDeduction === '1') {
                         //최소단가율 50% 적용 O
                         if (curObject.Weight === 0 && curObject.LaborUnit === 0) {
                             //공종 가중치 0%이고 노무비 단가가 0원인 경우 사용자의 소수처리 옵션과 상관없이 50% 적용후 소수첫째자리에서 올림 (23.2.23)
@@ -280,9 +264,9 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
                             bidT3[key]['C22']['_text'] = curObject.Expense.toString(); //경비
                             bidT3[key]['C23']['_text'] = curObject.PriceSum.toString(); //합계
                             //붙여넣기한 각 객체의 재료비, 노무비, 경비를 직접재료비, 직접노무비, 산출 경비에 더해나감
-                            Data_1.Data.RealDirectMaterial += +JSON.stringify(bidT3[key]['C20']['_text']).slice(1, -1);
-                            Data_1.Data.RealDirectLabor += +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1);
-                            Data_1.Data.RealOutputExpense += +JSON.stringify(bidT3[key]['C22']['_text']).slice(1, -1);
+                            Data_1.Data.RealDirectMaterial += Number(bidT3[key]['C20']['_text']);
+                            Data_1.Data.RealDirectLabor += Number(bidT3[key]['C21']['_text']);
+                            Data_1.Data.RealOutputExpense += Number(bidT3[key]['C22']['_text']);
                             return "continue";
                         }
                         else {
@@ -290,13 +274,13 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
                             this_1.CheckLaborLimit80(curObject, myMaterialUnit, myLaborUnit, myExpenseUnit);
                         }
                     }
-                    else if (Data_1.Data.ZeroWeightDeduction.localeCompare('2')) {
+                    else if (Data_1.Data.ZeroWeightDeduction === '2') {
                         //최소단가율 50% 적용 X
                         this_1.RoundOrTruncate(this_1.targetRate, curObject, myMaterialUnit, myLaborUnit, myExpenseUnit);
                         this_1.CheckLaborLimit80(curObject, myMaterialUnit, myLaborUnit, myExpenseUnit);
                     }
                     myPrice = myMaterialUnit.value + myLaborUnit.value + myExpenseUnit.value;
-                    if (Data_1.Data.LaborCostLowBound.localeCompare('1')) {
+                    if (Data_1.Data.LaborCostLowBound === '1') {
                         //노무비 하한 80% 적용 O
                         //여유분 조정 가능(조사노무비 대비 My노무비 비율에 따라 조정) <- ?
                         var Excess = myPrice - targetPrice;
@@ -341,18 +325,16 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
                     bidT3[key]['C22']['_text'] = curObject.Expense.toString(); //경비
                     bidT3[key]['C23']['_text'] = curObject.PriceSum.toString(); //합계
                     //붙여넣기한 각 객체의 재료비, 노무비, 경비를 직접재료비, 직접노무비, 산출 경비에 더해나감
-                    Data_1.Data.RealDirectMaterial += +JSON.stringify(bidT3[key]['C20']['_text']).slice(1, -1);
-                    Data_1.Data.RealDirectLabor += +JSON.stringify(bidT3[key]['C21']['_text']).slice(1, -1);
-                    Data_1.Data.RealOutputExpense += +JSON.stringify(bidT3[key]['C22']['_text']).slice(1, -1);
+                    Data_1.Data.RealDirectMaterial += Number(bidT3[key]['C20']['_text']);
+                    Data_1.Data.RealDirectLabor += Number(bidT3[key]['C21']['_text']);
+                    Data_1.Data.RealOutputExpense += Number(bidT3[key]['C22']['_text']);
                 }
                 //제요율적용제외공종 단가 재세팅
                 else if (curObject.Item === '제요율적용제외') {
-                    curObject.MaterialUnit =
-                        Math.trunc(curObject.MaterialUnit * this_1.targetRate * 10) / 10;
-                    curObject.LaborUnit =
-                        Math.trunc(curObject.LaborUnit * this_1.targetRate * 10) / 10;
-                    curObject.ExpenseUnit =
-                        Math.trunc(curObject.ExpenseUnit * this_1.targetRate * 10) / 10;
+                    curObject.MaterialUnit = Math.trunc(curObject.MaterialUnit * this_1.targetRate * 10) / 10;
+                    curObject.LaborUnit = Math.trunc(curObject.LaborUnit * this_1.targetRate * 10) / 10;
+                    curObject.ExpenseUnit = Math.trunc(curObject.ExpenseUnit * this_1.targetRate * 10) / 10;
+                    console.log(curObject);
                     this_1.exSum += curObject.PriceSum; //사정율을 적용한 제요율적용제외공종 항목의 합계
                     this_1.exCount++; //제요율적용제외공종 항목 수
                 }
@@ -374,7 +356,7 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
         var bidT3 = this.eleBID['T3'];
         var code;
         var type;
-        if (Data_1.Data.CostAccountDeduction.localeCompare('1')) {
+        if (Data_1.Data.CostAccountDeduction === '1') {
             TempExPrice = Math.ceil(Math.ceil(TempExPrice * 0.997));
             //제경비 99.7% 옵션 적용시 TempExPrice 업데이트
         }
@@ -387,17 +369,14 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
                 var detailVal_4 = JSON.stringify(bidT3[key]['C3']['_text']).slice(1, -1); //세부 공종 번호
                 var curObject = Data_1.Data.Dic.get(constNum).find(function (x) { return x.WorkNum === numVal_4 && x.DetailWorkNum === detailVal_4; });
                 //제요율적용제외공종 단가 재세팅
-                if (curObject.Item.localeCompare('제요율적용제외')) {
+                if (curObject.Item === '제요율적용제외') {
                     if (this_2.maxBID === undefined) {
                         //maxBid 초기화
                         this_2.maxBID = bidT3[key];
                     }
-                    if (bidT3[key]['C15']['_text'].slice(1, -1) === '1' &&
-                        bidT3[key]['C15']['_text'].slice(1, -1) !== '0') {
-                        if (Number(bidT3[key]['C19']['_text'].slice(1, -1)) >
-                            Number(this_2.maxBID['C19']['_text'].slice(1, -1))) {
-                            if (Number(bidT3[key]['C19']['_text'].slice(1, -1)) * 1.5 >
-                                curObject.PriceSum + (TempExPrice - this_2.exSum)) {
+                    if (bidT3[key]['C15']['_text'].slice(1, -1) === '1' && bidT3[key]['C15']['_text'].slice(1, -1) !== '0') {
+                        if (Number(bidT3[key]['C19']['_text']) > Number(this_2.maxBID['C19']['_text'])) {
+                            if (Number(bidT3[key]['C19']['_text']) * 1.5 > curObject.PriceSum + (TempExPrice - this_2.exSum)) {
                                 keyFound = 1;
                                 this_2.maxBID = bidT3[key];
                             }
@@ -435,11 +414,9 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
                         var numVal_5 = JSON.stringify(bidT3_1[key]['C2']['_text']).slice(1, -1); //세부공종 번호
                         var detailVal_5 = JSON.stringify(bidT3_1[key]['C3']['_text']).slice(1, -1); //세부 공종 번호
                         var curObject = Data_1.Data.Dic.get(constNum).find(function (x) { return x.WorkNum === numVal_5 && x.DetailWorkNum === detailVal_5; });
-                        if (curObject.Item.localeCompare('제요율적용제외') &&
-                            curObject.Quantity === 1) {
+                        if (curObject.Item === '제요율적용제외' && curObject.Quantity === 1) {
                             if (curObject.LaborUnit !== 0) {
-                                if (Number(bidT3_1[key]['C19']['_text'].slice(1, -1)) * 1.5 >
-                                    curObject.LaborUnit + divisionPrice) {
+                                if (Number(bidT3_1[key]['C19']['_text'].slice(1, -1)) * 1.5 > curObject.LaborUnit + divisionPrice) {
                                     curObject.LaborUnit += divisionPrice;
                                     bidT3_1[key]['C17']['_text'] = curObject.LaborUnit.toString(); //노무비 단가
                                     bidT3_1[key]['C19']['_text'] = curObject.UnitPriceSum.toString(); //합계 단가
@@ -458,13 +435,10 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
                             }
                             else {
                                 if (curObject.ExpenseUnit !== 0) {
-                                    if (Number(bidT3_1[key]['C19']['_text'].slice(1, -1)) * 1.5 >
-                                        curObject.ExpenseUnit + divisionPrice) {
+                                    if (Number(bidT3_1[key]['C19']['_text'].slice(1, -1)) * 1.5 > curObject.ExpenseUnit + divisionPrice) {
                                         curObject.ExpenseUnit += divisionPrice;
-                                        bidT3_1[key]['C18']['_text'] =
-                                            curObject.ExpenseUnit.toString(); //경비 단가
-                                        bidT3_1[key]['C19']['_text'] =
-                                            curObject.UnitPriceSum.toString(); //합계 단가
+                                        bidT3_1[key]['C18']['_text'] = curObject.ExpenseUnit.toString(); //경비 단가
+                                        bidT3_1[key]['C19']['_text'] = curObject.UnitPriceSum.toString(); //합계 단가
                                         bidT3_1[key]['C22']['_text'] = curObject.Expense.toString(); //경비
                                         bidT3_1[key]['C23']['_text'] = curObject.PriceSum.toString(); //합계
                                         count++;
@@ -479,13 +453,10 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
                                     }
                                 }
                                 else {
-                                    if (Number(bidT3_1[key]['C19']['_text'].slice(1, -1)) * 1.5 >
-                                        curObject.MaterialUnit + divisionPrice) {
+                                    if (Number(bidT3_1[key]['C19']['_text']) * 1.5 > curObject.MaterialUnit + divisionPrice) {
                                         curObject.MaterialUnit += divisionPrice;
-                                        bidT3_1[key]['C16']['_text'] =
-                                            curObject.MaterialUnit.toString(); //재료비 단가
-                                        bidT3_1[key]['C19']['_text'] =
-                                            curObject.UnitPriceSum.toString(); //합계 단가
+                                        bidT3_1[key]['C16']['_text'] = curObject.MaterialUnit.toString(); //재료비 단가
+                                        bidT3_1[key]['C19']['_text'] = curObject.UnitPriceSum.toString(); //합계 단가
                                         bidT3_1[key]['C20']['_text'] = curObject.Material.toString(); //재료비
                                         bidT3_1[key]['C23']['_text'] = curObject.PriceSum.toString(); //합계
                                         count++;
@@ -512,18 +483,10 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
             }
         }
         if (keyFound === 1 && this.exSum < TempExPrice) {
-            this.maxBID['C17']['_text'] = (Number(this.maxBID['C17']['_text'].slice(1, -1)) +
-                TempExPrice -
-                this.exSum).toString();
-            this.maxBID['C19']['_text'] = (Number(this.maxBID['C19']['_text'].slice(1, -1)) +
-                TempExPrice -
-                this.exSum).toString();
-            this.maxBID['C21']['_text'] = (Number(this.maxBID['C21']['_text'].slice(1, -1)) +
-                TempExPrice -
-                this.exSum).toString();
-            this.maxBID['C23']['_text'] = (Number(this.maxBID['C23']['_text'].slice(1, -1)) +
-                TempExPrice -
-                this.exSum).toString();
+            this.maxBID['C17']['_text'] = (Number(this.maxBID['C17']['_text']) + TempExPrice - this.exSum).toString();
+            this.maxBID['C19']['_text'] = (Number(this.maxBID['C19']['_text']) + TempExPrice - this.exSum).toString();
+            this.maxBID['C21']['_text'] = (Number(this.maxBID['C21']['_text']) + TempExPrice - this.exSum).toString();
+            this.maxBID['C23']['_text'] = (Number(this.maxBID['C23']['_text']) + TempExPrice - this.exSum).toString();
             //소수부분 차이에 의한 99.7% 이하 위반 문제에 대한 처리 (노무비에 보정)
         }
     };
@@ -540,10 +503,10 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
                 var numVal_6 = JSON.stringify(bidT3[key]['C2']['_text']).slice(1, -1); //세부공종 번호
                 var detailVal_6 = JSON.stringify(bidT3[key]['C3']['_text']).slice(1, -1); //세부 공종 번호
                 var curObject = Data_1.Data.Dic.get(constNum).find(function (x) { return x.WorkNum === numVal_6 && x.DetailWorkNum === detailVal_6; });
-                if (curObject.Item.localeCompare('제요율적용제외')) {
-                    Data_1.Data.AdjustedExMaterial += Number(bidT3[key]['C20']['_text'].slice(1, -1));
-                    Data_1.Data.AdjustedExLabor += Number(bidT3[key]['C21']['_text'].slice(1, -1));
-                    Data_1.Data.AdjustedExExpense += Number(bidT3[key]['C22']['_text'].slice(1, -1));
+                if (curObject.Item === '제요율적용제외') {
+                    Data_1.Data.AdjustedExMaterial += Number(bidT3[key]['C20']['_text']);
+                    Data_1.Data.AdjustedExLabor += Number(bidT3[key]['C21']['_text']);
+                    Data_1.Data.AdjustedExExpense += Number(bidT3[key]['C22']['_text']);
                 }
             }
         };
@@ -562,71 +525,45 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
         for (var key in bidT3) {
             code = JSON.stringify(bidT3[key]['C9']['_text']);
             type = JSON.stringify(bidT3[key]['C5']['_text'])[1];
-            if (code !== undefined && type === 'G') {
+            if (type === 'G') {
                 //공종이면
-                if (bidT3[key]['C23']['_text'].slice(1, -1) === '0') {
-                    //이미 합계가 세팅되어 있는지 확인 (중복 계산을 막기 위함)
-                    if (firstConstruction === undefined ||
-                        bidT3[key]['C3']['_text'].slice(1, -1) === '0') {
-                        //C3이 0이면 가장 상위 공종
+                if (bidT3[key]['C23']['_text'] === '0') { //이미 합계가 세팅되어 있는지 확인 (중복 계산을 막기 위함)
+                    if (firstConstruction === undefined || bidT3[key]['C3']['_text'] === '0') { //C3이 0이면 가장 상위 공종
                         firstConstruction = bidT3[key]; //현재 보고있는 object가 가장 상위 공종
                         secondConstruction = undefined; //중간 상위 공종 초기화
                         thirdConstruction = undefined; //마지막 상위 공종 초기화
                     }
-                    else if (bidT3[key]['C3']['_text'].slice(1, -1) ===
-                        firstConstruction['C2']['_text'].slice(1, -1) &&
-                        firstConstruction !== undefined) {
-                        //C3이 가장 상위 공종의 C2와 같다면 중간 상위 공종
+                    else if (bidT3[key]['C3']['_text'] === firstConstruction['C2']['_text'] && firstConstruction !== undefined) { //C3이 가장 상위 공종의 C2와 같다면 중간 상위 공종
                         secondConstruction = bidT3[key]; //현재 보고있는 object가 중간 상위 공종
                         thirdConstruction = undefined; //마지막 상위 공종 초기화
                     }
-                    else if (bidT3[key]['C3']['_text'].slice(1, -1) ===
-                        secondConstruction['C2']['_text'].slice(1, -1) &&
-                        secondConstruction !== undefined)
-                        // C3이 중간 상위 공종의 C2와 같다면 마지막 상위 공종
+                    else if (bidT3[key]['C3']['_text'] === secondConstruction['C2']['_text'] && secondConstruction !== undefined) // C3이 중간 상위 공종의 C2와 같다면 마지막 상위 공종
                         thirdConstruction = bidT3[key]; //현재 보고있는 object가 마지막 상위 공종
                 }
-                else {
-                    //공종에 합계가 이미 세팅되어 있다면 전부 초기화
+                else { //공종에 합계가 이미 세팅되어 있다면 전부 초기화
                     firstConstruction = undefined;
                     secondConstruction = undefined;
                     thirdConstruction = undefined;
                 }
             }
-            else if (code !== undefined && type === 'S') {
-                //공종이 아니면
-                if (firstConstruction !== undefined) {
-                    //현재 보는 object가 가장 상위 공종에 포함되어 있다면 단가별 합과 합계를 더해나감
-                    firstConstruction['C20']['_text'] = (Number(firstConstruction['C20']['_text'].slice(1, -1)) +
-                        Number(bidT3[key]['C20']['_text'].slice(1, -1))).toString(); //재료비
-                    firstConstruction['C21']['_text'] = (Number(firstConstruction['C21']['_text'].slice(1, -1)) +
-                        Number(bidT3[key]['C21']['_text'].slice(1, -1))).toString(); //노무비
-                    firstConstruction['C22']['_text'] = (Number(firstConstruction['C22']['_text'].slice(1, -1)) +
-                        Number(bidT3[key]['C22']['_text'].slice(1, -1))).toString(); //경비
-                    firstConstruction['C23']['_text'] = (Number(firstConstruction['C23']['_text'].slice(1, -1)) +
-                        Number(bidT3[key]['C23']['_text'].slice(1, -1))).toString(); //합계
+            else if (code !== undefined && type === 'S') { //공종이 아니면
+                if (firstConstruction !== undefined) { //현재 보는 object가 가장 상위 공종에 포함되어 있다면 단가별 합과 합계를 더해나감
+                    firstConstruction['C20']['_text'] = (Number(firstConstruction['C20']['_text']) + Number(bidT3[key]['C20']['_text'])).toString(); //재료비
+                    firstConstruction['C21']['_text'] = (Number(firstConstruction['C21']['_text']) + Number(bidT3[key]['C21']['_text'])).toString(); //노무비
+                    firstConstruction['C22']['_text'] = (Number(firstConstruction['C22']['_text']) + Number(bidT3[key]['C22']['_text'])).toString(); //경비
+                    firstConstruction['C23']['_text'] = (Number(firstConstruction['C23']['_text']) + Number(bidT3[key]['C23']['_text'])).toString(); //합계
                 }
-                if (secondConstruction !== undefined) {
-                    //현재 보는 object가 중간 상위 공종에 포함되어 있다면 단가별 합과 합계를 더해나감
-                    secondConstruction['C20']['_text'] = (Number(secondConstruction['C20']['_text'].slice(1, -1)) +
-                        Number(bidT3[key]['C20']['_text'].slice(1, -1))).toString(); //재료비
-                    secondConstruction['C21']['_text'] = (Number(secondConstruction['C21']['_text'].slice(1, -1)) +
-                        Number(bidT3[key]['C21']['_text'].slice(1, -1))).toString(); //노무비
-                    secondConstruction['C22']['_text'] = (Number(secondConstruction['C22']['_text'].slice(1, -1)) +
-                        Number(bidT3[key]['C22']['_text'].slice(1, -1))).toString(); //경비
-                    secondConstruction['C23']['_text'] = (Number(secondConstruction['C23']['_text'].slice(1, -1)) +
-                        Number(bidT3[key]['C23']['_text'].slice(1, -1))).toString(); //합계
+                if (secondConstruction !== undefined) { //현재 보는 object가 중간 상위 공종에 포함되어 있다면 단가별 합과 합계를 더해나감
+                    secondConstruction['C20']['_text'] = (Number(secondConstruction['C20']['_text']) + Number(bidT3[key]['C20']['_text'])).toString(); //재료비
+                    secondConstruction['C21']['_text'] = (Number(secondConstruction['C21']['_text']) + Number(bidT3[key]['C21']['_text'])).toString(); //노무비
+                    secondConstruction['C22']['_text'] = (Number(secondConstruction['C22']['_text']) + Number(bidT3[key]['C22']['_text'])).toString(); //경비
+                    secondConstruction['C23']['_text'] = (Number(secondConstruction['C23']['_text']) + Number(bidT3[key]['C23']['_text'])).toString(); //합계
                 }
-                if (thirdConstruction !== undefined) {
-                    //현재 보는 object가 마지막 상위 공종에 포함되어 있다면 단가별 합과 합계를 더해나감
-                    thirdConstruction['C20']['_text'] = (Number(thirdConstruction['C20']['_text'].slice(1, -1)) +
-                        Number(bidT3[key]['C20']['_text'].slice(1, -1))).toString(); //재료비
-                    thirdConstruction['C21']['_text'] = (Number(thirdConstruction['C21']['_text'].slice(1, -1)) +
-                        Number(bidT3[key]['C21']['_text'].slice(1, -1))).toString(); //노무비
-                    thirdConstruction['C22']['_text'] = (Number(thirdConstruction['C22']['_text'].slice(1, -1)) +
-                        Number(bidT3[key]['C22']['_text'].slice(1, -1))).toString(); //경비
-                    thirdConstruction['C23']['_text'] = (Number(thirdConstruction['C23']['_text'].slice(1, -1)) +
-                        Number(bidT3[key]['C23']['_text'].slice(1, -1))).toString(); //합계
+                if (thirdConstruction !== undefined) { //현재 보는 object가 마지막 상위 공종에 포함되어 있다면 단가별 합과 합계를 더해나감
+                    thirdConstruction['C20']['_text'] = (Number(thirdConstruction['C20']['_text']) + Number(bidT3[key]['C20']['_text'])).toString(); //재료비
+                    thirdConstruction['C21']['_text'] = (Number(thirdConstruction['C21']['_text']) + Number(bidT3[key]['C21']['_text'])).toString(); //노무비
+                    thirdConstruction['C22']['_text'] = (Number(thirdConstruction['C22']['_text']) + Number(bidT3[key]['C22']['_text'])).toString(); //경비
+                    thirdConstruction['C23']['_text'] = (Number(thirdConstruction['C23']['_text']) + Number(bidT3[key]['C23']['_text'])).toString(); //합계
                 }
             }
         }
@@ -637,25 +574,20 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
         bidT1['C18']['_text'] = Data_1.Data.CompanyRegistrationName;
     };
     CalculatePrice.SubstitutePrice = function () {
-        //BID 파일 내 원가계산서 관련 금액 세팅
         var bidT5 = this.eleBID['T5']; //bid.Name이 T5인지를 확인함으로 간단하게 원가 계산서부분의 element 인지를 판별. Tag는 T3가 아닌 T5 기준을 따른다. (23.01.31 수정)
         for (var key in bidT5) {
-            if (bidT5[key]['C4']['_text'].slice(1, -1) !== '이윤' &&
-                Data_1.Data.Bidding[bidT5[key]['C4']['_text'].slice(1, -1)]) {
-                bidT5[key]['C8']['_text'] =
-                    Data_1.Data.Bidding[bidT5[key]['C4']['_text'].slice(1, -1)].toString();
+            if (bidT5[key]['C4']['_text'] !== '이윤' && Data_1.Data.Bidding[bidT5[key]['C4']['_text']]) {
+                bidT5[key]['C8']['_text'] = Data_1.Data.Bidding[bidT5[key]['C4']['_text']].toString();
             }
-            else if (Data_1.Data.Rate1[bidT5[key]['C4']['_text'].slice(1, -1)]) {
-                bidT5[key]['C8']['_text'] =
-                    Data_1.Data.Bidding[bidT5[key]['C4']['_text'].slice(1, -1)].toString();
+            else if (Data_1.Data.Rate1[bidT5[key]['C4']['_text']]) {
+                bidT5[key]['C8']['_text'] = Data_1.Data.Bidding[bidT5[key]['C4']['_text']].toString();
             }
         }
         // 단순하게 JSON 포멧인 docBID를 string으로 변환하고 OutputDataFromBID.json 파일에 덮어쓰기
         fs.writeFileSync(Data_1.Data.folder + '\\OutputDataFromBID.json', JSON.stringify(this.docBID));
     };
     CalculatePrice.CreateZipFile = function (xlsfiles) {
-        if (fs.existsSync(Data_1.Data.folder + '\\WORK DIRCETORY\\입찰내역.zip')) {
-            //기존 입찰내역.zip 파일은 삭제한다. (23.02.02)
+        if (fs.existsSync(Data_1.Data.folder + '\\WORK DIRCETORY\\입찰내역.zip')) { //기존 입찰내역.zip 파일은 삭제한다. (23.02.02)
             fs.rmSync(Data_1.Data.folder + '\\WORK DIRCETORY\\입찰내역.zip');
         }
         var zip = new AdmZip();
@@ -676,5 +608,5 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
     CalculatePrice.exCount = 0; //제요율적용제외공종 항목 수량 합계
     return CalculatePrice;
 }());
-Setting_1.Setting.GetData();
-CalculatePrice.Calculation();
+// Setting.GetData()
+// CalculatePrice.Calculation()

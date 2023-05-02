@@ -33,6 +33,7 @@ var ExcelHandling = /** @class */ (function () {
         // 파일을 열고 파일 내용을 읽기/쓰기용 스트림으로 가져옴
         var workbook = new exceljs.Workbook();
         var stream = fs.createReadStream(filename + version, { flags: 'r+' });
+        console.log(filename);
         if (version === '.xls') {
             node_xj({ input: filename + version, output: filename + '.json' }, function (err, result) {
                 if (err)

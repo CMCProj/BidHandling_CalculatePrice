@@ -43,7 +43,6 @@ var ExcelHandling_1 = require("./ExcelHandling");
 var Data_1 = require("./Data");
 var fs = require("fs");
 var path = require("path");
-var big_js_1 = require("big.js");
 var FillCostAccount = /** @class */ (function () {
     function FillCostAccount() {
     }
@@ -295,7 +294,7 @@ var FillCostAccount = /** @class */ (function () {
         //3.2 제요율적용제외공종
         Data_1.Data.Investigation.set('제요율적용제외공종', FillCostAccount.ToLong(Data_1.Data.ExcludingMaterial + Data_1.Data.ExcludingLabor + Data_1.Data.ExcludingExpense));
         var exSum = Data_1.Data.ExcludingMaterial + Data_1.Data.ExcludingLabor + Data_1.Data.ExcludingExpense;
-        var exRate2 = new big_js_1.default(exSum).div(Data_1.Data.Investigation.get('직공비')).round(5).toNumber(); //소수점5자리 남기게 반올림
+        var exRate2 = Math.trunc((exSum / Data_1.Data.Investigation.get('직공비')) * 100000) / 100000;
         Data_1.Data.Rate2.set('제요율적용제외공종', exRate2);
         //4. 총원가
         Data_1.Data.Investigation.set('총원가', Data_1.Data.Investigation.get('순공사원가') +
@@ -321,7 +320,7 @@ var FillCostAccount = /** @class */ (function () {
         //9. 도급비계
         Data_1.Data.Investigation.set('도급비계', Data_1.Data.Investigation.get('소계') + Data_1.Data.Investigation.get('부가가치세'));
     };
-    //원가계산서 항목별 입찰금액 구하여 Bidding에 저장
+    /**원가계산서 항목별 입찰금액 구하여 Bidding에 저장*/
     FillCostAccount.CalculateBiddingCosts = function () {
         //직공비
         Data_1.Data.Bidding.set('직공비', FillCostAccount.ToLong(Data_1.Data.RealDirectMaterial + Data_1.Data.RealDirectLabor + Data_1.Data.RealOutputExpense));
@@ -485,10 +484,9 @@ var FillCostAccount = /** @class */ (function () {
         }
     };
     //decimal 금액 원 단위 절사
-    FillCostAccount.ToLong = function (price //price: decimal
-    ) {
-        var bigNum = new big_js_1.default(price).round(0, 0);
-        return bigNum.toNumber();
+    FillCostAccount.ToLong = function (price) {
+        var bigNum = Math.trunc(price);
+        return bigNum;
     };
     //공사이행보증서발급수수료 금액 계산 후 반환
     FillCostAccount.GetConstructionGuaranteeFee = function (directSum //long directSum //수정시 자료형 재확인
@@ -520,17 +518,9 @@ var FillCostAccount = /** @class */ (function () {
             item === '일반관리비' ||
             item === '공사손해보험료') {
             var before = item + 'before';
-            return new big_js_1.default(Data_1.Data.Bidding[item])
-                .div(Data_1.Data.Bidding[before])
-                .round(7)
-                .times(100)
-                .toNumber();
+            return Math.round(Data_1.Data.Bidding[item] / Data_1.Data.Bidding[before] * 10000000) / 10000000 * 100;
         }
-        var rate = new big_js_1.default(Data_1.Data.Bidding[item])
-            .div(Data_1.Data.Investigation[item])
-            .round(7)
-            .times(100)
-            .toNumber();
+        var rate = Math.round(Data_1.Data.Bidding[item] / Data_1.Data.Bidding[before] * 10000000) / 10000000;
         return rate;
     };
     //해당 공사에 특정 원가계산서 항목이 존재하지 않는 경우

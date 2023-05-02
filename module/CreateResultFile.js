@@ -72,7 +72,7 @@ var CreateResultFile = /** @class */ (function () {
             var workbook, sheet, resultPath, Path, i, materialUnit, laborUnit, expenseUnit, material, labor, expense, unitpricesum, pricesum;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, ExcelHandling_1.ExcelHandling.GetWorkbook("입찰내역.xls", "xls")];
+                    case 0: return [4 /*yield*/, ExcelHandling_1.ExcelHandling.GetWorkbook("/AutoBid/Excel_Templates/입찰내역", "xls")];
                     case 1:
                         workbook = _a.sent();
                         sheet = workbook.getWorksheet(0);

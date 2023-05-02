@@ -95,10 +95,10 @@ export class Data {
         return Math.floor(this.Quantity * this.ExpenseUnit)
     } //경비
     public get UnitPriceSum() {
-        return this.MaterialUnit + this.LaborUnit + this.ExpenseUnit
+        return Math.round((this.MaterialUnit + this.LaborUnit + this.ExpenseUnit) * 10000000) / 10000000;   //자바스크립트 소수점 계산 오류를 막기 위해 소수점 8자리에서 반올림 처리
     } //합계단가
     public get PriceSum() {
-        return this.Material + this.Labor + this.Expense
+        return Math.round((this.Material + this.Labor + this.Expense) * 10000000) / 10000000;   //자바스크립트 소수점 계산 오류를 막기 위해 소수점 8자리에서 반올림 처리
     } //합계(세부공종별 금액의 합계)
 
     public Weight: number = 0 //가중치
