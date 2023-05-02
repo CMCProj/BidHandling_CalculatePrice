@@ -2,6 +2,7 @@ var Data_1 = require('./module/Data')
 var CalculatePrice_1 = require('./module/CalculatePrice')
 var BidHandling_1 = require('./module/BidHandling')
 var Setting_1 = require('./module/Setting')
+var FillCostAccount_1 = require('./module/FillCostAccount')
 
 // '\AutoBid\EmpthBid'에 있는 공내역 BID 파일 읽어 '\AutoBid'에 json 파일 저장
 //Calculate에 필요한 Data 프로퍼티 세팅
@@ -41,9 +42,23 @@ function SetBusinessInfoBtnClick(CompanyName, CompanyNum) {
     Data_1.Data.CompanyRegistrationName = CompanyName
     Data_1.Data.CompanyRegistrationNum = CompanyNum
 }
+console.log('sdfsfd')
 
 //BidHandling_1.BidHandling.BidToJson()
 Setting_1.Setting.GetData() //BidToJson 생략하고 Setting 테스트
+
+FillCostAccount_1.FillCostAccount.CheckKeyNotFound()
+FillCostAccount_1.FillCostAccount.CalculateInvestigationCosts(Data_1.Data.Correction)
+FillCostAccount_1.FillCostAccount.CalculateInvestigationCosts(Data_1.Data.Correction)
+
+var FillInvestigationCostsFN = FillCostAccount_1.FillCostAccount.FillInvestigationCosts()
+
+FillInvestigationCostsFN.then(() => {
+    console.log('then!')
+}).catch(() => {
+    console.log('catch!')
+})
+
 RadioDecimal_Check('1')
 CheckStandardPrice('1')
 CheckWeightValue('1')

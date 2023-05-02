@@ -27,16 +27,18 @@ var Data = exports.Data = /** @class */ (function () {
         this.Standard = standard;
         this.Unit = unit;
         this.Quantity = quantity;
-        this.materialUnit = materialUnit;
-        this.laborUnit = laborUnit;
-        this.expenseUnit = expenseUnit;
+        this.MaterialUnit = materialUnit;
+        this.LaborUnit = laborUnit;
+        this.ExpenseUnit = expenseUnit;
     }
     Object.defineProperty(Data.prototype, "MaterialUnit", {
         /**재료비 단가*/
         get: function () {
+            //사용자가 단가 정수처리를 원한다면("2") 정수 값으로 return / Reset 함수를 쓰지 않은 경우의 조건 추가 (23.02.06)
             if (Data.UnitPriceTrimming === '2' && Data.ExecuteReset === '0')
                 return Math.ceil(this.materialUnit);
-            else if (Data.UnitPriceTrimming === '1' || Data.ExecuteReset === '1') // 사용자가 단가 소수점 처리를 원하거나 Reset 함수를 썼다면 소수 첫째 자리 아래로 절사 (23.02.06)
+            else if (Data.UnitPriceTrimming === '1' || Data.ExecuteReset === '1')
+                // 사용자가 단가 소수점 처리를 원하거나 Reset 함수를 썼다면 소수 첫째 자리 아래로 절사 (23.02.06)
                 return Math.floor(this.materialUnit * 10) / 10;
             return this.materialUnit; //Default는 있는 그대로의 값을 return
         },

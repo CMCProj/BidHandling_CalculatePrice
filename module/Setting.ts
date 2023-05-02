@@ -41,7 +41,7 @@ export class Setting {
         Data.InvestigateStandardMarket =
             Data.StandardMaterial + Data.StandardLabor + Data.StandardExpense
 
-        //console.log(Data.StandardMaterial);
+        console.log('세팉끝')
     }
 
     public static GetConstructionNum(): void {
@@ -133,13 +133,13 @@ export class Setting {
     public static async MatchConstructionNum(filePath: string): Promise<void> {
         // public static Dic = new Map<string, Data[]>() //key : 세부공사별 번호 / value : 세부공사별 리스트
         const workbook = await ExcelHandling.GetWorkbook(filePath, '.xlsx')
-        const sheet = workbook.getWorksheet('내역서');
+        const sheet = workbook.getWorksheet('내역서')
         let check: number //실내역 파일과 세부공사의 데이터가 일치하는 횟수
         Data.Dic.forEach((value, key) => {
             check = 0
             for (let i = 0; i < 5; i++) {
                 let row = sheet.getRow(i + 4)
-                let sameName: boolean = value[i].Name === row.getCell(4).value.toString();
+                let sameName: boolean = value[i].Name === row.getCell(4).value.toString()
                 if (sameName) check++
                 if (check == 3) {
                     Data.MatchedConstNum.set(filePath, key)
@@ -152,10 +152,10 @@ export class Setting {
 
     public static async CopyFile(filePath: string): Promise<void> {
         const workbook = await ExcelHandling.GetWorkbook(filePath, '.xlsx')
-        const sheet = workbook.getWorksheet('내역서');
+        const sheet = workbook.getWorksheet('내역서')
 
         const constNum = Data.MatchedConstNum[filePath]
-        const lastRowNum = sheet.rowCount;
+        const lastRowNum = sheet.rowCount
         let rowIndex = 4
         Data.Dic[constNum].forEach((curObj) => {
             const dcode: string = curObj.Code
@@ -167,9 +167,9 @@ export class Setting {
             const dquantity = curObj.Quantity
             while (true) {
                 const row = sheet.getRow(rowIndex)
-                const code = row.getCell(1).value.toString();
-                const name = row.getCell(4).value.toString();
-                const unit = row.getCell(6).value.toString();
+                const code = row.getCell(1).value.toString()
+                const name = row.getCell(4).value.toString()
+                const unit = row.getCell(6).value.toString()
                 let quantity: number = 0.0
 
                 try {
@@ -208,29 +208,35 @@ export class Setting {
     }
 
     public static SetUnitPriceNoExcel(): void {
-        const bidT3: object = this.eleBID['T3'];
-        let code: string;
-        let type: string;
+        const bidT3: object = this.eleBID['T3']
+        let code: string
+        let type: string
 
         for (let key in bidT3) {
-            code = JSON.stringify(bidT3[key]['C9']['_text']);
-            type = JSON.stringify(bidT3[key]['C5']['_text'])[1];
+            code = JSON.stringify(bidT3[key]['C9']['_text'])
+            type = JSON.stringify(bidT3[key]['C5']['_text'])[1]
 
             if (code !== undefined && type === 'S') {
-                let constNum: string = bidT3[key]['C1']['_text'];
-                let numVal: string = bidT3[key]['C2']['_text'];
-                let detailVal: string = bidT3[key]['C3']['_text'];
-                let curObject: Data = Data.Dic.get(constNum).find((x) => x.WorkNum === numVal && x.DetailWorkNum === detailVal);
+                let constNum: string = bidT3[key]['C1']['_text']
+                let numVal: string = bidT3[key]['C2']['_text']
+                let detailVal: string = bidT3[key]['C3']['_text']
+                let curObject: Data = Data.Dic.get(constNum).find(
+                    (x) => x.WorkNum === numVal && x.DetailWorkNum === detailVal
+                )
 
-                if (curObject.Item === '일반' || curObject.Item === '재요율적용제외' || curObject.Item === '표준시장단가' && curObject !== undefined) {
-                    bidT3[key]['C16']['_text'] = curObject.MaterialUnit.toString();
-                    bidT3[key]['C17']['_text'] = curObject.LaborUnit.toString();
-                    bidT3[key]['C18']['_text'] = curObject.ExpenseUnit.toString();
-                    bidT3[key]['C19']['_text'] = curObject.UnitPriceSum.toString();
-                    bidT3[key]['C20']['_text'] = curObject.Material.toString();
-                    bidT3[key]['C21']['_text'] = curObject.Labor.toString();
-                    bidT3[key]['C22']['_text'] = curObject.Expense.toString();
-                    bidT3[key]['C23']['_text'] = curObject.PriceSum.toString();
+                if (
+                    curObject.Item === '일반' ||
+                    curObject.Item === '재요율적용제외' ||
+                    (curObject.Item === '표준시장단가' && curObject !== undefined)
+                ) {
+                    bidT3[key]['C16']['_text'] = curObject.MaterialUnit.toString()
+                    bidT3[key]['C17']['_text'] = curObject.LaborUnit.toString()
+                    bidT3[key]['C18']['_text'] = curObject.ExpenseUnit.toString()
+                    bidT3[key]['C19']['_text'] = curObject.UnitPriceSum.toString()
+                    bidT3[key]['C20']['_text'] = curObject.Material.toString()
+                    bidT3[key]['C21']['_text'] = curObject.Labor.toString()
+                    bidT3[key]['C22']['_text'] = curObject.Expense.toString()
+                    bidT3[key]['C23']['_text'] = curObject.PriceSum.toString()
                 }
             }
         }
@@ -269,7 +275,6 @@ export class Setting {
     public static GetPrices(): void {
         for (let value of Array.from(Data.Dic.values())) {
             for (let item of value) {
-                //console.log(item)
                 if (item.Item === '관급') {
                     Data.GovernmentMaterial += item.Material
                     Data.GovernmentLabor += item.Labor
@@ -340,5 +345,3 @@ export class Setting {
         }
     }
 }
-
-// Setting.GetData();
