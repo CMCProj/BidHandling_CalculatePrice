@@ -78,5 +78,3 @@ class BidHandling {
     }
 }
 exports.BidHandling = BidHandling;
-// BidHandling.BidToJson();
-// BidHandling.JsonToBid();

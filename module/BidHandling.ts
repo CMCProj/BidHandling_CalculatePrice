@@ -64,7 +64,10 @@ export class BidHandling {
         zip.addLocalFile(Data.folder + '\\EmptyBid\\XmlToBID.BID')
         zip.writeZip(Data.folder + '\\EmptyBid\\' + filename + '.zip') // XmlToBID.BID파일을 .zip파일로 압축
 
-        fs.copyFileSync(Data.folder + '\\EmptyBid\\' + filename + '.zip', Data.folder + '\\EmptyBid\\' + filename + '.BID')
+        fs.copyFileSync(
+            Data.folder + '\\EmptyBid\\' + filename + '.zip',
+            Data.folder + '\\EmptyBid\\' + filename + '.BID'
+        )
 
         //======이 과정에서 만들어진 파일들은 전부 삭제======
         fs.rmSync(Data.folder + '\\EmptyBid\\' + filename + '.zip')
@@ -73,6 +76,3 @@ export class BidHandling {
         fs.rmSync(Data.folder + '\\EmptyBid\\XmlToBID.BID')
     }
 }
-
-// BidHandling.BidToJson();
-// BidHandling.JsonToBid();

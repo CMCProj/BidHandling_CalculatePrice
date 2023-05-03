@@ -69,7 +69,7 @@ export class Data {
             return Math.ceil(this.materialUnit)
         else if (Data.UnitPriceTrimming === '1' || Data.ExecuteReset === '1')
             // 사용자가 단가 소수점 처리를 원하거나 Reset 함수를 썼다면 소수 첫째 자리 아래로 절사 (23.02.06)
-            return Math.floor(this.materialUnit * 10) / 10
+            return Math.trunc(this.materialUnit * 10) / 10
         return this.materialUnit //Default는 있는 그대로의 값을 return
     }
     public set MaterialUnit(value: number) {
@@ -81,7 +81,7 @@ export class Data {
         if (Data.UnitPriceTrimming === '2' && Data.ExecuteReset === '0')
             return Math.ceil(this.laborUnit)
         else if (Data.UnitPriceTrimming === '1' || Data.ExecuteReset === '1')
-            return Math.floor(this.laborUnit * 10) / 10
+            return Math.trunc(this.laborUnit * 10) / 10
         return this.laborUnit
     }
     public set LaborUnit(value: number) {
@@ -93,7 +93,7 @@ export class Data {
         if (Data.UnitPriceTrimming === '2' && Data.ExecuteReset === '0')
             return Math.ceil(this.expenseUnit)
         else if (Data.UnitPriceTrimming === '1' || Data.ExecuteReset === '1')
-            return Math.floor(this.expenseUnit * 10) / 10
+            return Math.trunc(this.expenseUnit * 10) / 10
         return this.expenseUnit
     }
     public set ExpenseUnit(value: number) {
@@ -101,13 +101,13 @@ export class Data {
     }
 
     public get Material() {
-        return Math.floor(this.Quantity * this.MaterialUnit)
+        return Math.trunc(this.Quantity * this.MaterialUnit)
     } //재료비 (수량 x 단가)
     public get Labor() {
-        return Math.floor(this.Quantity * this.LaborUnit)
+        return Math.trunc(this.Quantity * this.LaborUnit)
     } //노무비
     public get Expense() {
-        return Math.floor(this.Quantity * this.ExpenseUnit)
+        return Math.trunc(this.Quantity * this.ExpenseUnit)
     } //경비
     public get UnitPriceSum() {
         return (
