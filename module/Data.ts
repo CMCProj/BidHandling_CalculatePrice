@@ -1,5 +1,5 @@
 import * as path from 'path'
-
+import Decimal from 'big.js'
 export class Data {
     constructor(
         item: string,
@@ -46,7 +46,6 @@ export class Data {
     public static BalanceRateNum?: number // 업체 평균 사정율 변수
     // 프로그램 폴더로 위치 변경
     public static work_path: string = path.join(Data.folder, 'WORK DIRECTORY') //작업폴더(WORK DIRECTORY) 경로
-
     private materialUnit: number = 0 //재료비 단가
     private laborUnit: number = 0 //노무비 단가
     private expenseUnit: number = 0 //경비 단가
@@ -65,11 +64,10 @@ export class Data {
     public get MaterialUnit(): number {
         //사용자가 단가 정수처리를 원한다면("2") 정수 값으로 return / Reset 함수를 쓰지 않은 경우의 조건 추가 (23.02.06)
         if (Data.UnitPriceTrimming === '2' && Data.ExecuteReset === '0')
-            // return Math.ceil(this.materialUnit)
-            return Math.ceil(this.materialUnit)
+            return Number(new Decimal(this.materialUnit).toFixed(0, 3))
         else if (Data.UnitPriceTrimming === '1' || Data.ExecuteReset === '1')
             // 사용자가 단가 소수점 처리를 원하거나 Reset 함수를 썼다면 소수 첫째 자리 아래로 절사 (23.02.06)
-            return Math.trunc(this.materialUnit * 10) / 10
+            return Number(new Decimal(this.materialUnit).toFixed(1, 0))
         return this.materialUnit //Default는 있는 그대로의 값을 return
     }
     public set MaterialUnit(value: number) {
@@ -79,9 +77,9 @@ export class Data {
     //노무비 단가
     public get LaborUnit() {
         if (Data.UnitPriceTrimming === '2' && Data.ExecuteReset === '0')
-            return Math.ceil(this.laborUnit)
+            return Number(new Decimal(this.laborUnit).toFixed(0, 3))
         else if (Data.UnitPriceTrimming === '1' || Data.ExecuteReset === '1')
-            return Math.trunc(this.laborUnit * 10) / 10
+            return Number(new Decimal(this.laborUnit).toFixed(1, 0))
         return this.laborUnit
     }
     public set LaborUnit(value: number) {
@@ -90,10 +88,12 @@ export class Data {
 
     //경비 단가
     public get ExpenseUnit() {
+        var decimal = new Decimal(0)
+
         if (Data.UnitPriceTrimming === '2' && Data.ExecuteReset === '0')
-            return Math.ceil(this.expenseUnit)
+            return Number(new Decimal(this.expenseUnit).toFixed(0, 3))
         else if (Data.UnitPriceTrimming === '1' || Data.ExecuteReset === '1')
-            return Math.trunc(this.expenseUnit * 10) / 10
+            return Number(new Decimal(this.expenseUnit).toFixed(1, 0))
         return this.expenseUnit
     }
     public set ExpenseUnit(value: number) {
@@ -101,22 +101,24 @@ export class Data {
     }
 
     public get Material() {
-        return Math.trunc(this.Quantity * this.MaterialUnit)
+        var decimal = new Decimal(this.Quantity).times(this.MaterialUnit)
+        return Number(decimal.toFixed(0, 0))
     } //재료비 (수량 x 단가)
     public get Labor() {
-        return Math.trunc(this.Quantity * this.LaborUnit)
+        var decimal = new Decimal(this.Quantity).times(this.LaborUnit)
+        return Number(decimal.toFixed(0, 0))
     } //노무비
     public get Expense() {
-        return Math.trunc(this.Quantity * this.ExpenseUnit)
+        var decimal = new Decimal(this.Quantity).times(this.ExpenseUnit)
+        return Number(decimal.toFixed(0, 0))
     } //경비
     public get UnitPriceSum() {
-        return (
-            Math.round((this.MaterialUnit + this.LaborUnit + this.ExpenseUnit) * 10000000) /
-            10000000
-        ) //자바스크립트 소수점 계산 오류를 막기 위해 소수점 8자리에서 반올림 처리
+        var decimal = new Decimal(this.MaterialUnit).plus(this.LaborUnit).plus(this.ExpenseUnit)
+        return decimal.toNumber()
     } //합계단가
     public get PriceSum() {
-        return Math.round((this.Material + this.Labor + this.Expense) * 10000000) / 10000000 //자바스크립트 소수점 계산 오류를 막기 위해 소수점 8자리에서 반올림 처리
+        var decimal = new Decimal(this.Material).plus(this.Labor).plus(this.Expense)
+        return decimal.toNumber()
     } //합계(세부공종별 금액의 합계)
 
     public Weight: number = 0 //가중치

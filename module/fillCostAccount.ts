@@ -5,6 +5,7 @@ import { ExcelHandling } from './ExcelHandling'
 import { Data } from './Data'
 import * as fs from 'fs'
 import * as path from 'path'
+import Decimal from 'big.js'
 
 export class FillCostAccount {
     //원가계산서 항목별 조사금액 채움(관리자 보정 후)
@@ -204,7 +205,9 @@ export class FillCostAccount {
         Data.Investigation.set(
             '직공비',
             FillCostAccount.ToLong(
-                Data.RealDirectMaterial + Data.RealDirectLabor + Data.RealOutputExpense
+                new Decimal(Data.RealDirectMaterial)
+                    .plus(Data.RealDirectLabor)
+                    .plus(Data.RealOutputExpense)
             )
         )
         //가-1. 직접재료비
@@ -336,7 +339,7 @@ export class FillCostAccount {
             )
         )
         let exSum = Data.ExcludingMaterial + Data.ExcludingLabor + Data.ExcludingExpense
-        let exRate2 = Math.trunc((exSum / Data.Investigation.get('직공비')) * 100000) / 100000;
+        let exRate2 = Math.trunc((exSum / Data.Investigation.get('직공비')) * 100000) / 100000
         Data.Rate2.set('제요율적용제외공종', exRate2)
         //4. 총원가
         Data.Investigation.set(
@@ -684,8 +687,9 @@ export class FillCostAccount {
     }
 
     //decimal 금액 원 단위 절사
-    public static ToLong(price: number) {//price: decimal
-        let bigNum = Math.trunc(price);
+    public static ToLong(price: number) {
+        //price: decimal
+        let bigNum = Math.trunc(price)
         return bigNum
     }
 
@@ -728,10 +732,13 @@ export class FillCostAccount {
             item === '공사손해보험료'
         ) {
             var before: string = item + 'before'
-            return Math.round(Data.Bidding[item] / Data.Bidding[before] * 10000000) / 10000000 * 100;
+            return (
+                (Math.round((Data.Bidding[item] / Data.Bidding[before]) * 10000000) / 10000000) *
+                100
+            )
         }
-        let rate = Math.round(Data.Bidding[item] / Data.Bidding[before] * 10000000) / 10000000;
-        return rate;
+        let rate = Math.round((Data.Bidding[item] / Data.Bidding[before]) * 10000000) / 10000000
+        return rate
     }
 
     //해당 공사에 특정 원가계산서 항목이 존재하지 않는 경우

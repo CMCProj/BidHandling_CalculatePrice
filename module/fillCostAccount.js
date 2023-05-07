@@ -1,29 +1,6 @@
 "use strict";
 //"object is possibly 'undefined'"" -> tsconfig.json 으로 이동하여 "strictNullChecks":false를 추가
 //decimal, round사용 부분 수정 필요(라이브러리)
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -33,197 +10,243 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FillCostAccount = void 0;
-const ExcelHandling_1 = require("./ExcelHandling");
-const Data_1 = require("./Data");
-const fs = __importStar(require("fs"));
-const path = __importStar(require("path"));
-class FillCostAccount {
+var ExcelHandling_1 = require("./ExcelHandling");
+var Data_1 = require("./Data");
+var fs = require("fs");
+var path = require("path");
+var big_js_1 = require("big.js");
+var FillCostAccount = /** @class */ (function () {
+    function FillCostAccount() {
+    }
     //원가계산서 항목별 조사금액 채움(관리자 보정 후)
-    static FillInvestigationCosts() {
-        return __awaiter(this, void 0, void 0, function* () {
-            let costStatementPath = '';
-            //원가 계산서 양식 불러오기
-            let workbook = yield ExcelHandling_1.ExcelHandling.GetWorkbook('세부결과_원가계산서.xlsx', '.xlsx');
-            let sheet = workbook.getWorksheet(0);
-            //적용비율1 작성
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 7, 6).value = Data_1.Data.Rate1.get('간접노무비') + ' %';
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 7, 6).value = Data_1.Data.Rate1.get('간접노무비') + ' %';
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 10, 6).value = Data_1.Data.Rate1.get('산재보험료') + ' %';
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 11, 6).value = Data_1.Data.Rate1.get('고용보험료') + ' %';
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 19, 6).value = Data_1.Data.Rate1.get('환경보전비') + ' %';
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 20, 6).value =
-                Data_1.Data.Rate1.get('공사이행보증서발급수수료') + ' %';
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 21, 6).value = Data_1.Data.Rate1.get('건설하도급보증수수료') + ' %';
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 22, 6).value =
-                Data_1.Data.Rate1.get('건설기계대여대금 지급보증서발급금액') + ' %';
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 23, 6).value = Data_1.Data.Rate1.get('기타경비') + ' %';
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 24, 6).value = Data_1.Data.Rate1.get('일반관리비') + ' %';
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 29, 6).value = Data_1.Data.Rate1.get('공사손해보험료') + ' %';
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 31, 6).value = Data_1.Data.Rate1.get('부가가치세') + ' %';
-            //적용비율 2 작성
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 7, 7).value = Data_1.Data.Rate2.get('간접노무비') + ' %';
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 10, 7).value = Data_1.Data.Rate2.get('산재보험료') + ' %';
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 11, 7).value = Data_1.Data.Rate2.get('고용보험료') + ' %';
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 23, 7).value = Data_1.Data.Rate2.get('기타경비') + ' %';
-            //금액 세팅
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 2, 8).value = Data_1.Data.Investigation.get('순공사원가'); //1. 순공사원가
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 3, 8).value = Data_1.Data.Investigation.get('직접재료비'); //가. 재료비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 4, 8).value = Data_1.Data.Investigation.get('직접재료비'); //가-1. 직접재료비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 5, 8).value = Data_1.Data.Investigation.get('노무비'); //나. 노무비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 6, 8).value = Data_1.Data.Investigation.get('직접노무비'); //나-1. 직접노무비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 7, 8).value = Data_1.Data.Investigation.get('간접노무비'); //나-2. 간접노무비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 8, 8).value = Data_1.Data.Investigation.get('경비'); //다. 경비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 9, 8).value = Data_1.Data.Investigation.get('산출경비'); //다-1. 산출경비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 10, 8).value = Data_1.Data.Investigation.get('산재보험료'); //다-2. 산재보험료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 11, 8).value = Data_1.Data.Investigation.get('고용보험료'); //다-3. 고용보험료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 12, 8).value = Data_1.Data.Fixed.get('국민건강보험료'); //다-4. 국민건강보험료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 13, 8).value = Data_1.Data.Fixed.get('노인장기요양보험'); //다-5. 노인장기요양보험
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 14, 8).value = Data_1.Data.Fixed.get('국민연금보험료'); //다-6. 국민연금보험료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 15, 8).value = Data_1.Data.Fixed.get('퇴직공제부금'); //다-7. 퇴직공제부금
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 16, 8).value = Data_1.Data.Fixed.get('산업안전보건관리비'); //다-8. 산업안전보건관리비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 17, 8).value = Data_1.Data.Fixed.get('안전관리비'); //다-9. 안전관리비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 18, 8).value = Data_1.Data.Fixed.get('품질관리비'); //다-10. 품질관리비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 19, 8).value = Data_1.Data.Investigation.get('환경보전비'); //다-11. 환경보전비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 20, 8).value =
-                Data_1.Data.Investigation.get('공사이행보증서발급수수료'); //다-12. 공사이행보증수수료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 21, 8).value = Data_1.Data.Investigation.get('건설하도급보증수수료'); //다-13. 하도급대금지급 보증수수료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 22, 8).value =
-                Data_1.Data.Investigation.get('건설기계대여대금 지급보증서발급금액'); //다-14. 건설기계대여대금 지급보증서 발급금액
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 23, 8).value = Data_1.Data.Investigation.get('기타경비'); //다-15. 기타경비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 24, 8).value = Data_1.Data.Investigation.get('일반관리비'); //2. 일반관리비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 25, 8).value = Data_1.Data.Investigation.get('이윤'); //3. 이윤
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 26, 8).value = Data_1.Data.Investigation.get('PS'); //3.1 PS
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 27, 8).value = Data_1.Data.Investigation.get('제요율적용제외공종'); //3.2 제요율적용제외공종
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 28, 8).value = Data_1.Data.Investigation.get('총원가'); //4. 총원가
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 29, 8).value = Data_1.Data.Investigation.get('공사손해보험료'); //5. 공사손해보험료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 30, 8).value = Data_1.Data.Investigation.get('소계'); //6. 소계
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 31, 8).value = Data_1.Data.Investigation.get('부가가치세'); //7. 부가가치세
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 32, 8).value = 0; //8. 매입세
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 33, 8).value = Data_1.Data.Investigation.get('도급비계'); //9. 도급비계
-            //원가계산서 조사금액 세팅 시점에 CalculatePrice.cs에서 재계산 시, 초기화를 위한 조사금액 저장
-            let FM = Data_1.Data.FixedPriceDirectMaterial;
-            let FL = Data_1.Data.FixedPriceDirectLabor;
-            let FOE = Data_1.Data.FixedPriceOutputExpense;
-            let SM = Data_1.Data.StandardMaterial;
-            let SL = Data_1.Data.StandardLabor;
-            let SOE = Data_1.Data.StandardExpense;
-            Data_1.Data.InvestigateFixedPriceDirectMaterial = FM;
-            Data_1.Data.InvestigateFixedPriceDirectLabor = FL;
-            Data_1.Data.InvestigateFixedPriceOutputExpense = FOE;
-            Data_1.Data.InvestigateStandardMaterial = SM;
-            Data_1.Data.InvestigateStandardLabor = SL;
-            Data_1.Data.InvestigateStandardExpense = SOE;
-            if (fs.existsSync(Data_1.Data.work_path + '원가계산서.xlsx')) {
-                //먼저 기존 원가계산서 파일이 있다면 삭제한다. (23.02.02)
-                fs.unlinkSync(Data_1.Data.work_path + '원가계산서.xlsx');
-            }
-            costStatementPath = path.join(Data_1.Data.work_path, '원가계산서.xlsx');
-            ExcelHandling_1.ExcelHandling.WriteExcel(workbook, costStatementPath);
+    FillCostAccount.FillInvestigationCosts = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var costStatementPath, workbook, sheet, FM, FL, FOE, SM, SL, SOE;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        costStatementPath = '';
+                        return [4 /*yield*/, ExcelHandling_1.ExcelHandling.GetWorkbook('세부결과_원가계산서.xlsx', '.xlsx')];
+                    case 1:
+                        workbook = _a.sent();
+                        sheet = workbook.getWorksheet(0);
+                        //적용비율1 작성
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 7, 6).value = Data_1.Data.Rate1.get('간접노무비') + ' %';
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 7, 6).value = Data_1.Data.Rate1.get('간접노무비') + ' %';
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 10, 6).value = Data_1.Data.Rate1.get('산재보험료') + ' %';
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 11, 6).value = Data_1.Data.Rate1.get('고용보험료') + ' %';
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 19, 6).value = Data_1.Data.Rate1.get('환경보전비') + ' %';
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 20, 6).value =
+                            Data_1.Data.Rate1.get('공사이행보증서발급수수료') + ' %';
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 21, 6).value = Data_1.Data.Rate1.get('건설하도급보증수수료') + ' %';
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 22, 6).value =
+                            Data_1.Data.Rate1.get('건설기계대여대금 지급보증서발급금액') + ' %';
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 23, 6).value = Data_1.Data.Rate1.get('기타경비') + ' %';
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 24, 6).value = Data_1.Data.Rate1.get('일반관리비') + ' %';
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 29, 6).value = Data_1.Data.Rate1.get('공사손해보험료') + ' %';
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 31, 6).value = Data_1.Data.Rate1.get('부가가치세') + ' %';
+                        //적용비율 2 작성
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 7, 7).value = Data_1.Data.Rate2.get('간접노무비') + ' %';
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 10, 7).value = Data_1.Data.Rate2.get('산재보험료') + ' %';
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 11, 7).value = Data_1.Data.Rate2.get('고용보험료') + ' %';
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 23, 7).value = Data_1.Data.Rate2.get('기타경비') + ' %';
+                        //금액 세팅
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 2, 8).value = Data_1.Data.Investigation.get('순공사원가'); //1. 순공사원가
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 3, 8).value = Data_1.Data.Investigation.get('직접재료비'); //가. 재료비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 4, 8).value = Data_1.Data.Investigation.get('직접재료비'); //가-1. 직접재료비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 5, 8).value = Data_1.Data.Investigation.get('노무비'); //나. 노무비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 6, 8).value = Data_1.Data.Investigation.get('직접노무비'); //나-1. 직접노무비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 7, 8).value = Data_1.Data.Investigation.get('간접노무비'); //나-2. 간접노무비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 8, 8).value = Data_1.Data.Investigation.get('경비'); //다. 경비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 9, 8).value = Data_1.Data.Investigation.get('산출경비'); //다-1. 산출경비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 10, 8).value = Data_1.Data.Investigation.get('산재보험료'); //다-2. 산재보험료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 11, 8).value = Data_1.Data.Investigation.get('고용보험료'); //다-3. 고용보험료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 12, 8).value = Data_1.Data.Fixed.get('국민건강보험료'); //다-4. 국민건강보험료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 13, 8).value = Data_1.Data.Fixed.get('노인장기요양보험'); //다-5. 노인장기요양보험
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 14, 8).value = Data_1.Data.Fixed.get('국민연금보험료'); //다-6. 국민연금보험료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 15, 8).value = Data_1.Data.Fixed.get('퇴직공제부금'); //다-7. 퇴직공제부금
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 16, 8).value = Data_1.Data.Fixed.get('산업안전보건관리비'); //다-8. 산업안전보건관리비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 17, 8).value = Data_1.Data.Fixed.get('안전관리비'); //다-9. 안전관리비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 18, 8).value = Data_1.Data.Fixed.get('품질관리비'); //다-10. 품질관리비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 19, 8).value = Data_1.Data.Investigation.get('환경보전비'); //다-11. 환경보전비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 20, 8).value =
+                            Data_1.Data.Investigation.get('공사이행보증서발급수수료'); //다-12. 공사이행보증수수료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 21, 8).value = Data_1.Data.Investigation.get('건설하도급보증수수료'); //다-13. 하도급대금지급 보증수수료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 22, 8).value =
+                            Data_1.Data.Investigation.get('건설기계대여대금 지급보증서발급금액'); //다-14. 건설기계대여대금 지급보증서 발급금액
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 23, 8).value = Data_1.Data.Investigation.get('기타경비'); //다-15. 기타경비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 24, 8).value = Data_1.Data.Investigation.get('일반관리비'); //2. 일반관리비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 25, 8).value = Data_1.Data.Investigation.get('이윤'); //3. 이윤
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 26, 8).value = Data_1.Data.Investigation.get('PS'); //3.1 PS
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 27, 8).value = Data_1.Data.Investigation.get('제요율적용제외공종'); //3.2 제요율적용제외공종
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 28, 8).value = Data_1.Data.Investigation.get('총원가'); //4. 총원가
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 29, 8).value = Data_1.Data.Investigation.get('공사손해보험료'); //5. 공사손해보험료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 30, 8).value = Data_1.Data.Investigation.get('소계'); //6. 소계
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 31, 8).value = Data_1.Data.Investigation.get('부가가치세'); //7. 부가가치세
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 32, 8).value = 0; //8. 매입세
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 33, 8).value = Data_1.Data.Investigation.get('도급비계'); //9. 도급비계
+                        FM = Data_1.Data.FixedPriceDirectMaterial;
+                        FL = Data_1.Data.FixedPriceDirectLabor;
+                        FOE = Data_1.Data.FixedPriceOutputExpense;
+                        SM = Data_1.Data.StandardMaterial;
+                        SL = Data_1.Data.StandardLabor;
+                        SOE = Data_1.Data.StandardExpense;
+                        Data_1.Data.InvestigateFixedPriceDirectMaterial = FM;
+                        Data_1.Data.InvestigateFixedPriceDirectLabor = FL;
+                        Data_1.Data.InvestigateFixedPriceOutputExpense = FOE;
+                        Data_1.Data.InvestigateStandardMaterial = SM;
+                        Data_1.Data.InvestigateStandardLabor = SL;
+                        Data_1.Data.InvestigateStandardExpense = SOE;
+                        if (fs.existsSync(Data_1.Data.work_path + '원가계산서.xlsx')) {
+                            //먼저 기존 원가계산서 파일이 있다면 삭제한다. (23.02.02)
+                            fs.unlinkSync(Data_1.Data.work_path + '원가계산서.xlsx');
+                        }
+                        costStatementPath = path.join(Data_1.Data.work_path, '원가계산서.xlsx');
+                        ExcelHandling_1.ExcelHandling.WriteExcel(workbook, costStatementPath);
+                        return [2 /*return*/];
+                }
+            });
         });
-    }
+    };
     //원가계산서 항목별 입찰금액 채움
-    static FillBiddingCosts() {
-        return __awaiter(this, void 0, void 0, function* () {
-            //조사금액을 채운 원가계산서_세부결과.xlsx의 경로
-            let costStatementPath = path.join(Data_1.Data.work_path, '원가계산서.xlsx');
-            //원가계산서_세부결과 파일 불러오기
-            let workbook = yield ExcelHandling_1.ExcelHandling.GetWorkbook(costStatementPath, '.xlsx');
-            let sheet = workbook.getWorksheet(0);
-            //적용비율 1, 2 적용금액 원가계산서 반영
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 7, 9).value = Data_1.Data.Bidding.get('간접노무비1');
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 10, 9).value = Data_1.Data.Bidding.get('산재보험료1');
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 11, 9).value = Data_1.Data.Bidding.get('고용보험료1');
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 23, 9).value = Data_1.Data.Bidding.get('기타경비1');
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 7, 10).value = Data_1.Data.Bidding.get('간접노무비2');
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 10, 10).value = Data_1.Data.Bidding.get('산재보험료2');
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 11, 10).value = Data_1.Data.Bidding.get('고용보험료2');
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 23, 10).value = Data_1.Data.Bidding.get('기타경비2');
-            //적용비율 1, 2 적용 금액 중, 큰 금액 세팅
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 7, 11).value = Data_1.Data.Bidding.get('간접노무비max');
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 10, 11).value = Data_1.Data.Bidding.get('산재보험료max');
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 11, 11).value = Data_1.Data.Bidding.get('고용보험료max');
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 23, 11).value = Data_1.Data.Bidding.get('기타경비max');
-            //금액 세팅
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 2, 19).value = Data_1.Data.Bidding.get('순공사원가'); //1. 순공사원가
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 3, 19).value = Data_1.Data.Bidding.get('직접재료비'); //가. 재료비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 4, 19).value = Data_1.Data.Bidding.get('직접재료비'); //가-1. 직접재료비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 5, 19).value = Data_1.Data.Bidding.get('노무비'); //나. 노무비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 6, 19).value = Data_1.Data.Bidding.get('직접노무비'); //나-1. 직접노무비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 7, 19).value = Data_1.Data.Bidding.get('간접노무비'); //나-2. 간접노무비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 8, 19).value = Data_1.Data.Bidding.get('경비'); //다. 경비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 9, 19).value = Data_1.Data.Bidding.get('산출경비'); //다-1. 산출경비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 10, 19).value = Data_1.Data.Bidding.get('산재보험료'); //다-2. 산재보험료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 11, 19).value = Data_1.Data.Bidding.get('고용보험료'); //다-3. 고용보험료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 12, 19).value = Data_1.Data.Fixed.get('국민건강보험료'); //다-4. 국민건강보험료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 13, 19).value = Data_1.Data.Fixed.get('노인장기요양보험'); //다-5. 노인장기요양보험
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 14, 19).value = Data_1.Data.Fixed.get('국민연금보험료'); //다-6. 국민연금보험료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 15, 19).value = Data_1.Data.Fixed.get('퇴직공제부금'); //다-7. 퇴직공제부금
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 16, 19).value = Data_1.Data.Fixed.get('산업안전보건관리비'); //다-8. 산업안전보건관리비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 17, 19).value = Data_1.Data.Fixed.get('안전관리비'); //다-9. 안전관리비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 18, 19).value = Data_1.Data.Fixed.get('품질관리비'); //다-10. 품질관리비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 19, 19).value = Data_1.Data.Bidding.get('환경보전비'); //다-11. 환경보전비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 20, 19).value = Data_1.Data.Bidding.get('공사이행보증서발급수수료'); //다-12. 공사이행보증수수료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 21, 19).value = Data_1.Data.Bidding.get('건설하도급보증수수료'); //다-13. 하도급대금지급 보증수수료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 22, 19).value =
-                Data_1.Data.Bidding.get('건설기계대여대금 지급보증서발급금액'); //다-14. 건설기계대여대금 지급보증서 발급금액
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 23, 19).value = Data_1.Data.Bidding.get('기타경비'); //다-15. 기타경비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 24, 19).value = Data_1.Data.Bidding.get('일반관리비'); //2. 일반관리비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 25, 19).value = Data_1.Data.Bidding.get('이윤'); //3. 이윤
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 26, 19).value = Data_1.Data.Bidding.get('PS'); //3.1 PS
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 27, 19).value = Data_1.Data.Bidding.get('제요율적용제외공종'); //3.2 제요율적용제외공종
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 28, 19).value = Data_1.Data.Bidding.get('총원가'); //4. 총원가
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 29, 19).value = Data_1.Data.Bidding.get('공사손해보험료'); //5. 공사손해보험료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 30, 19).value = Data_1.Data.Bidding.get('소계'); //6. 소계
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 31, 19).value = Data_1.Data.Bidding.get('부가가치세'); //7. 부가가치세
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 32, 19).value = 0; //8. 매입세
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 33, 19).value = Data_1.Data.Bidding.get('도급비계'); //9. 도급비계
-            //비율 세팅
-            //C#: FillCostAccount.GetRate() 결과 (double)로 형식 변환
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 4, 20).value = FillCostAccount.GetRate('직접재료비') + '%'; //가-1. 직접재료비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 6, 20).value = FillCostAccount.GetRate('직접노무비') + ' %'; //나-1. 직접노무비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 7, 20).value = FillCostAccount.GetRate('간접노무비') + ' %'; //나-2. 간접노무비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 9, 20).value = FillCostAccount.GetRate('산출경비') + ' %'; //다-1. 산출경비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 10, 20).value = FillCostAccount.GetRate('산재보험료') + ' %'; //다-2. 산재보험료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 11, 20).value = FillCostAccount.GetRate('고용보험료') + ' %'; //다-3. 고용보험료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 12, 20).value =
-                FillCostAccount.GetRate('국민건강보험료') + ' %'; //다-4. 국민건강보험료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 13, 20).value =
-                FillCostAccount.GetRate('노인장기요양보험') + ' %'; //다-5. 노인장기요양보험
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 14, 20).value =
-                FillCostAccount.GetRate('국민연금보험료') + ' %'; //다-6. 국민연금보험료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 15, 20).value = FillCostAccount.GetRate('퇴직공제부금') + ' %'; //다-7. 퇴직공제부금
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 16, 20).value =
-                FillCostAccount.GetRate('산업안전보건관리비') + ' %'; //다-8. 산업안전보건관리비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 17, 20).value = FillCostAccount.GetRate('안전관리비') + ' %'; //다-9. 안전관리비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 18, 20).value = FillCostAccount.GetRate('품질관리비') + ' %'; //다-10. 품질관리비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 19, 20).value = FillCostAccount.GetRate('환경보전비') + ' %'; //다-11. 환경보전비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 20, 20).value =
-                FillCostAccount.GetRate('공사이행보증서발급수수료') + ' %'; //다-12. 공사이행보증수수료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 21, 20).value =
-                FillCostAccount.GetRate('건설하도급보증수수료') + ' %'; //다-13. 하도급대금지급 보증수수료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 22, 20).value =
-                FillCostAccount.GetRate('건설기계대여대금 지급보증서발급금액') + ' %'; //다-14. 건설기계대여대금 지급보증서 발급금액
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 23, 20).value = FillCostAccount.GetRate('기타경비') + ' %'; //다-15. 기타경비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 24, 20).value = FillCostAccount.GetRate('일반관리비') + ' %'; //2. 일반관리비
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 25, 20).value = '0%'; //3. 이윤
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 26, 20).value = FillCostAccount.GetRate('PS') + ' %'; //3.1 PS
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 27, 20).value =
-                FillCostAccount.GetRate('제요율적용제외공종') + ' %'; //3.2 제요율적용제외공종
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 29, 20).value =
-                FillCostAccount.GetRate('공사손해보험료') + ' %'; //5. 공사손해보험료
-            ExcelHandling_1.ExcelHandling.GetCell(sheet, 33, 20).value = FillCostAccount.GetRate('도급비계') + ' %'; //9. 도급비계
-            costStatementPath = path.join(Data_1.Data.work_path, '원가계산서_세부결과.xlsx');
-            ExcelHandling_1.ExcelHandling.WriteExcel(workbook, costStatementPath);
+    FillCostAccount.FillBiddingCosts = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var costStatementPath, workbook, sheet;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        costStatementPath = path.join(Data_1.Data.work_path, '원가계산서.xlsx');
+                        return [4 /*yield*/, ExcelHandling_1.ExcelHandling.GetWorkbook(costStatementPath, '.xlsx')];
+                    case 1:
+                        workbook = _a.sent();
+                        sheet = workbook.getWorksheet(0);
+                        //적용비율 1, 2 적용금액 원가계산서 반영
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 7, 9).value = Data_1.Data.Bidding.get('간접노무비1');
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 10, 9).value = Data_1.Data.Bidding.get('산재보험료1');
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 11, 9).value = Data_1.Data.Bidding.get('고용보험료1');
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 23, 9).value = Data_1.Data.Bidding.get('기타경비1');
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 7, 10).value = Data_1.Data.Bidding.get('간접노무비2');
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 10, 10).value = Data_1.Data.Bidding.get('산재보험료2');
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 11, 10).value = Data_1.Data.Bidding.get('고용보험료2');
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 23, 10).value = Data_1.Data.Bidding.get('기타경비2');
+                        //적용비율 1, 2 적용 금액 중, 큰 금액 세팅
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 7, 11).value = Data_1.Data.Bidding.get('간접노무비max');
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 10, 11).value = Data_1.Data.Bidding.get('산재보험료max');
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 11, 11).value = Data_1.Data.Bidding.get('고용보험료max');
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 23, 11).value = Data_1.Data.Bidding.get('기타경비max');
+                        //금액 세팅
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 2, 19).value = Data_1.Data.Bidding.get('순공사원가'); //1. 순공사원가
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 3, 19).value = Data_1.Data.Bidding.get('직접재료비'); //가. 재료비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 4, 19).value = Data_1.Data.Bidding.get('직접재료비'); //가-1. 직접재료비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 5, 19).value = Data_1.Data.Bidding.get('노무비'); //나. 노무비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 6, 19).value = Data_1.Data.Bidding.get('직접노무비'); //나-1. 직접노무비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 7, 19).value = Data_1.Data.Bidding.get('간접노무비'); //나-2. 간접노무비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 8, 19).value = Data_1.Data.Bidding.get('경비'); //다. 경비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 9, 19).value = Data_1.Data.Bidding.get('산출경비'); //다-1. 산출경비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 10, 19).value = Data_1.Data.Bidding.get('산재보험료'); //다-2. 산재보험료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 11, 19).value = Data_1.Data.Bidding.get('고용보험료'); //다-3. 고용보험료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 12, 19).value = Data_1.Data.Fixed.get('국민건강보험료'); //다-4. 국민건강보험료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 13, 19).value = Data_1.Data.Fixed.get('노인장기요양보험'); //다-5. 노인장기요양보험
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 14, 19).value = Data_1.Data.Fixed.get('국민연금보험료'); //다-6. 국민연금보험료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 15, 19).value = Data_1.Data.Fixed.get('퇴직공제부금'); //다-7. 퇴직공제부금
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 16, 19).value = Data_1.Data.Fixed.get('산업안전보건관리비'); //다-8. 산업안전보건관리비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 17, 19).value = Data_1.Data.Fixed.get('안전관리비'); //다-9. 안전관리비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 18, 19).value = Data_1.Data.Fixed.get('품질관리비'); //다-10. 품질관리비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 19, 19).value = Data_1.Data.Bidding.get('환경보전비'); //다-11. 환경보전비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 20, 19).value = Data_1.Data.Bidding.get('공사이행보증서발급수수료'); //다-12. 공사이행보증수수료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 21, 19).value = Data_1.Data.Bidding.get('건설하도급보증수수료'); //다-13. 하도급대금지급 보증수수료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 22, 19).value =
+                            Data_1.Data.Bidding.get('건설기계대여대금 지급보증서발급금액'); //다-14. 건설기계대여대금 지급보증서 발급금액
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 23, 19).value = Data_1.Data.Bidding.get('기타경비'); //다-15. 기타경비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 24, 19).value = Data_1.Data.Bidding.get('일반관리비'); //2. 일반관리비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 25, 19).value = Data_1.Data.Bidding.get('이윤'); //3. 이윤
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 26, 19).value = Data_1.Data.Bidding.get('PS'); //3.1 PS
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 27, 19).value = Data_1.Data.Bidding.get('제요율적용제외공종'); //3.2 제요율적용제외공종
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 28, 19).value = Data_1.Data.Bidding.get('총원가'); //4. 총원가
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 29, 19).value = Data_1.Data.Bidding.get('공사손해보험료'); //5. 공사손해보험료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 30, 19).value = Data_1.Data.Bidding.get('소계'); //6. 소계
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 31, 19).value = Data_1.Data.Bidding.get('부가가치세'); //7. 부가가치세
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 32, 19).value = 0; //8. 매입세
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 33, 19).value = Data_1.Data.Bidding.get('도급비계'); //9. 도급비계
+                        //비율 세팅
+                        //C#: FillCostAccount.GetRate() 결과 (double)로 형식 변환
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 4, 20).value = FillCostAccount.GetRate('직접재료비') + '%'; //가-1. 직접재료비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 6, 20).value = FillCostAccount.GetRate('직접노무비') + ' %'; //나-1. 직접노무비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 7, 20).value = FillCostAccount.GetRate('간접노무비') + ' %'; //나-2. 간접노무비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 9, 20).value = FillCostAccount.GetRate('산출경비') + ' %'; //다-1. 산출경비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 10, 20).value = FillCostAccount.GetRate('산재보험료') + ' %'; //다-2. 산재보험료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 11, 20).value = FillCostAccount.GetRate('고용보험료') + ' %'; //다-3. 고용보험료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 12, 20).value =
+                            FillCostAccount.GetRate('국민건강보험료') + ' %'; //다-4. 국민건강보험료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 13, 20).value =
+                            FillCostAccount.GetRate('노인장기요양보험') + ' %'; //다-5. 노인장기요양보험
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 14, 20).value =
+                            FillCostAccount.GetRate('국민연금보험료') + ' %'; //다-6. 국민연금보험료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 15, 20).value = FillCostAccount.GetRate('퇴직공제부금') + ' %'; //다-7. 퇴직공제부금
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 16, 20).value =
+                            FillCostAccount.GetRate('산업안전보건관리비') + ' %'; //다-8. 산업안전보건관리비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 17, 20).value = FillCostAccount.GetRate('안전관리비') + ' %'; //다-9. 안전관리비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 18, 20).value = FillCostAccount.GetRate('품질관리비') + ' %'; //다-10. 품질관리비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 19, 20).value = FillCostAccount.GetRate('환경보전비') + ' %'; //다-11. 환경보전비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 20, 20).value =
+                            FillCostAccount.GetRate('공사이행보증서발급수수료') + ' %'; //다-12. 공사이행보증수수료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 21, 20).value =
+                            FillCostAccount.GetRate('건설하도급보증수수료') + ' %'; //다-13. 하도급대금지급 보증수수료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 22, 20).value =
+                            FillCostAccount.GetRate('건설기계대여대금 지급보증서발급금액') + ' %'; //다-14. 건설기계대여대금 지급보증서 발급금액
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 23, 20).value = FillCostAccount.GetRate('기타경비') + ' %'; //다-15. 기타경비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 24, 20).value = FillCostAccount.GetRate('일반관리비') + ' %'; //2. 일반관리비
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 25, 20).value = '0%'; //3. 이윤
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 26, 20).value = FillCostAccount.GetRate('PS') + ' %'; //3.1 PS
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 27, 20).value =
+                            FillCostAccount.GetRate('제요율적용제외공종') + ' %'; //3.2 제요율적용제외공종
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 29, 20).value =
+                            FillCostAccount.GetRate('공사손해보험료') + ' %'; //5. 공사손해보험료
+                        ExcelHandling_1.ExcelHandling.GetCell(sheet, 33, 20).value = FillCostAccount.GetRate('도급비계') + ' %'; //9. 도급비계
+                        costStatementPath = path.join(Data_1.Data.work_path, '원가계산서_세부결과.xlsx');
+                        ExcelHandling_1.ExcelHandling.WriteExcel(workbook, costStatementPath);
+                        return [2 /*return*/];
+                }
+            });
         });
-    }
+    };
     //원가계산서 항목별 조사금액 구하여 Dictionary Investigation에 저장
     //보정의 경우, 매개변수로 보정할 항목의 이름(item)과 보정할 금액(price)를 받아 값을 적용
-    static CalculateInvestigationCosts(correction //Dictionary<string, long>->Map<string, number>
+    FillCostAccount.CalculateInvestigationCosts = function (correction //Dictionary<string, long>->Map<string, number>
     ) {
         //직공비
-        Data_1.Data.Investigation.set('직공비', FillCostAccount.ToLong(Data_1.Data.RealDirectMaterial + Data_1.Data.RealDirectLabor + Data_1.Data.RealOutputExpense));
+        Data_1.Data.Investigation.set('직공비', FillCostAccount.ToLong(new big_js_1.default(Data_1.Data.RealDirectMaterial)
+            .plus(Data_1.Data.RealDirectLabor)
+            .plus(Data_1.Data.RealOutputExpense)));
         //가-1. 직접재료비
         Data_1.Data.Investigation.set('직접재료비', FillCostAccount.ToLong(Data_1.Data.RealDirectMaterial));
         //나-1. 직접노무비
@@ -287,8 +310,8 @@ class FillCostAccount {
         Data_1.Data.Investigation.set('PS', FillCostAccount.ToLong(Data_1.Data.PsMaterial + Data_1.Data.PsLabor + Data_1.Data.PsExpense));
         //3.2 제요율적용제외공종
         Data_1.Data.Investigation.set('제요율적용제외공종', FillCostAccount.ToLong(Data_1.Data.ExcludingMaterial + Data_1.Data.ExcludingLabor + Data_1.Data.ExcludingExpense));
-        let exSum = Data_1.Data.ExcludingMaterial + Data_1.Data.ExcludingLabor + Data_1.Data.ExcludingExpense;
-        let exRate2 = Math.trunc((exSum / Data_1.Data.Investigation.get('직공비')) * 100000) / 100000;
+        var exSum = Data_1.Data.ExcludingMaterial + Data_1.Data.ExcludingLabor + Data_1.Data.ExcludingExpense;
+        var exRate2 = Math.trunc((exSum / Data_1.Data.Investigation.get('직공비')) * 100000) / 100000;
         Data_1.Data.Rate2.set('제요율적용제외공종', exRate2);
         //4. 총원가
         Data_1.Data.Investigation.set('총원가', Data_1.Data.Investigation.get('순공사원가') +
@@ -313,16 +336,16 @@ class FillCostAccount {
         //8. 매입세(입찰 공사 파일 중, 매입세 있는 공사 없음. 추후 추가할 수 있음)
         //9. 도급비계
         Data_1.Data.Investigation.set('도급비계', Data_1.Data.Investigation.get('소계') + Data_1.Data.Investigation.get('부가가치세'));
-    }
+    };
     /**원가계산서 항목별 입찰금액 구하여 Bidding에 저장*/
-    static CalculateBiddingCosts() {
+    FillCostAccount.CalculateBiddingCosts = function () {
         //직공비
         Data_1.Data.Bidding.set('직공비', FillCostAccount.ToLong(Data_1.Data.RealDirectMaterial + Data_1.Data.RealDirectLabor + Data_1.Data.RealOutputExpense));
         //적용비율 2를 적용한 금액 계산
-        let undirectlabor2 = Data_1.Data.Bidding.get('직공비') * (Data_1.Data.Rate2.get('간접노무비') * 0.01);
-        let industrial2 = Data_1.Data.Bidding.get('직공비') * (Data_1.Data.Rate2.get('산재보험료') * 0.01);
-        let employ2 = Data_1.Data.Bidding.get('직공비') * (Data_1.Data.Rate2.get('고용보험료') * 0.01);
-        let etc2 = Data_1.Data.Bidding.get('직공비') * (Data_1.Data.Rate2.get('기타경비') * 0.01);
+        var undirectlabor2 = Data_1.Data.Bidding.get('직공비') * (Data_1.Data.Rate2.get('간접노무비') * 0.01);
+        var industrial2 = Data_1.Data.Bidding.get('직공비') * (Data_1.Data.Rate2.get('산재보험료') * 0.01);
+        var employ2 = Data_1.Data.Bidding.get('직공비') * (Data_1.Data.Rate2.get('고용보험료') * 0.01);
+        var etc2 = Data_1.Data.Bidding.get('직공비') * (Data_1.Data.Rate2.get('기타경비') * 0.01);
         //적용비율 2를 적용한 금액 저장
         Data_1.Data.Bidding.set('간접노무비2', FillCostAccount.ToLong(undirectlabor2));
         Data_1.Data.Bidding.set('산재보험료2', FillCostAccount.ToLong(industrial2));
@@ -462,8 +485,8 @@ class FillCostAccount {
         Data_1.Data.Bidding.set('도급비계', Data_1.Data.Bidding.get('소계') + Data_1.Data.Bidding.get('부가가치세'));
         //도급비계 1000원 단위 절상 옵션 적용시
         if (Data_1.Data.BidPriceRaise === '1') {
-            let raise = 1000 - (Data_1.Data.Bidding.get('도급비계') % 1000); //1000원 단위 절상 //Convert.ToDecimal (Data.Bidding.get("도급비계")) % 1000)
-            let addPrice = raise / 1.1; //decimal 1.1m
+            var raise = 1000 - (Data_1.Data.Bidding.get('도급비계') % 1000); //1000원 단위 절상 //Convert.ToDecimal (Data.Bidding.get("도급비계")) % 1000)
+            var addPrice = raise / 1.1; //decimal 1.1m
             Data_1.Data.Bidding.set('도급비계', FillCostAccount.ToLong(Data_1.Data.Bidding.get('도급비계') + raise));
             Data_1.Data.Bidding.set('일반관리비', FillCostAccount.ToLong(Data_1.Data.Bidding.get('일반관리비') + addPrice)); //절상에 필요한 가격을 일반관리비에 더해 금액을 맞추어줌
             //FillCostAccount.ToLong(Convert.ToDecimal (Data.Bidding.get("일반관리비")) + addPrice)
@@ -471,19 +494,20 @@ class FillCostAccount {
             Data_1.Data.Bidding.set('소계', FillCostAccount.ToLong(Data_1.Data.Bidding.get('소계') + addPrice)); //FillCostAccount.ToLong(Convert.ToDecimal (Data.Bidding.get("소계")) + addPrice)
             Data_1.Data.Bidding.set('부가가치세', FillCostAccount.ToLong(Data_1.Data.Bidding.get('소계') * (Data_1.Data.Rate1.get('부가가치세') * 0.01))); //decimal 0.01m
             //계산된 도급비계 금액이 천원 단위가 아닐 경우, 부가세 조정
-            let difference = Data_1.Data.Bidding.get('도급비계') -
+            var difference = Data_1.Data.Bidding.get('도급비계') -
                 (Data_1.Data.Bidding.get('소계') + Data_1.Data.Bidding.get('부가가치세'));
             Data_1.Data.Bidding.set('부가가치세', FillCostAccount.ToLong(Data_1.Data.Bidding.get('부가가치세') + difference));
             //Console.WriteLine("차이 : " + difference);
         }
-    }
+    };
     //decimal 금액 원 단위 절사
-    static ToLong(price) {
-        let bigNum = Math.trunc(price);
+    FillCostAccount.ToLong = function (price) {
+        //price: decimal
+        var bigNum = Math.trunc(price);
         return bigNum;
-    }
+    };
     //공사이행보증서발급수수료 금액 계산 후 반환
-    static GetConstructionGuaranteeFee(directSum //long directSum //수정시 자료형 재확인
+    FillCostAccount.GetConstructionGuaranteeFee = function (directSum //long directSum //수정시 자료형 재확인
     ) {
         var guaranteeFee = 0; //long
         var rate = Data_1.Data.Rate1.get('공사이행보증서발급수수료') * 0.01; //decimal 0.01m
@@ -499,9 +523,9 @@ class FillCostAccount {
         else
             guaranteeFee = FillCostAccount.ToLong(((directSum - 50000000000) * rate + 10000000) * term);
         return guaranteeFee;
-    }
+    };
     //입찰 금액의 조사금액 대 비율 저장
-    static GetRate(item) {
+    FillCostAccount.GetRate = function (item) {
         if (Data_1.Data.Fixed.has(item))
             return 100;
         if (Data_1.Data.Investigation.get(item) == 0 && Data_1.Data.Bidding.get(item) == 0)
@@ -512,13 +536,14 @@ class FillCostAccount {
             item === '일반관리비' ||
             item === '공사손해보험료') {
             var before = item + 'before';
-            return Math.round(Data_1.Data.Bidding[item] / Data_1.Data.Bidding[before] * 10000000) / 10000000 * 100;
+            return ((Math.round((Data_1.Data.Bidding[item] / Data_1.Data.Bidding[before]) * 10000000) / 10000000) *
+                100);
         }
-        let rate = Math.round(Data_1.Data.Bidding[item] / Data_1.Data.Bidding[before] * 10000000) / 10000000;
+        var rate = Math.round((Data_1.Data.Bidding[item] / Data_1.Data.Bidding[before]) * 10000000) / 10000000;
         return rate;
-    }
+    };
     //해당 공사에 특정 원가계산서 항목이 존재하지 않는 경우
-    static CheckKeyNotFound() {
+    FillCostAccount.CheckKeyNotFound = function () {
         if (!Data_1.Data.Rate1.has('간접노무비'))
             Data_1.Data.Rate1.set('간접노무비', 0);
         if (!Data_1.Data.Rate1.has('산재보험료'))
@@ -563,6 +588,7 @@ class FillCostAccount {
             Data_1.Data.Rate2.set('고용보험료', 0);
         if (!Data_1.Data.Rate2.has('기타경비'))
             Data_1.Data.Rate2.set('기타경비', 0);
-    }
-}
+    };
+    return FillCostAccount;
+}());
 exports.FillCostAccount = FillCostAccount;
