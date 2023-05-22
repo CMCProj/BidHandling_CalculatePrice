@@ -687,7 +687,7 @@ export class FillCostAccount {
     }
 
     //decimal 금액 원 단위 절사
-    public static ToLong(price: number) {
+    public static ToLong(price) {
         //price: decimal
         let bigNum = Math.trunc(price)
         return bigNum

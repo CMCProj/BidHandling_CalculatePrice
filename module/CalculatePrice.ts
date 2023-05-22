@@ -1,6 +1,6 @@
 //ApplyStandardPriceOption 소수점 0.1 더하기에서 오차 발생
 import { Data } from './Data'
-import { FillCostAccount } from './FillCostAccount'
+import { FillCostAccount } from './fillCostAccount'
 import { CreateResultFile } from './CreateResultFile'
 import { Setting } from './Setting'
 import Decimal from 'big.js'
@@ -29,7 +29,7 @@ export class CalculatePrice {
 
         FillCostAccount.CheckKeyNotFound()
         FillCostAccount.CalculateInvestigationCosts(Data.Correction)
-        FillCostAccount.CalculateInvestigationCosts(Data.Correction)
+        //FillCostAccount.CalculateInvestigationCosts(Data.Correction)
 
         //FillConstAccount.FillInvestigationCosts() 내용
         let FM = Data.FixedPriceDirectMaterial
@@ -49,26 +49,39 @@ export class CalculatePrice {
         //가격 재세팅 후 리셋 함수 실행 횟수 증가
         this.Reset()
 
+        console.log("Reset()")
+
         //최저네고단가율 계산 전, 표준시장단가 99.7% 적용옵션에 따른 분기처리
         if (Data.StandardMarketDeduction === '1') this.ApplyStandardPriceOption()
 
         this.GetFixedPriceRate() //직공비 대비 고정금액 비중 계산
+        console.log("GetFixedPriceRate()")
         this.FindMyPercent() //최저네고단가율 계산
+        console.log("FindMyPercent()")
         this.GetWeight() //가중치 계산
+        console.log("GetWeight()")
         this.CalculateRate(Data.PersonalRate, Data.BalancedRate) //Target Rate 계산
+        console.log("CalculateRate")
         this.Recalculation() //사정율에 따른 재계산
+        console.log("Recalculation()")
 
         if (this.exCount !== 0) {
             this.SetExcludingPrice() //제요율적용제외공종 항목 Target Rate 적용
+            console.log("SetExcludingPrice()")
             this.GetAdjustedExcludePrice() //사정율 적용한 제요율적용제외 금액 저장
+            console.log("GetAdjustedExcludePrice()")
         }
 
         this.SetPriceOfSuperConstruction() //공종 합계 bid에 저장 (23.02.07)
+        console.log("SetPriceOfSuperConstrucion()");
 
         FillCostAccount.CalculateBiddingCosts() //원가계산서 사정율적용(입찰) 금액 계산 및 저장
+        console.log("FillCostAccount.CalculateBiddingCosts()")
         this.SetBusinessInfo() //사업자등록번호 <T1></C17></T1>에 추가
+        console.log("SetBusinessInfo()")
         this.SubstitutePrice() //원가계산서 사정율 적용하여 계산한 금액들 BID 파일에도 반영
-        this.CreateFile() //입찰내역 파일 생성
+        console.log("SubstitutePrice()")
+        //this.CreateFile() //입찰내역 파일 생성
     }
 
     public static Reset(): void {
@@ -591,9 +604,7 @@ export class CalculatePrice {
                     curObject.ExpenseUnit = Number(
                         new Decimal(curObject.ExpenseUnit).times(this.targetRate).toFixed(1, 0)
                     )
-
-                    console.log(curObject)
-
+                    
                     this.exSum = new Decimal(this.exSum).plus(curObject.PriceSum).toNumber() //사정율을 적용한 제요율적용제외공종 항목의 합계
                     this.exCount++ //제요율적용제외공종 항목 수
                 }

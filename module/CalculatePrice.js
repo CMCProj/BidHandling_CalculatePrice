@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CalculatePrice = void 0;
 //ApplyStandardPriceOption 소수점 0.1 더하기에서 오차 발생
 var Data_1 = require("./Data");
-var FillCostAccount_1 = require("./FillCostAccount");
+var fillCostAccount_1 = require("./fillCostAccount");
 var CreateResultFile_1 = require("./CreateResultFile");
 var big_js_1 = require("big.js");
 var fs = require("fs");
@@ -16,9 +16,9 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
         var bidString = fs.readFileSync(Data_1.Data.folder + '\\WORK DIRECTORY\\Setting_Json.json', 'utf-8');
         this.docBID = JSON.parse(bidString);
         this.eleBID = this.docBID['data'];
-        FillCostAccount_1.FillCostAccount.CheckKeyNotFound();
-        FillCostAccount_1.FillCostAccount.CalculateInvestigationCosts(Data_1.Data.Correction);
-        FillCostAccount_1.FillCostAccount.CalculateInvestigationCosts(Data_1.Data.Correction);
+        fillCostAccount_1.FillCostAccount.CheckKeyNotFound();
+        fillCostAccount_1.FillCostAccount.CalculateInvestigationCosts(Data_1.Data.Correction);
+        //FillCostAccount.CalculateInvestigationCosts(Data.Correction)
         //FillConstAccount.FillInvestigationCosts() 내용
         var FM = Data_1.Data.FixedPriceDirectMaterial;
         var FL = Data_1.Data.FixedPriceDirectLabor;
@@ -34,23 +34,35 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
         Data_1.Data.InvestigateStandardExpense = SOE;
         //가격 재세팅 후 리셋 함수 실행 횟수 증가
         this.Reset();
+        console.log("Reset()");
         //최저네고단가율 계산 전, 표준시장단가 99.7% 적용옵션에 따른 분기처리
         if (Data_1.Data.StandardMarketDeduction === '1')
             this.ApplyStandardPriceOption();
         this.GetFixedPriceRate(); //직공비 대비 고정금액 비중 계산
+        console.log("GetFixedPriceRate()");
         this.FindMyPercent(); //최저네고단가율 계산
+        console.log("FindMyPercent()");
         this.GetWeight(); //가중치 계산
+        console.log("GetWeight()");
         this.CalculateRate(Data_1.Data.PersonalRate, Data_1.Data.BalancedRate); //Target Rate 계산
+        console.log("CalculateRate");
         this.Recalculation(); //사정율에 따른 재계산
+        console.log("Recalculation()");
         if (this.exCount !== 0) {
             this.SetExcludingPrice(); //제요율적용제외공종 항목 Target Rate 적용
+            console.log("SetExcludingPrice()");
             this.GetAdjustedExcludePrice(); //사정율 적용한 제요율적용제외 금액 저장
+            console.log("GetAdjustedExcludePrice()");
         }
         this.SetPriceOfSuperConstruction(); //공종 합계 bid에 저장 (23.02.07)
-        FillCostAccount_1.FillCostAccount.CalculateBiddingCosts(); //원가계산서 사정율적용(입찰) 금액 계산 및 저장
+        console.log("SetPriceOfSuperConstrucion()");
+        fillCostAccount_1.FillCostAccount.CalculateBiddingCosts(); //원가계산서 사정율적용(입찰) 금액 계산 및 저장
+        console.log("FillCostAccount.CalculateBiddingCosts()");
         this.SetBusinessInfo(); //사업자등록번호 <T1></C17></T1>에 추가
+        console.log("SetBusinessInfo()");
         this.SubstitutePrice(); //원가계산서 사정율 적용하여 계산한 금액들 BID 파일에도 반영
-        this.CreateFile(); //입찰내역 파일 생성
+        console.log("SubstitutePrice()");
+        //this.CreateFile() //입찰내역 파일 생성
     };
     CalculatePrice.Reset = function () {
         Data_1.Data.ExecuteReset = '1'; //Reset 함수 사용 여부
@@ -471,7 +483,6 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
                     curObject.MaterialUnit = Number(new big_js_1.default(curObject.MaterialUnit).times(this_1.targetRate).toFixed(1, 0));
                     curObject.LaborUnit = Number(new big_js_1.default(curObject.LaborUnit).times(this_1.targetRate).toFixed(1, 0));
                     curObject.ExpenseUnit = Number(new big_js_1.default(curObject.ExpenseUnit).times(this_1.targetRate).toFixed(1, 0));
-                    console.log(curObject);
                     this_1.exSum = new big_js_1.default(this_1.exSum).plus(curObject.PriceSum).toNumber(); //사정율을 적용한 제요율적용제외공종 항목의 합계
                     this_1.exCount++; //제요율적용제외공종 항목 수
                 }
