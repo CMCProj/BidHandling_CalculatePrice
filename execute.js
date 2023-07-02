@@ -9,6 +9,10 @@ var FillCostAccount_1 = require('./module/fillCostAccount')
 //Calculation()실행
 function execute(RadioDecimal, StandardPrice, WeightValue, CAD_Click, Ceiling_Click, LaborCost_Click, CompanyName, CompanyNum, BalanceRate, PersonalRate){
 
+    Data_1.Data.reset_data();
+
+    console.log(Data_1.Data);
+
     Data_1.Data.UnitPriceTrimming = RadioDecimal;
     Data_1.Data.StandardMarketDeduction = StandardPrice;
     Data_1.Data.ZeroWeightDeduction = WeightValue;
@@ -23,6 +27,8 @@ function execute(RadioDecimal, StandardPrice, WeightValue, CAD_Click, Ceiling_Cl
     BidHandling_1.BidHandling.BidToJson()
     CalculatePrice_1.CalculatePrice.Calculation()
     BidHandling_1.BidHandling.JsonToBid()
+    
+    console.log(Data_1.Data);
 }
 
 exports.execute = execute;

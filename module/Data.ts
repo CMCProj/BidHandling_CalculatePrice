@@ -197,4 +197,76 @@ export class Data {
         return Data.PersonalRateNum //입력받은 PersonalRateNum(double? 형)을 decimal로 바꿈
     }
     public static ExecuteReset: string = '0' //Reset 함수 사용시 단가 소수처리 옵션과 별개로 소수 첫째자리 아래로 절사
+
+    public static reset_data(){
+        this.XlsText = ''
+        this.CanCovertFile = false // 새로운 파일 업로드 시 변환 가능
+        this.IsConvert = false // 변환을 했는지 안했는지
+        this.IsBidFileOk = true // 정상적인 공내역 파일인지
+        this.IsFileMatch = true // 공내역 파일과 실내역 파일의 공사가 일치하는지
+        this.CompanyRegistrationNum = '' //1.31 사업자등록번호 추가
+        this.CompanyRegistrationName = '' // 2.02 회사명 추가
+        this.PersonalRateNum = 0 // 내 사정율 변수
+        //C#에서는 BalanceRate 속성에서 get을 통해 ToDecimal(BalanceRateNum) 리턴받음.
+        //js는 number가 부동소수점
+        this.BalanceRateNum = 0 // 업체 평균 사정율 변수
+
+        this.ConstructionTerm = 0 //공사 기간
+        this.RealDirectMaterial = 0 //실내역 직접 재료비(일반, - , 표준시장단가)
+        this.RealDirectLabor = 0 //실내역 직접 노무비(일반, - , 표준시장단가)
+        this.RealOutputExpense = 0 //실내역 산출 경비(일반, - , 표준시장단가)
+        this.FixedPriceDirectMaterial = 0 //고정금액 항목 직접 재료비
+        this.FixedPriceDirectLabor = 0 //고정금액 항목 직접 노무비
+        this.FixedPriceOutputExpense = 0 //고정금액 항목 산출 경비
+        this.RealPriceDirectMaterial = 0 //일반항목 직접 재료비
+        this.RealPriceDirectLabor = 0 //일반항목 직접 노무비
+        this.RealPriceOutputExpense = 0 //일반항목 산출 경비
+        this.InvestigateFixedPriceDirectMaterial = 0 //고정금액 항목 직접 재료비(조사금액)
+        this.InvestigateFixedPriceDirectLabor = 0 //고정금액 항목 직접 노무비(조사금액)
+        this.InvestigateFixedPriceOutputExpense = 0 //고정금액 항목 산출 경비(조사금액)
+        this.InvestigateStandardMaterial = 0 //표준시장단가 재료비(조사금액)
+        this.InvestigateStandardLabor = 0 //표준시장단가 노무비(조사금액)
+        this.InvestigateStandardExpense = 0 //표준시장단가 산출경비(조사금액)
+        this.PsMaterial = 0 //PS(재료비) 금액(직접 재료비에서 제외)
+        this.PsLabor = 0 //PS(노무비) 금액(직접 노무비에서 제외)
+        this.PsExpense = 0 //PS(경비) 금액(산출 경비에서 제외)
+        this.ExcludingMaterial = 0 //제요율적용제외(재료비) 금액(직접 재료비에서 제외)
+        this.ExcludingLabor = 0 //제요율적용제외(노무비) 금액(직접 노무비에서 제외)
+        this.ExcludingExpense = 0 //제요율적용제외(경비) 금액(산출 경비에서 제외)
+        this.AdjustedExMaterial = 0 //사정율 적용한 제요율적용제외 금액(재료비)
+        this.AdjustedExLabor = 0 //사정율 적용한 제요율적용제외 금액(노무비)
+        this.AdjustedExExpense = 0 //사정율 적용한 제요율적용제외 금액(경비)
+        this.GovernmentMaterial = 0 //관급자재요소(재료비) 금액(직접 재료비에서 제외)
+        this.GovernmentLabor = 0 //관급자재요소(노무비) 금액(직접 노무비에서 제외)
+        this.GovernmentExpense = 0 //관급자재요소(경비) 금액(산출 경비에서 제외)
+        this.SafetyPrice = 0 //안전관리비(산출 경비에서 제외)
+        this.StandardMaterial = 0 //표준시장단가 재료비
+        this.StandardLabor = 0 //표준시장단가 노무비
+        this.StandardExpense = 0 //표준시장단가 산출경비
+        this.InvestigateStandardMarket = 0 //표준시장단가 합계(조사내역)
+        this.FixedPricePercent = 0 //고정금액 비중
+        this.ByProduct = 0 //작업설
+
+        this.Dic = new Map<string, Array<Data>>() //key : 세부공사별 번호 / value : 세부공사별 리스트
+        this.ConstructionNums = new Map<string, string>() //세부 공사별 번호 저장
+        this.MatchedConstNum = new Map<string, string>() //실내역과 세부공사별 번호의 매칭 결과
+
+        this.Fixed = new Map<string, number>() //고정금액 항목별 금액 저장
+        this.Rate1 = new Map<string, number>() //적용비율1 저장
+        this.Rate2 = new Map<string, number>() //적용비율2 저장
+
+        this.RealPrices = new Map<string, number>() //원가계산서 항목별 금액 저장
+
+        this.Investigation = new Map<string, number>() //세부결과_원가계산서 항목별 조사금액 저장
+        this.Bidding = new Map<string, number>() //세부결과_원가계산서 항목별 입찰금액 저장
+        this.Correction = new Map<string, number>() //원가계산서 조사금액 보정 항목 저장
+
+        //사용자의 옵션 및 사정률 데이터
+        this.UnitPriceTrimming = '0' //단가 소수 처리 (defalut = "0")
+        this.StandardMarketDeduction = '2' //표준시장단가 99.7% 적용
+        this.ZeroWeightDeduction= '2' //가중치 0% 공종 50% 적용
+        this.CostAccountDeduction = '2' //원가계산 제경비 99.7% 적용
+        this.BidPriceRaise = '2' //투찰금액 천원 절상
+        this.LaborCostLowBound = '2' //노무비 하한 80%
+    }
 }
