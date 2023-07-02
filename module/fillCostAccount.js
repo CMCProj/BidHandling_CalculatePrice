@@ -536,10 +536,11 @@ var FillCostAccount = /** @class */ (function () {
             item === '일반관리비' ||
             item === '공사손해보험료') {
             var before = item + 'before';
-            return ((Math.round((Data_1.Data.Bidding[item] / Data_1.Data.Bidding[before]) * 10000000) / 10000000) *
+            return ((Math.round((Data_1.Data.Bidding.get(item) / Data_1.Data.Bidding.get(before)) * 10000000) /
+                10000000) *
                 100);
         }
-        var rate = Math.round((Data_1.Data.Bidding[item] / Data_1.Data.Bidding[before]) * 10000000) / 10000000;
+        var rate = Math.round((Data_1.Data.Bidding.get(item) / Data_1.Data.Bidding.get(before)) * 10000000) / 10000000;
         return rate;
     };
     //해당 공사에 특정 원가계산서 항목이 존재하지 않는 경우

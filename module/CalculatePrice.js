@@ -34,34 +34,34 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
         Data_1.Data.InvestigateStandardExpense = SOE;
         //가격 재세팅 후 리셋 함수 실행 횟수 증가
         this.Reset();
-        console.log("Reset()");
+        console.log('Reset()');
         //최저네고단가율 계산 전, 표준시장단가 99.7% 적용옵션에 따른 분기처리
         if (Data_1.Data.StandardMarketDeduction === '1')
             this.ApplyStandardPriceOption();
         this.GetFixedPriceRate(); //직공비 대비 고정금액 비중 계산
-        console.log("GetFixedPriceRate()");
+        console.log('GetFixedPriceRate()');
         this.FindMyPercent(); //최저네고단가율 계산
-        console.log("FindMyPercent()");
+        console.log('FindMyPercent()');
         this.GetWeight(); //가중치 계산
-        console.log("GetWeight()");
+        console.log('GetWeight()');
         this.CalculateRate(Data_1.Data.PersonalRate, Data_1.Data.BalancedRate); //Target Rate 계산
-        console.log("CalculateRate");
+        console.log('CalculateRate');
         this.Recalculation(); //사정율에 따른 재계산
-        console.log("Recalculation()");
+        console.log('Recalculation()');
         if (this.exCount !== 0) {
             this.SetExcludingPrice(); //제요율적용제외공종 항목 Target Rate 적용
-            console.log("SetExcludingPrice()");
+            console.log('SetExcludingPrice()');
             this.GetAdjustedExcludePrice(); //사정율 적용한 제요율적용제외 금액 저장
-            console.log("GetAdjustedExcludePrice()");
+            console.log('GetAdjustedExcludePrice()');
         }
         this.SetPriceOfSuperConstruction(); //공종 합계 bid에 저장 (23.02.07)
-        console.log("SetPriceOfSuperConstrucion()");
+        console.log('SetPriceOfSuperConstrucion()');
         fillCostAccount_1.FillCostAccount.CalculateBiddingCosts(); //원가계산서 사정율적용(입찰) 금액 계산 및 저장
-        console.log("FillCostAccount.CalculateBiddingCosts()");
+        console.log('FillCostAccount.CalculateBiddingCosts()');
         this.SetBusinessInfo(); //사업자등록번호 <T1></C17></T1>에 추가
-        console.log("SetBusinessInfo()");
+        console.log('SetBusinessInfo()');
         this.SubstitutePrice(); //원가계산서 사정율 적용하여 계산한 금액들 BID 파일에도 반영
-        console.log("SubstitutePrice()");
+        console.log('SubstitutePrice()');
         //this.CreateFile() //입찰내역 파일 생성
     };
     CalculatePrice.Reset = function () {
@@ -216,7 +216,7 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
         var decimal = new big_js_1.default(Data_1.Data.InvestigateFixedPriceDirectMaterial)
             .plus(Data_1.Data.InvestigateFixedPriceDirectLabor)
             .plus(Data_1.Data.InvestigateFixedPriceOutputExpense);
-        Data_1.Data.FixedPricePercent = Number(decimal.div(directConstPrice).toFixed(5, 0)); // 고정금액 비중 계산 / 고정금액 소수점 5자리 수에서 절사 (23.02.06)
+        Data_1.Data.FixedPricePercent = Number(decimal.div(directConstPrice).times(100).toFixed(5, 0)); // 고정금액 비중 계산 / 고정금액 소수점 5자리 수에서 절사 (23.02.06)
     };
     CalculatePrice.FindMyPercent = function () {
         //고정금액 비중에 따른 최저네고단가율 계산
@@ -286,8 +286,8 @@ var CalculatePrice = exports.CalculatePrice = /** @class */ (function () {
             .times(this.myPercent)
             .div(100)
             .toNumber(); //Target_Rate
-        this.targetRate = Number(new big_js_1.default(this.targetRate).toFixed(6, 0));
-        //소수점 아래 6자리 남기고 절사
+        this.targetRate = Number(new big_js_1.default(this.targetRate).toFixed(5, 0));
+        //소수점 아래 5자리 남기고 절사
     };
     CalculatePrice.RoundOrTruncate = function (Rate, Object, refMyMaterialUnit, refMyLaborUnit, refMyExpenseUnit) {
         //절사,반올림 옵션

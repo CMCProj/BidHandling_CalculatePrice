@@ -733,11 +733,13 @@ export class FillCostAccount {
         ) {
             var before: string = item + 'before'
             return (
-                (Math.round((Data.Bidding[item] / Data.Bidding[before]) * 10000000) / 10000000) *
+                (Math.round((Data.Bidding.get(item) / Data.Bidding.get(before)) * 10000000) /
+                    10000000) *
                 100
             )
         }
-        let rate = Math.round((Data.Bidding[item] / Data.Bidding[before]) * 10000000) / 10000000
+        let rate =
+            Math.round((Data.Bidding.get(item) / Data.Bidding.get(before)) * 10000000) / 10000000
         return rate
     }
 
